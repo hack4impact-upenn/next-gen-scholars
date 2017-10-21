@@ -7,4 +7,4 @@ class ChecklistItem(db.Model):
     student_profile_id = db.Column(db.Integer, db.ForeignKey('student_profiles.id'), nullable=False)
     deadline = db.Column(db.Date, index=True) 
     text = db.Column(db.Text, index=True) 
-    checked = db.Column(db.Boolean, index=True, Default=False)
+    isChecked = db.Column(db.Boolean, index=True, Default=False)
