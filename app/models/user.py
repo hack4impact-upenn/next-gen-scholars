@@ -9,8 +9,8 @@ from .. import db, login_manager
 
 class Permission:
     GENERAL = 0x01
-    ADMINISTER = 0x02
-    COUNSELOR = 0x03
+    COUNSELOR = 0x02
+    ADMINISTER = 0x03
 
 class Role(db.Model):
     __tablename__ = 'roles'

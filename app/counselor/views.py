@@ -7,6 +7,7 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
+from ..decorators import admin_required
 from ..email import send_email
 from ..models import Role, User, EditableHTML
 
@@ -109,57 +110,6 @@ def change_user_email(user_id):
         flash('Email for user {} successfully changed to {}.'
               .format(user.full_name(), user.email), 'form-success')
     return render_template('counselor/manage_user.html', user=user, form=form)
-
-
-@counselor.route(
-    '/user/<int:user_id>/change-account-type', methods=['GET', 'POST'])
-@login_required
-@counselor_required
-def change_account_type(user_id):
-    """Change a user's account type."""
-    if current_user.id == user_id:
-        flash('You cannot change the type of your own account. Please ask '
-              'another administrator to do this.', 'error')
-        return redirect(url_for('counselor.user_info', user_id=user_id))
-
-    user = User.query.get(user_id)
-    if user is None:
-        abort(404)
-    form = ChangeAccountTypeForm()
-    if form.validate_on_submit():
-        user.role = form.role.data
-        db.session.add(user)
-        db.session.commit()
-        flash('Role for user {} successfully changed to {}.'
-              .format(user.full_name(), user.role.name), 'form-success')
-    return render_template('counselor/manage_user.html', user=user, form=form)
-
-
-@counselor.route('/user/<int:user_id>/delete')
-@login_required
-@counselor_required
-def delete_user_request(user_id):
-    """Request deletion of a user's account."""
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
-        abort(404)
-    return render_template('counselor/manage_user.html', user=user)
-
-
-@counselor.route('/user/<int:user_id>/_delete')
-@login_required
-@counselor_required
-def delete_user(user_id):
-    """Delete a user's account."""
-    if current_user.id == user_id:
-        flash('You cannot delete your own account. Please ask another '
-              'administrator to do this.', 'error')
-    else:
-        user = User.query.filter_by(id=user_id).first()
-        db.session.delete(user)
-        db.session.commit()
-        flash('Successfully deleted user %s.' % user.full_name(), 'success')
-    return redirect(url_for('counselor.registered_users'))
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])
