@@ -1,6 +1,5 @@
 from .. import db
 
-
 class ChecklistItem(db.Model):
 	__tablename__ = "checklist_items"
     id = db.Column(db.Integer, primary_key=True)
