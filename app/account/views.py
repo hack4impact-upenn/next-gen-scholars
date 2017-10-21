@@ -271,3 +271,21 @@ def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
     return render_template('account/unconfirmed.html')
+
+
+@account.route('/calendar', methods=['GET', 'POST'])
+@login_required
+def calendar():
+    return render_template('account/calendar.html')
+
+
+@account.route('/resources')
+@login_required
+def resources():
+    return render_template('account/resources.html')
+
+
+@account.route('/scattergram', methods=['GET', 'POST'])
+@login_required
+def scattergram():
+    return render_template('account/scattergram.html')
