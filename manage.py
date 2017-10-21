@@ -73,7 +73,7 @@ def setup_prod():
 
 def setup_general():
     """Runs the set-up needed for both local development and production.
-       Also sets up first admin user."""
+       Also sets up first admin, counselor, and student users.."""
     Role.insert_roles()
     admin_query = Role.query.filter_by(name='Administrator')
     if admin_query.first() is not None:
@@ -87,6 +87,30 @@ def setup_general():
             db.session.add(user)
             db.session.commit()
             print('Added administrator {}'.format(user.full_name()))
+    counselor_query = Role.query.filter_by(name='Counselor')
+    if counselor_query.first() is not None:
+        if User.query.filter_by(email=Config.COUNSELOR_EMAIL).first() is None:
+            user = User(
+                first_name='Counselor',
+                last_name='Account',
+                password=Config.COUNSELOR_PASSWORD,
+                confirmed=True,
+                email=Config.COUNSELOR_EMAIL)
+            db.session.add(user)
+            db.session.commit()
+            print('Added counselor {}'.format(user.full_name()))
+    user_query = Role.query.filter_by(name='User')
+    if user_query.first() is not None:
+        if User.query.filter_by(email=Config.USER_EMAIL).first() is None:
+            user = User(
+                first_name='Student',
+                last_name='Account',
+                password=Config.USER_PASSWORD,
+                confirmed=True,
+                email=Config.USER_EMAIL)
+            db.session.add(user)
+            db.session.commit()
+            print('Added user {}'.format(user.full_name()))
 
 
 @manager.command

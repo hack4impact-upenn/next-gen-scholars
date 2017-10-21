@@ -9,8 +9,8 @@ from .. import db, login_manager
 
 class Permission:
     GENERAL = 0x01
-    ADMINISTER = 0xff
-
+    COUNSELOR = 0x02
+    ADMINISTER = 0x03
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -29,6 +29,10 @@ class Role(db.Model):
                 Permission.ADMINISTER,
                 'admin',
                 False  # grants all permissions
+            ),
+            'Counselor': (Permission.COUNSELOR,
+                'counselor',
+                False
             )
         }
         for r in roles:
@@ -63,6 +67,9 @@ class User(UserMixin, db.Model):
             if self.email == current_app.config['ADMIN_EMAIL']:
                 self.role = Role.query.filter_by(
                     permissions=Permission.ADMINISTER).first()
+            if self.email == current_app.config['COUNSELOR_EMAIL']:
+                self.role = Role.query.filter_by(
+                    permissions=Permission.COUNSELOR).first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
 
@@ -75,6 +82,9 @@ class User(UserMixin, db.Model):
 
     def is_admin(self):
         return self.can(Permission.ADMINISTER)
+
+    def is_counselor(self):
+        return self.can(Permission.COUNSELOR)
 
     @property
     def password(self):
@@ -190,6 +200,8 @@ class AnonymousUser(AnonymousUserMixin):
     def is_admin(self):
         return False
 
+    def is_counselor(self):
+        return False
 
 login_manager.anonymous_user = AnonymousUser
 
