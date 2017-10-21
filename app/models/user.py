@@ -59,7 +59,8 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.String(20), index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    
+    student_profile = db.relationship("StudentProfile", uselist=False, back_populates="user")
+
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
