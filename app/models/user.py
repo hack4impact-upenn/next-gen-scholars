@@ -60,6 +60,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     student_profile = db.relationship("StudentProfile", uselist=False, back_populates="user")
+    checklist = db.relationship('ChecklistItem', back_populates='assignee')
 
 
     def __init__(self, **kwargs):
