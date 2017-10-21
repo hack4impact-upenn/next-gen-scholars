@@ -55,6 +55,7 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.Integer(15), string = True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)

@@ -1,29 +1,25 @@
-from flask import current_app
-from flask_login import AnonymousUserMixin, UserMixin
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from itsdangerous import BadSignature, SignatureExpired
-from werkzeug.security import check_password_hash, generate_password_hash
+from .. import db
 
-from .. import db, login_manager
 
 class StudentProfile(db.Model):
-    __tablename__ = 'students'
+    __tablename__ = 'student_profiles'
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    colleges = db.Column(db.String(10000), index = True) 
-    common_app_essay = db.Column(db.String(1000), index = True)
-    college_essays = db.Column(db.Integer(10000), index = True) 
-    recommendation_letters = db.Column(db.String(10000), index = True) 
-    resume = db.column(db.String(10000), index = True)
-    high_school = db.column(db.String(1000), index = True)
-    state = db.column(db.String(1000), index = True)
-    city = db.column(db.String(1000), index = True)
-    district = db.column(db.String(1000), index = True)
-    graduation_year = db.column(db.Integer(4), index = True)
-    grade = db.column(db.Integer(2), index = True)
-    majors = db.column(db.String(10000), index = True)
-
-
-
-
-
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    # PERSONAL INFO
+    high_school = db.column(db.String, index=True)
+    district = db.column(db.String, index=True)
+    city = db.column(db.String, index=True)
+    state = db.column(db.String(2), index=True)
+    graduation_year = db.column(db.Integer(4), index=True)
+    grade = db.column(db.Integer(2), index=True)  
+    # ACADEMIC INFO
+    gpa = db.column(db.Float, index=True)
+    test_scores = db.relationship('TestScore', backref='student_profile', lazy=True, index=True)
+    majors = db.relationship('Major', secondary='majors', lazy='subquery',
+        backref=db.backref('student_profiles', lazy=True), index=True)
+    colleges = db.relationship('College', secondary='colleges', lazy='subquery',
+        backref=db.backref('student_profiles', lazy=True), index=True)
+    # APPLICATION INFO
+    common_app_essay = db.Column(db.String, index=True)
+    essays = db.relationship('Essay', backref='student_profile', lazy=True, index=True)
+    recommendation_letters = db.relationship('RecommendationLetter', backref='student_profile', lazy=True, index=True)
