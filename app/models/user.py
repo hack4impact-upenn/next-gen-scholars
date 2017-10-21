@@ -52,7 +52,7 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(64), index=True)
     last_name = db.Column(db.String(64), index=True)
     email = db.Column(db.String(64), unique=True, index=True)
-    phone_number = db.Column(db.Integer(15), string = True)
+    phone_number = db.Column(db.String(20), index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     
@@ -171,6 +171,7 @@ class User(UserMixin, db.Model):
                 password=fake.password(),
                 confirmed=True,
                 role=choice(roles),
+                phone_number=fake.phone_number(),
                 **kwargs)
             db.session.add(u)
             try:
