@@ -15,6 +15,7 @@ student_majors = db.Table('student_majors',
 class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship("User", back_populates="student_profile")
     # PERSONAL INFO
     high_school = db.Column(db.String, index=True)
     district = db.Column(db.String, index=True)
