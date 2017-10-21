@@ -30,9 +30,9 @@
     {% set scattergram = [] %}
     {% if current_user.is_authenticated %}
       {% set user = ([(current_user.role.index + '.index', current_user.role.name + ' Dashboard', 'user')]) %}
-      {% set calendar = ([('account.calendar', 'Calendar', 'info')]) %}
-      {% set scattergram = ([('account.scattergram', 'Scattegram', 'info')]) %}
-      {% set resources = ([('account.resources', 'Resources', 'info')]) %}
+      {% set calendar = ([('main.calendar', 'Calendar', 'info')]) %}
+      {% set scattergram = ([('main.scattergram', 'Scattegram', 'info')]) %}
+      {% set resources = ([('main.resources', 'Resources', 'info')]) %}
     {% endif %}
     {{ render_menu_items( endpoints +  user + calendar + resources + scattergram) }}
 {% endmacro %}
