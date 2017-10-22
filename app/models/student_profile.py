@@ -22,13 +22,13 @@ class StudentProfile(db.Model):
     city = db.Column(db.String, index=True)
     state = db.Column(db.String(2), index=True)
     graduation_year = db.Column(db.Integer, index=True)
-    grade = db.Column(db.Integer, index=True)  
+    grade = db.Column(db.Integer, index=True)
     # ACADEMIC INFO
     gpa = db.Column(db.Float, index=True)
     test_scores = db.relationship('TestScore', backref='student_profile', lazy=True)
     majors = db.relationship('Major', secondary=student_majors,
         backref=db.backref('student_profiles', lazy='dynamic'))
-    colleges = db.relationship('College', secondary=student_colleges, 
+    colleges = db.relationship('College', secondary=student_colleges,
         backref=db.backref('student_profiles', lazy='dynamic'))
     # APPLICATION INFO
     common_app_essay = db.Column(db.String, index=True)

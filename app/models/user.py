@@ -12,6 +12,7 @@ class Permission:
     COUNSELOR = 0x02
     ADMINISTER = 0x03
 
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +31,8 @@ class Role(db.Model):
                 'admin',
                 False  # grants all permissions
             ),
-            'Counselor': (Permission.COUNSELOR,
+            'Counselor': (
+                Permission.COUNSELOR,
                 'counselor',
                 False
             )
@@ -59,9 +61,11 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.String(20), index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    student_profile = db.relationship("StudentProfile", uselist=False, back_populates="user")
+    student_profile = db.relationship(
+        "StudentProfile",
+        uselist=False,
+        back_populates="user")
     checklist = db.relationship('ChecklistItem', back_populates='assignee')
-
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -204,6 +208,7 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_counselor(self):
         return False
+
 
 login_manager.anonymous_user = AnonymousUser
 
