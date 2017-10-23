@@ -38,7 +38,7 @@ class StudentProfile(db.Model):
     colleges = db.relationship('College', secondary=student_colleges,
                                backref=db.backref('student_profiles', lazy='dynamic'))
     # APPLICATION INFO
-    common_app_essay = db.Column(db.String, index=True)
+    common_app_essay = db.Column(db.String, index=True) # link to common app essay
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
 
