@@ -4,6 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from . import StudentProfile
 from .. import db, login_manager
 
 
@@ -11,6 +12,7 @@ class Permission:
     GENERAL = 0x01
     COUNSELOR = 0x02
     ADMINISTER = 0x03
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -30,9 +32,10 @@ class Role(db.Model):
                 'admin',
                 False  # grants all permissions
             ),
-            'Counselor': (Permission.COUNSELOR,
+            'Counselor': (
+                Permission.COUNSELOR,
                 'counselor',
-                False
+                False  # grants all permissions
             )
         }
         for r in roles:
@@ -59,9 +62,13 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.String(20), index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    student_profile = db.relationship("StudentProfile", uselist=False, back_populates="user")
+    student_profile_id = db.Column(
+        db.Integer, db.ForeignKey('student_profile.id'))
+    student_profile = db.relationship(
+        "StudentProfile",
+        uselist=False,
+        back_populates="user")
     checklist = db.relationship('ChecklistItem', back_populates='assignee')
-
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -165,26 +172,34 @@ class User(UserMixin, db.Model):
         return True
 
     @staticmethod
-    def generate_fake(count=100, **kwargs):
+    def generate_fake(num_students=10, num_counselors=5, num_admins=3, **kwargs):
         """Generate a number of fake users for testing."""
         from sqlalchemy.exc import IntegrityError
         from random import seed, choice
         from faker import Faker
 
         fake = Faker()
-        roles = Role.query.all()
+        roles = list(Role.query.all())
 
         seed()
-        for i in range(count):
+        for i in range(num_students + num_counselors + num_admins):
+            if i < num_students:
+                role = roles[0]
+            elif i < num_students + num_counselors:
+                role = roles[1]
+            else:
+                role = roles[2]
             u = User(
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
                 email=fake.email(),
                 password=fake.password(),
                 confirmed=True,
-                role=choice(roles),
+                role=role,
                 phone_number=fake.phone_number(),
                 **kwargs)
+            if role.name == 'User':
+                u.student_profile = StudentProfile.generate_fake()
             db.session.add(u)
             try:
                 db.session.commit()
@@ -204,6 +219,7 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_counselor(self):
         return False
+
 
 login_manager.anonymous_user = AnonymousUser
 

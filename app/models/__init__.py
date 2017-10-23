@@ -9,6 +9,6 @@ from .essay import *
 from .major import *
 from .miscellaneous import *
 from .recommendation_letter import *
-from .student_profile import *
 from .test_score import *
+from .student_profile import *
 from .user import *
