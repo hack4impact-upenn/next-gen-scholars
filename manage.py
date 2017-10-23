@@ -56,10 +56,9 @@ def add_fake_data(number_users):
     """
     Adds fake data to the database.
     """
-    User.generate_fake(count=number_users)
     College.insert_colleges()
     Major.insert_majors()
-    print(StudentProfile.generate_fake())
+    User.generate_fake()
 
 
 @manager.command

@@ -10,5 +10,5 @@ from .major import *
 from .miscellaneous import *
 from .recommendation_letter import *
 from .test_score import *
-from .user import *
 from .student_profile import *
+from .user import *

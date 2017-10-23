@@ -4,6 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from . import StudentProfile
 from .. import db, login_manager
 
 
@@ -170,26 +171,34 @@ class User(UserMixin, db.Model):
         return True
 
     @staticmethod
-    def generate_fake(count=100, **kwargs):
+    def generate_fake(num_students=10, num_counselors=5, num_admins=3, **kwargs):
         """Generate a number of fake users for testing."""
         from sqlalchemy.exc import IntegrityError
         from random import seed, choice
         from faker import Faker
 
         fake = Faker()
-        roles = Role.query.all()
+        roles = list(Role.query.all())
 
         seed()
-        for i in range(count):
+        for i in range(num_students + num_counselors + num_admins):
+            if i < num_students:
+                role = roles[0]
+            elif i < num_students + num_counselors:
+                role = roles[1]
+            else:
+                role = roles[2]
             u = User(
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
                 email=fake.email(),
                 password=fake.password(),
                 confirmed=True,
-                role=choice(roles),
+                role=role,
                 phone_number=fake.phone_number(),
                 **kwargs)
+            if role.name == 'User':
+                u.student_profile = StudentProfile.generate_fake()
             db.session.add(u)
             try:
                 db.session.commit()
