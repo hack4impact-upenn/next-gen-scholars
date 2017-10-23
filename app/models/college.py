@@ -13,14 +13,26 @@ class College(db.Model):
     def insert_colleges():
         college_names = {
             'University of Pennsylvania',
-            'Carnegie Mellon University',
             'Columbia University',
             'Stanford University',
-            'Massachusetts Institute of Technology',
             'Princeton University',
+            'Harvard University',
+            'Cornell University',
+            'Yale University',
+            'Brown University',
             'Dartmouth College',
+            'New York University',
             'University of California, Berkeley',
+            'University of California, Los Angelos',
+            'University of Michigan',
+            'Carnegie Mellon University',
+            'John Hopkins University',
+            'University of Chicago',
             'Amherst College',
+            'Williams College',
+            'Massachusetts Institute of Technology',
+            'Georgia Institute of Technology',
+            'California Institute of Technology'
             'Duke University'
         }
 

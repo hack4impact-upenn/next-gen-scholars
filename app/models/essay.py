@@ -1,4 +1,5 @@
 import random
+from faker import Faker
 from .. import db
 
 
@@ -15,8 +16,9 @@ class Essay(db.Model):
     link = db.Column(db.String, index=True)
 
     @staticmethod
-    def generate_fake_essay(student_profile):
-        essay_names = {
+    def generate_fake(count=2):
+        fake = Faker()
+        essay_names = random.sample([
             'UPenn Why Essay',
             'Dartmouth Supplemental Essay',
             'Columbia Why Essay',
@@ -27,9 +29,14 @@ class Essay(db.Model):
             'MIT Activity Essay',
             'UChicago Community Supplemental',
             'Harvard Why Essay'
-        }
-        essay = Essay(
-            name=random.choice(essay_names),
-            student_profile_id=student_profile.id
-        )
-        return essay
+        ], count)
+        essays = []
+        for i in range(count):
+            essays.append(Essay(
+                name=essay_names[i],
+                link=fake.text(max_nb_chars=50)
+            ))
+        return essays
+
+    def __repr__(self):
+        return '<Essay {}, {}>'.format(self.name, self.link)

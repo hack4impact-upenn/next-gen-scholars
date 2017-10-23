@@ -15,8 +15,9 @@ class RecommendationLetter(db.Model):
     status = db.Column(db.String, index=True)
 
     @staticmethod
-    def generate_fake_rec_letter(student_profile):
-        categories = {
+    def generate_fake(count=2):
+        fake = Faker()
+        categories = random.sample([
             '12th grade Calculus teacher',
             '12th grade physics teacher',
             '11th grade biology teacher',
@@ -26,12 +27,16 @@ class RecommendationLetter(db.Model):
             '10th grade history teacher',
             'High school principal',
             'Employer',
-        }
-        statuses = {'Submitted', 'Pending', 'Incomplete'}
-        rec_letter = RecommendationLetter(
-            student_profile_id=student_profile.id
-            name=faker.name(),
-            category=random.choice(categories),
-            status=random.choice(statuses)
-        )
-        retrun rec_letter
+        ], count)
+        statuses = ['Submitted', 'Pending', 'Incomplete']
+        rec_letters = []
+        for i in range(count):
+            rec_letters.append(RecommendationLetter(
+                name=fake.name(),
+                category=categories[i],
+                status=random.choice(statuses)
+            ))
+        return rec_letters
+
+    def __repr__(self):
+        return '<RecommendationLetter {}, {}, {}>'.format(self.name, self.category, self.status)
