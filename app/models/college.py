@@ -32,7 +32,7 @@ class College(db.Model):
             'Williams College',
             'Massachusetts Institute of Technology',
             'Georgia Institute of Technology',
-            'California Institute of Technology'
+            'California Institute of Technology',
             'Duke University'
         }
 
