@@ -1,0 +1,26 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <div class="ui text container">
+      <h1>{{ user.full_name() }}'s Profile:</h1>
+        <h2>Personal Information:</h2>
+            <p><strong>First Name</strong>: {{ user.first_name }}</p>
+            <p><strong>Last Name</strong>: {{ user.last_name }}</p>
+            <p><strong>Email Address</strong>: {{ user.email }}</p>
+            <p><strong>District</strong>: {{ user.student_profile.district }}</p>
+            <p><strong>Residence</strong>: {{ user.student_profile.city}}, {{ user.student_profile.state}}</p>
+            <p><strong>Graduation Year</strong>: {{ user.student_profile.graduation_year}} </p>
+        <h2>Academic Information:</h2>
+            <p><strong>High School</strong>: {{ user.student_profile.high_school }}</p>
+            <p><strong>Grade</strong>: {{ user.student_profile.grade }}th </p>
+            <p><strong>GPA</strong>: {{ user.student_profile.gpa}} </p>
+            <p><strong>Test Scores</strong>: {{ user.student_profile.test_scores }}</p>
+            <p><strong>Majors of Interest</strong>: {{ user.student_profile.majors }}</p>
+            <p><strong>Colleges of Interest</strong>: {{ user.student_profile.colleges }}</p>
+        <h2>College Application Information</h2>
+            <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
+            <p><strong>Supplemental Essays</strong>: {{ user.student_profile.essays }}</p>
+            <p><strong>Recommendation Letters</strong>: {{ user.student_profile.recommendation_letters }}</p>
+
+    </div>
+{% endblock %}
