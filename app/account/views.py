@@ -135,18 +135,6 @@ def change_password():
     return render_template('account/manage.html', form=form)
 
 
-@account.route('/checklist', methods=['GET', 'POST'])
-@login_required
-def checklist():
-    form = AddChecklistItemForm()
-    if form.validate_on_submit():
-        #add new checklist item to user's account
-        item_text = form.item_text
-        flash('Text= {}.'.format(item_text),
-                  'warning')
-        return redirect(url_for('account.checklist'))
-    return render_template('account/checklist.html', user=current_user, form=form, checklist=current_user.checklist)
-
 @account.route('/manage/change-email', methods=['GET', 'POST'])
 @login_required
 def change_email_request():
@@ -283,3 +271,36 @@ def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
     return render_template('account/unconfirmed.html')
+
+
+@account.route('/checklist', methods=['GET', 'POST'])
+@login_required
+def checklist():
+    form = AddChecklistItemForm()
+    if form.validate_on_submit():
+        #add new checklist item to user's account
+        checklist_item = ChecklistItem(
+            assignee_id=current_user.id,
+            text=form.item_text.data)
+        db.session.add(checklist_item)
+        db.session.commit()
+        return redirect(url_for('account.checklist'))
+    return render_template('account/checklist.html', user=current_user, form=form, checklist=current_user.checklist)
+
+
+@account.route('/checklist/delete/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def checklist_delete_item(item_id):
+    checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+    db.session.delete(checklist_item)
+    db.session.commit()
+    return redirect(url_for('account.checklist'))
+
+@account.route('/checklist/update/<int:item_id>/<string:new_item_text>', methods=['GET', 'POST'])
+@login_required
+def checklist_update_item(item_id, new_item_text):
+    checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+    checklist_item.text = new_item_text
+    db.session.add(checklist_item)
+    db.session.commit()
+    return redirect(url_for('account.checklist'))

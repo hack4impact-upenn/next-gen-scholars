@@ -100,5 +100,5 @@ class ChangeEmailForm(Form):
 
 class AddChecklistItemForm(Form):
     item_text = StringField(
-        'Checklist Item', validators=[InputRequired(), Length(1, 64)])
+        'Checklist Item!!', validators=[InputRequired(), Length(1, 64)])
     submit = SubmitField('Add checklist item')
