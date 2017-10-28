@@ -6,10 +6,10 @@ from flask_rq import get_queue
 from . import account
 from .. import db
 from ..email import send_email
-from ..models import User
+from ..models import User, ChecklistItem
 from .forms import (ChangeEmailForm, ChangePasswordForm, CreatePasswordForm,
                     LoginForm, RegistrationForm, RequestResetPasswordForm,
-                    ResetPasswordForm)
+                    ResetPasswordForm, AddChecklistItemForm)
 
 
 @account.route('/login', methods=['GET', 'POST'])
@@ -134,6 +134,18 @@ def change_password():
             flash('Original password is invalid.', 'form-error')
     return render_template('account/manage.html', form=form)
 
+
+@account.route('/checklist', methods=['GET', 'POST'])
+@login_required
+def checklist():
+    form = AddChecklistItemForm()
+    if form.validate_on_submit():
+        #add new checklist item to user's account
+        item_text = form.item_text
+        flash('Text= {}.'.format(item_text),
+                  'warning')
+        return redirect(url_for('account.checklist'))
+    return render_template('account/checklist.html', user=current_user, form=form, checklist=current_user.checklist)
 
 @account.route('/manage/change-email', methods=['GET', 'POST'])
 @login_required

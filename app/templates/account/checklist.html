@@ -1,0 +1,26 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% macro user_checklist(user, checklist) %}
+    <table class="ui compact definition table">
+    	{% for item in checklist %}
+            <tr><td>Full name</td><td>{{ '%s' % (item.text) }}</td></tr>
+        {% endfor %}
+    </table>
+{% endmacro %}
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            <h2 class="ui header">
+                Checklist
+            </h2>
+        </div>
+        <div class="stretched divided very relaxed row">
+            <div class="eight wide column">
+            	{{ user_checklist(user, checklist) }}
+                {{ f.render_form(form, extra_classes='fluid') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -97,3 +97,8 @@ class ChangeEmailForm(Form):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('Email already registered.')
+
+class AddChecklistItemForm(Form):
+    item_text = StringField(
+        'Checklist Item', validators=[InputRequired(), Length(1, 64)])
+    submit = SubmitField('Add checklist item')

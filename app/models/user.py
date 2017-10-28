@@ -4,7 +4,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from . import StudentProfile
+from . import StudentProfile, ChecklistItem
 from .. import db, login_manager
 
 
@@ -196,6 +196,7 @@ class User(UserMixin, db.Model):
                 password=fake.password(),
                 confirmed=True,
                 role=role,
+                checklist = ChecklistItem.generate_fake(),
                 phone_number=fake.phone_number(),
                 **kwargs)
             if role.name == 'User':
