@@ -301,6 +301,7 @@ def delete_checklist_item(item_id):
     flash('You cannot delete this item', 'error')
     return redirect(url_for('account.checklist'))
 
+
 @account.route('/checklist/complete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def complete_checklist_item(item_id):
@@ -315,21 +316,14 @@ def complete_checklist_item(item_id):
 @login_required
 def update_checklist_item(item_id):
     item = ChecklistItem.query.filter_by(id=item_id).first()
-    form = EditChecklistItemForm(item_text=item.text)
-    if form.validate_on_submit():
-        #update checklist item's text
-        item.text=form.item_text.data
-        db.session.add(item)
-        db.session.commit()
-        return redirect(url_for('account.checklist'))
-    return render_template('account/update_checklist.html', form=form)
-
-
-# @account.route('/checklist/update/<int:item_id>/<string:new_item_text>', methods=['GET', 'POST'])
-# @login_required
-# def checklist_update_item(item_id, new_item_text):
-#     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
-#     checklist_item.text = new_item_text
-#     db.session.add(checklist_item)
-#     db.session.commit()
-#     return redirect(url_for('account.checklist'))
+    if item.is_deletable:
+        form = EditChecklistItemForm(item_text=item.text)
+        if form.validate_on_submit():
+            #update checklist item's text
+            item.text=form.item_text.data
+            db.session.add(item)
+            db.session.commit()
+            return redirect(url_for('account.checklist'))
+        return render_template('account/update_checklist.html', form=form)
+    flash('You cannot modify this item', 'error')
+    return redirect(url_for('account.checklist'))

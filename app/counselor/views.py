@@ -3,13 +3,13 @@ from flask_login import current_user, login_required
 from flask_rq import get_queue
 
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
-                    NewUserForm)
+                    NewUserForm, AddChecklistItemForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import Role, User, EditableHTML
+from ..models import Role, User, EditableHTML, ChecklistItem
 
 @counselor.route('/')
 @login_required
@@ -141,3 +141,28 @@ def update_editor_contents():
     db.session.commit()
 
     return 'OK', 200
+
+@counselor.route('/checklist', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def checklist():
+    checklist_items = ChecklistItem.query.filter_by(creator_role_id=3)
+    form = AddChecklistItemForm()
+    if form.validate_on_submit():
+        users = User.query.filter_by(role_id=1)
+        if users is not None:
+            for user in users:  
+                #add new checklist item to each user's account
+                checklist_item = ChecklistItem(
+                    assignee_id=user.id,
+                    text=form.item_text.data,
+                    is_deletable=False)
+                db.session.add(checklist_item)
+            checklist_item = ChecklistItem(
+                    text=form.item_text.data,
+                    assignee_id=current_user.id,
+                    creator_role_id=3)
+            db.session.add(checklist_item)
+            db.session.commit()
+        return redirect(url_for('counselor.checklist'))
+    return render_template('counselor/checklist.html', form=form, checklist=checklist_items)
