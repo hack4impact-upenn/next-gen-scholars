@@ -10,6 +10,7 @@ class ChecklistItem(db.Model):
     deadline = db.Column(db.Date, index=True) 
     text = db.Column(db.Text, index=True) 
     is_checked = db.Column(db.Boolean, index=True, default=False)
+    is_deletable = db.Column(db.Boolean, index=True, default=False)
     # creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     @staticmethod

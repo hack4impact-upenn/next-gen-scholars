@@ -9,7 +9,10 @@
             	<td class = "right aligned">
             		<button class="ui small basic icon button"><i class="checkmark box icon"></i></button>
             		<button class="ui small basic icon button"><i class="write icon"></i></button>
-            		<button class="ui small basic icon button"><i class="remove icon"></i></button>
+
+                    <a class="ui small basic icon button" href="{{ url_for('account.delete_checklist_item', item_id=item.id) }}">
+                    <i class="remove icon"></i>
+                    </a>
             	</td>
             </tr>
         {% endfor %}

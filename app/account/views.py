@@ -290,10 +290,13 @@ def checklist():
 
 @account.route('/checklist/delete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
-def checklist_delete_item(item_id):
+def delete_checklist_item(item_id):
     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
-    db.session.delete(checklist_item)
-    db.session.commit()
+    if checklist_item.is_deletable:
+        db.session.delete(checklist_item)
+        db.session.commit()
+        return redirect(url_for('account.checklist'))
+    flash('You cannot delete this item', 'error')
     return redirect(url_for('account.checklist'))
 
 @account.route('/checklist/update/<int:item_id>/<string:new_item_text>', methods=['GET', 'POST'])
