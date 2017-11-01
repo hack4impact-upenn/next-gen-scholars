@@ -57,7 +57,7 @@ class StudentProfile(db.Model):
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),
             colleges=random.sample(College.query.all(), 3),
-            common_app_essay='Common App Essay Link',
+            common_app_essay='https://google.com',
             essays=Essay.generate_fake(),
             recommendation_letters=RecommendationLetter.generate_fake()
         )

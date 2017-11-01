@@ -34,7 +34,7 @@ class Essay(db.Model):
         for i in range(count):
             essays.append(Essay(
                 name=essay_names[i],
-                link=fake.text(max_nb_chars=50)
+                link="https://google.com"
             ))
         return essays
 
