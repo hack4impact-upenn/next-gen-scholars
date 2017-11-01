@@ -9,7 +9,7 @@ from ..email import send_email
 from ..models import User, ChecklistItem
 from .forms import (ChangeEmailForm, ChangePasswordForm, CreatePasswordForm,
                     LoginForm, RegistrationForm, RequestResetPasswordForm,
-                    ResetPasswordForm, AddChecklistItemForm)
+                    ResetPasswordForm, AddChecklistItemForm, EditChecklistItemForm)
 
 
 @account.route('/login', methods=['GET', 'POST'])
@@ -276,16 +276,18 @@ def unconfirmed():
 @account.route('/checklist', methods=['GET', 'POST'])
 @login_required
 def checklist():
+    checklist_items = ChecklistItem.query.filter_by(assignee_id=current_user.id, is_checked=False)
     form = AddChecklistItemForm()
     if form.validate_on_submit():
         #add new checklist item to user's account
         checklist_item = ChecklistItem(
             assignee_id=current_user.id,
-            text=form.item_text.data)
+            text=form.item_text.data,
+            is_deletable=True)
         db.session.add(checklist_item)
         db.session.commit()
         return redirect(url_for('account.checklist'))
-    return render_template('account/checklist.html', user=current_user, form=form, checklist=current_user.checklist)
+    return render_template('account/checklist.html', user=current_user, form=form, checklist=checklist_items)
 
 
 @account.route('/checklist/delete/<int:item_id>', methods=['GET', 'POST'])
@@ -299,11 +301,35 @@ def delete_checklist_item(item_id):
     flash('You cannot delete this item', 'error')
     return redirect(url_for('account.checklist'))
 
-@account.route('/checklist/update/<int:item_id>/<string:new_item_text>', methods=['GET', 'POST'])
+@account.route('/checklist/complete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
-def checklist_update_item(item_id, new_item_text):
+def complete_checklist_item(item_id):
     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
-    checklist_item.text = new_item_text
+    checklist_item.is_checked = True
     db.session.add(checklist_item)
     db.session.commit()
     return redirect(url_for('account.checklist'))
+
+
+@account.route('/checklist/update/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def update_checklist_item(item_id):
+    item = ChecklistItem.query.filter_by(id=item_id).first()
+    form = EditChecklistItemForm(item_text=item.text)
+    if form.validate_on_submit():
+        #update checklist item's text
+        item.text=form.item_text.data
+        db.session.add(item)
+        db.session.commit()
+        return redirect(url_for('account.checklist'))
+    return render_template('account/update_checklist.html', form=form)
+
+
+# @account.route('/checklist/update/<int:item_id>/<string:new_item_text>', methods=['GET', 'POST'])
+# @login_required
+# def checklist_update_item(item_id, new_item_text):
+#     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+#     checklist_item.text = new_item_text
+#     db.session.add(checklist_item)
+#     db.session.commit()
+#     return redirect(url_for('account.checklist'))

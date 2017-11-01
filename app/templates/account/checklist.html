@@ -7,11 +7,17 @@
             <tr>
             	<td>{{ '%s' % (item.text) }}</td> 
             	<td class = "right aligned">
-            		<button class="ui small basic icon button"><i class="checkmark box icon"></i></button>
-            		<button class="ui small basic icon button"><i class="write icon"></i></button>
 
+                    <a class="ui small basic icon button" href="{{ url_for('account.complete_checklist_item', item_id=item.id) }}">
+                        <i class="checkmark box icon"></i>
+                    </a>
+
+                    <a class="ui small basic icon button" href="{{ url_for('account.update_checklist_item', item_id=item.id) }}">
+                        <i class="write icon"></i>
+                    </a>
+                    
                     <a class="ui small basic icon button" href="{{ url_for('account.delete_checklist_item', item_id=item.id) }}">
-                    <i class="remove icon"></i>
+                        <i class="remove icon"></i>
                     </a>
             	</td>
             </tr>
