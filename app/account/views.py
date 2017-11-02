@@ -317,6 +317,18 @@ def complete_checklist_item(item_id):
     flash('Item could not be completed', 'error')
     return redirect(url_for('account.checklist'))
 
+@account.route('/checklist/undo/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def undo_checklist_item(item_id):
+    checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+    if checklist_item:
+        checklist_item.is_checked = False
+        db.session.add(checklist_item)
+        db.session.commit()
+        return redirect(url_for('account.checklist'))
+    flash('Item could not be undone', 'error')
+    return redirect(url_for('account.checklist'))
+
 
 @account.route('/checklist/update/<int:item_id>', methods=['GET', 'POST'])
 @login_required

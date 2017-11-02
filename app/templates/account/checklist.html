@@ -39,6 +39,9 @@
                             <i class="remove icon"></i>
                         </a>
                     {% endif %}
+                    <a class="ui small basic icon button" href="{{ url_for('account.undo_checklist_item', item_id=item.id) }}">
+                            <i class="undo icon"></i>
+                        </a>
                 </td>
             </tr>
         {% endfor %}
