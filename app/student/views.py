@@ -7,3 +7,9 @@ from . import student
 def checklist():
     """Counselor dashboard page."""
     return render_template('student/checklist.html')
+
+
+@student.route('/profile')
+@login_required
+def view_user_profile():
+	return render_template('student/my_profile.html', user = current_user)

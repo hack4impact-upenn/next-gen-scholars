@@ -110,7 +110,8 @@ def setup_general():
                 password=Config.USER_PASSWORD,
                 confirmed=True,
                 email=Config.USER_EMAIL,
-                checklist=ChecklistItem.generate_fake())
+                checklist=ChecklistItem.generate_fake(),
+                student_profile = student_profile.generate())
             db.session.add(user)
             db.session.commit()
             print('Added user {}'.format(user.full_name()))
