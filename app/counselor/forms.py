@@ -56,3 +56,9 @@ class NewUserForm(InviteUserForm):
     password2 = PasswordField('Confirm password', validators=[InputRequired()])
 
     submit = SubmitField('Create')
+
+
+class AddChecklistItemForm(Form):
+    item_text = StringField(
+        'Checklist Item', validators=[InputRequired(), Length(1, 64)])
+    submit = SubmitField('Add checklist item')
