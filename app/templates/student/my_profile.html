@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="ui text container">
-      <h1>My Profile:</h1>
+      <h1>{{ user.full_name() }}'s Profile:</h1>
         <h2>Personal Information:</h2>
             <p><strong>First Name</strong>: {{ user.first_name }}</p>
             <p><strong>Last Name</strong>: {{ user.last_name }}</p>
@@ -13,38 +13,38 @@
         <h2>Academic Information:</h2>
             <p><strong>High School</strong>: {{ user.student_profile.high_school }}</p>
             <p><strong>Grade</strong>: {{ user.student_profile.grade }}th </p>
-            <p><strong>GPA</strong>: {{ user.student_profile.gpa}} </p>
+            <p><strong>GPA</strong>: {{ user.student_profile.gpa }} </p>
 
-            <p><strong>Test Scores</strong></p>
+            <p><strong>Test Scores:</strong></p>
             {% for item in user.student_profile.test_scores %}
                 <p>{{ item.name + ': ' + item.score|string}}</p>
             {% endfor %}
 
-            <p><strong>Majors of Interest</strong>
+            <p><strong>Majors of Interest:</strong>
             {% for item in user.student_profile.majors %}
                 <p>{{ item.name }}</p>
             {% endfor %}
 
-            <p><strong>Colleges of Interest</strong>
+            <p><strong>Colleges of Interest:</strong>
             {% for item in user.student_profile.colleges %}
                 <p>{{ item.name }}</p>
             {% endfor %}
 
 
-        <h2>College Application Information</h2>
+        <h2>College Application Information:</h2>
             <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
 
             <p><strong>Supplemental Essays</strong>
             {% for item in user.student_profile.essays %}
-                <p>{{ item.name + ': '}} <a href = "item.link">{{ item.link }}</a></p>
+                <p>{{ item.name + ': '}} Click <a href = "item.link">here</a> to view</p>
             {% endfor %}
 
 
             <p><strong>Recommendation Letters</strong>
             {% for item in user.student_profile.recommendation_letters %}
-                <p>{{ "Name: " + item.name}}<br>
-                {{"Position: " + item.category}}<br>
-                {{"Status: " + item.status}}</br></p>
+                <p> <strong>Name: </strong>{{ item.name }}<br>
+                <strong>Position: </strong>{{ item.category }}<br>
+                <strong>Status: </strong>{{ item.status }}</br></p>
             {% endfor %}
 
     </div>

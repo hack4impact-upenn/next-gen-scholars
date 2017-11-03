@@ -13,14 +13,39 @@
         <h2>Academic Information:</h2>
             <p><strong>High School</strong>: {{ user.student_profile.high_school }}</p>
             <p><strong>Grade</strong>: {{ user.student_profile.grade }}th </p>
-            <p><strong>GPA</strong>: {{ user.student_profile.gpa}} </p>
-            <p><strong>Test Scores</strong>: {{ user.student_profile.test_scores }}</p>
-            <p><strong>Majors of Interest</strong>: {{ user.student_profile.majors }}</p>
-            <p><strong>Colleges of Interest</strong>: {{ user.student_profile.colleges }}</p>
-        <h2>College Application Information</h2>
+            <p><strong>GPA</strong>: {{ user.student_profile.gpa }} </p>
+
+            <p><strong>Test Scores:</strong></p>
+            {% for item in user.student_profile.test_scores %}
+                <p><li>{{ item.name + ': ' + item.score|string}}</li></p>
+            {% endfor %}
+
+            <p><strong>Majors of Interest:</strong>
+            {% for item in user.student_profile.majors %}
+                <p><li>{{ item.name }}</li></p>
+            {% endfor %}
+
+            <p><strong>Colleges of Interest:</strong>
+            {% for item in user.student_profile.colleges %}
+                <p><li>{{ item.name }}</li></p>
+            {% endfor %}
+
+
+        <h2>College Application Information:</h2>
             <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
-            <p><strong>Supplemental Essays</strong>: {{ user.student_profile.essays }}</p>
-            <p><strong>Recommendation Letters</strong>: {{ user.student_profile.recommendation_letters }}</p>
+
+            <p><strong>Supplemental Essays:</strong>
+            {% for item in user.student_profile.essays %}
+                <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view</li></p>
+            {% endfor %}
+
+
+            <p><strong>Recommendation Letters:</strong>
+            {% for item in user.student_profile.recommendation_letters %}
+                <p> <strong>Name: </strong>{{ item.name }}<br>
+                <strong>Position: </strong>{{ item.category }}<br>
+                <strong>Status: </strong>{{ item.status }}</br></p>
+            {% endfor %}
 
     </div>
 {% endblock %}

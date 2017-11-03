@@ -12,4 +12,4 @@ def checklist():
 @student.route('/profile')
 @login_required
 def view_user_profile():
-	return render_template('student/my_profile.html', user = current_user)
+	return render_template('student/student_profile.html', user = current_user)
