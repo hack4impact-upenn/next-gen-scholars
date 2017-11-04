@@ -11,6 +11,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import Role, User, StudentProfile, EditableHTML, ChecklistItem
 
+
 @counselor.route('/')
 @login_required
 @counselor_required
@@ -37,6 +38,7 @@ def new_user():
         flash('User {} successfully created'.format(user.full_name()),
               'form-success')
     return render_template('counselor/new_user.html', form=form)
+
 
 @counselor.route('/invite-user', methods=['GET', 'POST'])
 @login_required
@@ -122,13 +124,37 @@ def change_user_email(user_id):
     return render_template('counselor/manage_user.html', user=user, form=form)
 
 
-@counselor.route('/student_database', methods=['GET'])
+@counselor.route('/student_database', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def student_database():
     """View student database."""
+    default_items = ChecklistItem.query.filter_by(creator_role_id=3)
+    checklist_form = AddChecklistItemForm()
+    if checklist_form.validate_on_submit():
+        # print(form.item_text.data)
+        # create new checklist item from form data
+
+        # new_item = ChecklistItem(
+        #     text=form.item_text.data,
+        #     assignee_id=current_user.id,
+        #     creator_role_id=3)
+        # db.session.add(new_item)
+        #
+        # users = User.query.filter_by(role_id=1)
+        # for user in users:
+        #     # add new checklist to each user's account
+        #     checklist_item = ChecklistItem(
+        #         assignee_id=user.id,
+        #         text=form.item_text.data,
+        #         is_deletable=False)
+        #     db.session.add(checklist_item)
+        # db.session.commit()
+        flash('Checklist item added.', 'form-success')
+
+        return redirect(url_for('counselor.student_database'))
     student_profiles = StudentProfile.query.all()
-    return render_template('counselor/student_database.html', student_profiles=student_profiles)
+    return render_template('counselor/student_database.html', student_profiles=student_profiles, checklist_form=checklist_form)
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])
@@ -151,24 +177,25 @@ def update_editor_contents():
 
     return 'OK', 200
 
+
 @counselor.route('/checklist', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def checklist():
-    #display list of default checklist items and option to add a new one
+    # display list of default checklist items and option to add a new one
     default_items = ChecklistItem.query.filter_by(creator_role_id=3)
     form = AddChecklistItemForm()
     if form.validate_on_submit():
-        #create new checklist item from form data
+        # create new checklist item from form data
         new_item = ChecklistItem(
-                    text=form.item_text.data,
-                    assignee_id=current_user.id,
-                    creator_role_id=3)
+            text=form.item_text.data,
+            assignee_id=current_user.id,
+            creator_role_id=3)
         db.session.add(new_item)
 
         users = User.query.filter_by(role_id=1)
         for user in users:
-            #add new checklist to each user's account
+            # add new checklist to each user's account
             checklist_item = ChecklistItem(
                 assignee_id=user.id,
                 text=form.item_text.data,

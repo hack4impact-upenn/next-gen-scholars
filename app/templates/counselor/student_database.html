@@ -1,8 +1,20 @@
 {% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
 
 {% block content %}
     <div class="ui stackable centered grid container">
+        <div class="four wide column">
+            <br /><br /><br /><br />
+            <h3 class="ui header">
+                Add Checklist Item
+            </h3>
+            <p>
+                {{ f.render_form(checklist_form, extra_classes='fluid') }}
+            </p>
+        </div>
         <div class="twelve wide column">
+            <br />
             <h2 class="ui header">
                 Student Database
                 <div class="sub header">
@@ -16,14 +28,18 @@
                         <i class="search icon"></i>
                     </div>
                 </div>
+                
             </div>
+            <p>
+                Filters
+            </p>
             <div style="overflow-x: scroll;">
-                <table class="ui searchable sortable unstackable selectable celled table">
+                <table class="ui searchable unstackable sortable selectable celled table">
                     <thead>
                         <tr>
                             <th>First name</th>
                             <th>Last name</th>
-                            <th>Graduation Year</th>
+                            <th>Grad Year</th>
                             <th>High School</th>
                             <th>GPA</th>
                             <th>Student Profile</th>
@@ -31,7 +47,7 @@
                     </thead>
                     <tbody>
                     {% for s in student_profiles %}
-                        <tr>
+                        <tr class="student-row" data-profile-id={{s.id}}>
                             <td>{{ s.user[0].first_name }}</td>
                             <td>{{ s.user[0].last_name }}</td>
                             <td>{{ s.graduation_year }}</td>
@@ -46,8 +62,25 @@
         </div>
     </div>
 
+    <script src="{{url_for('static', filename='scripts/semantic-tablesort.js')}}"></script>
+
     <script type="text/javascript">
         $(document).ready(function () {
+            $('table').tablesort();
+
+            var selectedProfileIds = new Set();
+            $('.student-row').click(function (e) {
+                studentProfileId = this.getAttribute('data-profile-id');
+                if (selectedProfileIds.has(studentProfileId)) {
+                    selectedProfileIds.delete(studentProfileId);
+                    $(this).removeClass('active');
+                } else {
+                    selectedProfileIds.add(studentProfileId);
+                    $(this).addClass('active');
+                }
+                console.log(selectedProfileIds);
+            });
+
             $('#search-students').keyup(function () {
                 var searchText = $(this).val();
                 if (searchText.length > 0) {
