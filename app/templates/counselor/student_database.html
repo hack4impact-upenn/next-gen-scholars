@@ -5,7 +5,18 @@
         <div class="twelve wide column">
             <h2 class="ui header">
                 Student Database
+                <div class="sub header">
+                    View and filter through student profiles.
+                </div>
             </h2>
+            <div class="ui menu">
+                <div class="ui search item">
+                    <div class="ui transparent icon input">
+                        <input id="search-students" type="text" placeholder="Search students...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
             <div style="overflow-x: scroll;">
                 <table class="ui searchable sortable unstackable selectable celled table">
                     <thead>
@@ -15,16 +26,18 @@
                             <th>Graduation Year</th>
                             <th>High School</th>
                             <th>GPA</th>
+                            <th>Student Profile</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for s in student_profiles %}
-                        <tr onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">
+                        <tr>
                             <td>{{ s.user[0].first_name }}</td>
                             <td>{{ s.user[0].last_name }}</td>
                             <td>{{ s.graduation_year }}</td>
                             <td>{{ s.high_school }}</td>
                             <td>{{ s.gpa }}</td>
+                            <td><div class="ui button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -32,4 +45,21 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#search-students').keyup(function () {
+                var searchText = $(this).val();
+                if (searchText.length > 0) {
+                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+                } else {
+                    $('td.positive').removeClass('positive');
+                    $('tr.hidden').removeClass('hidden').show();
+                }
+            });
+        });
+    </script>
 {% endblock %}
