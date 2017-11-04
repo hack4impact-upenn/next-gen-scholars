@@ -1,0 +1,35 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            <h2 class="ui header">
+                Student Database
+            </h2>
+            <div style="overflow-x: scroll;">
+                <table class="ui searchable sortable unstackable selectable celled table">
+                    <thead>
+                        <tr>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>Graduation Year</th>
+                            <th>High School</th>
+                            <th>GPA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for s in student_profiles %}
+                        <tr>
+                            <td>{{ s.user[0].first_name }}</td>
+                            <td>{{ s.user[0].last_name }}</td>
+                            <td>{{ s.graduation_year }}</td>
+                            <td>{{ s.high_school }}</td>
+                            <td>{{ s.gpa }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -9,7 +9,7 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import Role, User, EditableHTML, ChecklistItem
+from ..models import Role, User, StudentProfile, EditableHTML, ChecklistItem
 
 @counselor.route('/')
 @login_required
@@ -122,6 +122,15 @@ def change_user_email(user_id):
     return render_template('counselor/manage_user.html', user=user, form=form)
 
 
+@counselor.route('/student_database', methods=['GET'])
+@login_required
+@counselor_required
+def student_database():
+    """View student database."""
+    student_profiles = StudentProfile.query.all()
+    return render_template('counselor/student_database.html', student_profiles=student_profiles)
+
+
 @counselor.route('/_update_editor_contents', methods=['POST'])
 @login_required
 @counselor_required
@@ -158,7 +167,7 @@ def checklist():
         db.session.add(new_item)
 
         users = User.query.filter_by(role_id=1)
-        for user in users:  
+        for user in users:
             #add new checklist to each user's account
             checklist_item = ChecklistItem(
                 assignee_id=user.id,
