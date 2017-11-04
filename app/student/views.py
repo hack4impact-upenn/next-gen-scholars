@@ -109,7 +109,7 @@ def delete_essay(item_id):
 @login_required
 def delete_common_app_essay():
     #todo: this is hacky- figure out what to do
-    current_user.student_profile.common_app_essay=""
+    current_user.student_profile.common_app_essay=''
     db.session.add(current_user)
     db.session.commit()
     return redirect(url_for('student.view_user_profile'))
