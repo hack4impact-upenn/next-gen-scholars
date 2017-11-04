@@ -1,5 +1,5 @@
 {
-  "name": "flask-base",
+  "name": "next-generation-scholars",
   "description": "",
   "scripts": {
     "postdeploy": "python manage.py recreate_db && python manage.py setup_prod && python manage.py add_fake_data"
