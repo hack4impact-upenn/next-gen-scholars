@@ -20,7 +20,6 @@ def view_user_profile():
 @student.route('/profile/college/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit_college(item_id):
-	#todo: make this so it doesn't update every college- might change how colleges are stored in db
     college = College.query.filter_by(id=item_id).first()
     if college:
         form = EditCollegeForm(college_name=college.name)
@@ -108,7 +107,6 @@ def delete_essay(item_id):
 @student.route('/profile/common_app_essay/delete', methods=['GET', 'POST'])
 @login_required
 def delete_common_app_essay():
-    #todo: this is hacky- figure out what to do
     current_user.student_profile.common_app_essay=''
     db.session.add(current_user)
     db.session.commit()
