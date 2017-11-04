@@ -1,0 +1,152 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="four wide column">
+            <br /><br /><br /><br />
+            <h3 class="ui header">
+                Add Checklist Item
+            </h3>
+            {% set flashes = {
+               'error':   get_flashed_messages(category_filter=['form-error']),
+               'success': get_flashed_messages(category_filter=['form-success'])
+            } %}
+
+            {{ f.begin_form(checklist_form, flashes) }}
+            {{ f.render_form_field(checklist_form.item_text) }}
+            {{ f.render_form_field(checklist_form.submit) }}
+            {{ checklist_form.assignee_ids }}
+            {{ f.end_form(checklist_form) }}
+        </div>
+        <div class="twelve wide column">
+            <br />
+            <h2 class="ui header">
+                Student Database
+                <div class="sub header">
+                    View and filter through student profiles.
+                </div>
+            </h2>
+            <div class="ui menu">
+                <div class="ui search item">
+                    <div class="ui transparent icon input">
+                        <input id="search-students" type="text" placeholder="Search students...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div id="filter-form" class="ui form">
+                <div class="two fields">
+                    <div class="four wide field">
+                        <label>FAFSA Status</label>
+                        <select class="ui dropdown">
+                            <option value="all">All</option>
+                            <option value="incomplete">Incomplete</option>
+                            <option value="complete">Complete</option>
+                        </select>
+                    </div>
+                    <div class="twelve wide field">
+                        <label>Colleges</label>
+                            <select multiple="" class="ui dropdown">
+                                {% for c in colleges %}
+                                    <option value="{{ c.name }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Common App Essay Status</label>
+                        <select multiple="" class="ui dropdown">
+                            <option value="waiting">Waiting Review</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="edited">Edited</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Supplemental Essay Status</label>
+                        <select multiple="" class="ui dropdown">
+                            <option value="waiting">Waiting Review</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="edited">Edited</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <label>Essay Status</label><br /><br />
+                  <div class="ui checkbox">
+                    <input type="checkbox" tabindex="0" class="hidden">
+                    <label>No essays uploaded</label>
+                  </div>
+                </div>
+                <button class="ui button" type="submit">Filter</button>
+            </div>
+            <br />
+            <div style="overflow-x: scroll;">
+                <table class="ui searchable unstackable sortable selectable celled table">
+                    <thead>
+                        <tr>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>Grad Year</th>
+                            <th>High School</th>
+                            <th>GPA</th>
+                            <th>Student Profile</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for s in student_profiles %}
+                        <tr class="student-row" data-profile-id={{s.id}}>
+                            <td>{{ s.user[0].first_name }}</td>
+                            <td>{{ s.user[0].last_name }}</td>
+                            <td>{{ s.graduation_year }}</td>
+                            <td>{{ s.high_school }}</td>
+                            <td>{{ s.gpa }}</td>
+                            <td><div class="ui button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{url_for('static', filename='scripts/semantic-tablesort.js')}}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('table').tablesort();
+            $('select.dropdown').dropdown();
+            $('.ui.checkbox').checkbox();
+
+            var selectedProfileIds = new Set(); // these are student profile ids
+            $('.student-row').click(function (e) {
+                studentProfileId = this.getAttribute('data-profile-id');
+                if (selectedProfileIds.has(studentProfileId)) {
+                    selectedProfileIds.delete(studentProfileId);
+                    $(this).removeClass('active');
+                } else {
+                    selectedProfileIds.add(studentProfileId);
+                    $(this).addClass('active');
+                }
+                $('#assignee_ids').val(Array.from(selectedProfileIds));
+            });
+
+            $('#search-students').keyup(function () {
+                var searchText = $(this).val();
+                if (searchText.length > 0) {
+                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+                } else {
+                    $('td.positive').removeClass('positive');
+                    $('tr.hidden').removeClass('hidden').show();
+                }
+            });
+        });
+    </script>
+{% endblock %}
