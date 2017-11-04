@@ -124,35 +124,25 @@ def change_user_email(user_id):
     return render_template('counselor/manage_user.html', user=user, form=form)
 
 
-@counselor.route('/student_database', methods=['GET', 'POST'])
+@counselor.route('/student-database', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def student_database():
     """View student database."""
-    default_items = ChecklistItem.query.filter_by(creator_role_id=3)
     checklist_form = AddChecklistItemForm()
     if checklist_form.validate_on_submit():
-        # print(form.item_text.data)
-        # create new checklist item from form data
-
-        # new_item = ChecklistItem(
-        #     text=form.item_text.data,
-        #     assignee_id=current_user.id,
-        #     creator_role_id=3)
-        # db.session.add(new_item)
-        #
-        # users = User.query.filter_by(role_id=1)
-        # for user in users:
-        #     # add new checklist to each user's account
-        #     checklist_item = ChecklistItem(
-        #         assignee_id=user.id,
-        #         text=form.item_text.data,
-        #         is_deletable=False)
-        #     db.session.add(checklist_item)
-        # db.session.commit()
+        for assignee_id in checklist_form.assignee_ids.data.split(','):
+            checklist_item = ChecklistItem(
+                text=checklist_form.item_text.data,
+                assignee_id=assignee_id,
+                is_deletable=False,
+                creator_role_id=3
+            )
+            db.session.add(checklist_item)
+        db.session.commit()
         flash('Checklist item added.', 'form-success')
+        return redirect(url_for('counselor.student-database'))
 
-        return redirect(url_for('counselor.student_database'))
     student_profiles = StudentProfile.query.all()
     return render_template('counselor/student_database.html', student_profiles=student_profiles, checklist_form=checklist_form)
 
