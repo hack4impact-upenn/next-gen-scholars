@@ -16,6 +16,10 @@
             <p><strong>GPA</strong>: {{ user.student_profile.gpa }} </p>
 
             <p><strong>Test Scores:</strong></p>
+            <p><li> {{ user.student_profile.test_scores }} </li></p>
+             <a class="ui small basic icon button" href="{{ url_for('student.add_test_score') }}">Add Test Score</a>
+            }
+            }
             {% for item in user.student_profile.test_scores %}
                 <p><li>{{ item.name + ': ' + item.score|string}}</li></p>
             {% endfor %}
