@@ -19,7 +19,7 @@
                     </thead>
                     <tbody>
                     {% for s in student_profiles %}
-                        <tr>
+                        <tr onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">
                             <td>{{ s.user[0].first_name }}</td>
                             <td>{{ s.user[0].last_name }}</td>
                             <td>{{ s.graduation_year }}</td>
