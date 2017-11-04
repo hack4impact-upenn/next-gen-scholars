@@ -9,7 +9,7 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import Role, User, StudentProfile, EditableHTML, ChecklistItem
+from ..models import Role, User, College, StudentProfile, EditableHTML, ChecklistItem
 
 
 @counselor.route('/')
@@ -144,7 +144,8 @@ def student_database():
         return redirect(url_for('counselor.student-database'))
 
     student_profiles = StudentProfile.query.all()
-    return render_template('counselor/student_database.html', student_profiles=student_profiles, checklist_form=checklist_form)
+    colleges = College.query.all()
+    return render_template('counselor/student_database.html', student_profiles=student_profiles, checklist_form=checklist_form, colleges=colleges)
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])

@@ -36,9 +36,55 @@
                     </div>
                 </div>
             </div>
-            <p>
-                Filters
-            </p>
+            <div id="filter-form" class="ui form">
+                <div class="two fields">
+                    <div class="four wide field">
+                        <label>FAFSA Status</label>
+                        <select class="ui dropdown">
+                            <option value="all">All</option>
+                            <option value="incomplete">Incomplete</option>
+                            <option value="complete">Complete</option>
+                        </select>
+                    </div>
+                    <div class="twelve wide field">
+                        <label>Colleges</label>
+                            <select multiple="" class="ui dropdown">
+                                {% for c in colleges %}
+                                    <option value="{{ c.name }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Common App Essay Status</label>
+                        <select multiple="" class="ui dropdown">
+                            <option value="waiting">Waiting Review</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="edited">Edited</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Supplemental Essay Status</label>
+                        <select multiple="" class="ui dropdown">
+                            <option value="waiting">Waiting Review</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="edited">Edited</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <label>Essay Status</label><br /><br />
+                  <div class="ui checkbox">
+                    <input type="checkbox" tabindex="0" class="hidden">
+                    <label>No essays uploaded</label>
+                  </div>
+                </div>
+                <button class="ui button" type="submit">Filter</button>
+            </div>
+            <br />
             <div style="overflow-x: scroll;">
                 <table class="ui searchable unstackable sortable selectable celled table">
                     <thead>
@@ -73,6 +119,8 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $('table').tablesort();
+            $('select.dropdown').dropdown();
+            $('.ui.checkbox').checkbox();
 
             var selectedProfileIds = new Set(); // these are student profile ids
             $('.student-row').click(function (e) {
