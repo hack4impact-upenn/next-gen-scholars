@@ -56,8 +56,6 @@ def add_fake_data(number_users):
     """
     Adds fake data to the database.
     """
-    College.insert_colleges()
-    Major.insert_majors()
     User.generate_fake()
 
 
@@ -76,6 +74,8 @@ def setup_prod():
 def setup_general():
     """Runs the set-up needed for both local development and production.
        Also sets up first admin, counselor, and student users.."""
+    College.insert_colleges()
+    Major.insert_majors()
     Role.insert_roles()
     admin_query = Role.query.filter_by(name='Administrator')
     if admin_query.first() is not None:
@@ -111,7 +111,7 @@ def setup_general():
                 confirmed=True,
                 email=Config.USER_EMAIL,
                 checklist=ChecklistItem.generate_fake(),
-                student_profile = student_profile.generate())
+                student_profile=StudentProfile.generate_fake())
             db.session.add(user)
             db.session.commit()
             print('Added user {}'.format(user.full_name()))
