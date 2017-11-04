@@ -19,3 +19,19 @@ class AddTestScoreForm(Form):
 	test_year = StringField(
 		'Test Year', validators=[InputRequired(), Length(1, 10)])
 	submit = SubmitField('Add Test Score')
+
+class AddRecommendationLetterForm(Form):
+	name = StringField(
+		'Name', validators=[InputRequired(), Length(1, 100)])
+	category = StringField(
+		'Position', validators=[InputRequired(), Length(1, 100)])
+	status = StringField(
+		'Status', validators=[InputRequired(), Length(1, 100)])
+	submit = SubmitField('Add Recommendation Letter')
+
+class AddEssayForm(Form):
+	name = StringField(
+		'Name', validators=[InputRequired(), Length(1, 100)])
+	link = StringField(
+		'Link', validators=[InputRequired(), Length(1, 100)])
+	submit = SubmitField('Add Essay')
