@@ -1,7 +1,7 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from . import student
-from .forms import (EditCollegeForm, EditEssayForm, EditTestScoreForm, EditCommonAppForm, AddChecklistItemForm, EditChecklistItemForm)
+from .forms import (EditCollegeForm, EditSupplementalEssayForm, EditTestScoreForm, EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem)
 from .. import db
 
@@ -45,12 +45,12 @@ def edit_test_score(item_id):
     return redirect(url_for('student.view_user_profile'))
 
 
-@student.route('/profile/essay/edit/<int:item_id>', methods=['GET', 'POST'])
+@student.route('/profile/supplemental_essay/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
-def edit_essay(item_id):
+def edit_supplemental_essay(item_id):
     essay = Essay.query.filter_by(id=item_id).first()
     if essay:
-        form = EditEssayForm(essay_name=essay.name, link=essay.link)
+        form = EditSupplementalEssayForm(essay_name=essay.name, link=essay.link)
         if form.validate_on_submit():
             essay.name=form.essay_name.data
             essay.link=form.link.data
@@ -64,7 +64,7 @@ def edit_essay(item_id):
 @student.route('/profile/common_app_essay/edit', methods=['GET', 'POST'])
 @login_required
 def edit_common_app_essay():
-    form = EditCommonAppForm(link=current_user.student_profile.common_app_essay)
+    form = EditCommonAppEssayForm(link=current_user.student_profile.common_app_essay)
     if form.validate_on_submit():
         current_user.student_profile.common_app_essay=form.link.data
         db.session.add(current_user)
@@ -85,9 +85,9 @@ def delete_test_score(item_id):
     return redirect(url_for('student.view_user_profile'))
 
 
-@student.route('/profile/essay/delete/<int:item_id>', methods=['GET', 'POST'])
+@student.route('/profile/supplemental_essay/delete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
-def delete_essay(item_id):
+def delete_supplemental_essay(item_id):
     essay = Essay.query.filter_by(id=item_id).first()
     if essay:
         db.session.delete(essay)

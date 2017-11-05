@@ -4,7 +4,7 @@ from wtforms import ValidationError
 from wtforms.fields import (StringField, IntegerField, SubmitField)
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
-class EditCommonAppForm(Form):
+class EditCommonAppEssayForm(Form):
     link = StringField(
         'Link to Common App Essay', validators=[InputRequired(), Length(1, 64)])
     submit = SubmitField('Update essay link')
@@ -25,7 +25,7 @@ class EditTestScoreForm(Form):
         'Test Score', validators=[InputRequired()])
     submit = SubmitField('Update test score')
 
-class EditEssayForm(Form):
+class EditSupplementalEssayForm(Form):
     essay_name = StringField(
         'Essay Name', validators=[InputRequired(), Length(1, 64)])
     link = StringField(

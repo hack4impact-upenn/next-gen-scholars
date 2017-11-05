@@ -65,11 +65,11 @@
             <p><strong>Supplemental Essays:</strong>
             {% for item in user.student_profile.essays %}
                 <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view
-                    <a class="ui small basic icon button" href="{{ url_for('student.edit_essay', item_id=item.id) }}">
+                    <a class="ui small basic icon button" href="{{ url_for('student.edit_supplemental_essay', item_id=item.id) }}">
                             <i class="write icon"></i>
                     </a>
 
-                    <a class="ui small basic icon button" href="{{ url_for('student.delete_essay', item_id=item.id) }}">
+                    <a class="ui small basic icon button" href="{{ url_for('student.delete_supplemental_essay', item_id=item.id) }}">
                             <i class="remove icon"></i>
                     </a>
                 </li></p>
