@@ -161,7 +161,7 @@ def checklist():
         for user in users:  
             #add new checklist to each user's account
             checklist_item = ChecklistItem(
-                assignee_id=user.id,
+                assignee_id=user.student_profile_id,
                 text=form.item_text.data,
                 is_deletable=False)
             db.session.add(checklist_item)

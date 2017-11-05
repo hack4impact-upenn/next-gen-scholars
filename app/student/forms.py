@@ -31,3 +31,13 @@ class EditEssayForm(Form):
     link = StringField(
         'Essay Link', validators=[InputRequired(), Length(1, 64)])
     submit = SubmitField('Update essay')
+
+class AddChecklistItemForm(Form):
+    item_text = StringField(
+        'Checklist Item', validators=[InputRequired(), Length(1, 64)])
+    submit = SubmitField('Add checklist item')
+
+class EditChecklistItemForm(Form):
+    item_text = StringField(
+        'New text', validators=[InputRequired(), Length(1, 64)])
+    submit = SubmitField('Update checklist item')

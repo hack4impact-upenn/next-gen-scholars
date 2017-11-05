@@ -5,8 +5,12 @@ import random
 
 class ChecklistItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    assignee_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    assignee = db.relationship('User')
+    assignee_id = db.Column(
+        db.Integer,
+        db.ForeignKey('student_profile.id'),
+        nullable=False,
+        index=True
+    )
     deadline = db.Column(db.Date, index=True) 
     text = db.Column(db.Text, index=True) 
     is_checked = db.Column(db.Boolean, index=True, default=False)

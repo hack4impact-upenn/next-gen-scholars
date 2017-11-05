@@ -5,6 +5,6 @@
 
 	{{ f.render_form(form, extra_classes='fluid') }}
 
-    <a class="ui small basic icon button" href="{{ url_for('student.view_user_profile') }}">
+    <a class="ui small basic icon button" href="{{ url_for('student.checklist', student_profile_id=student_profile_id) }}">
     Back</a>
 {% endblock %}

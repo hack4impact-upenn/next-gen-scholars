@@ -1,16 +1,9 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from . import student
-from .forms import (EditCollegeForm, EditEssayForm, EditTestScoreForm, EditCommonAppForm)
-from ..models import (User, College, Essay, TestScore)
+from .forms import (EditCollegeForm, EditEssayForm, EditTestScoreForm, EditCommonAppForm, AddChecklistItemForm, EditChecklistItemForm)
+from ..models import (User, College, Essay, TestScore, ChecklistItem)
 from .. import db
-
-@student.route('/checklist')
-@login_required
-def checklist():
-    """Counselor dashboard page."""
-    return render_template('student/checklist.html')
-
 
 @student.route('/profile')
 @login_required
@@ -123,3 +116,81 @@ def delete_college(item_id):
         return redirect(url_for('student.view_user_profile'))
     flash('Item could not be deleted', 'error')
     return redirect(url_for('student.view_user_profile'))
+
+
+
+@student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
+@login_required
+def checklist(student_profile_id):
+    if student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
+        checklist_items = ChecklistItem.query.filter_by(assignee_id=student_profile_id)
+        completed_items = [item for item in checklist_items if item.is_checked]
+        checklist_items = [item for item in checklist_items if not item.is_checked]
+        form = AddChecklistItemForm()
+        if form.validate_on_submit():
+            #add new checklist item to user's account
+            checklist_item = ChecklistItem(
+                assignee_id=student_profile_id,
+                text=form.item_text.data,
+                is_deletable=True)
+            db.session.add(checklist_item)
+            db.session.commit()
+            return redirect(url_for('student.checklist', student_profile_id=student_profile_id))
+        return render_template('student/checklist.html', form=form, checklist=checklist_items, 
+            completed=completed_items, student_profile_id=student_profile_id)
+    flash('You do not have access to this page', 'error')
+    return redirect(url_for('main.index'))
+
+
+@student.route('/checklist/delete/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def delete_checklist_item(item_id):
+    checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+    if checklist_item:
+        db.session.delete(checklist_item)
+        db.session.commit()
+        return redirect(url_for('student.checklist', student_profile_id=checklist_item.assignee_id))
+    flash('Item could not be deleted', 'error')
+    return redirect(url_for('main.index'))
+
+
+@student.route('/checklist/complete/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def complete_checklist_item(item_id):
+    checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+    if checklist_item:
+        checklist_item.is_checked = True
+        db.session.add(checklist_item)
+        db.session.commit()
+        return redirect(url_for('student.checklist', student_profile_id=checklist_item.assignee_id))
+    flash('Item could not be completed', 'error')
+    return redirect(url_for('main.index'))
+
+@student.route('/checklist/undo/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def undo_checklist_item(item_id):
+    checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
+    if checklist_item:
+        checklist_item.is_checked = False
+        db.session.add(checklist_item)
+        db.session.commit()
+        return redirect(url_for('student.checklist', student_profile_id=checklist_item.assignee_id))
+    flash('Item could not be undone', 'error')
+    return redirect(url_for('main.index'))
+
+
+@student.route('/checklist/update/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def update_checklist_item(item_id):
+    item = ChecklistItem.query.filter_by(id=item_id).first()
+    if item:
+        form = EditChecklistItemForm(item_text=item.text)
+        if form.validate_on_submit():
+            #update checklist item's text
+            item.text=form.item_text.data
+            db.session.add(item)
+            db.session.commit()
+            return redirect(url_for('student.checklist', student_profile_id=item.assignee_id))
+        return render_template('student/update_checklist.html', form=form, student_profile_id=item.assignee_id)
+    flash('Item could not be updated', 'error')
+    return redirect(url_for('main.index'))

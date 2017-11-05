@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from . import College, Essay, Major, RecommendationLetter, TestScore
+from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem
 from .. import db
 
 
@@ -41,6 +41,7 @@ class StudentProfile(db.Model):
     common_app_essay = db.Column(db.String, index=True) # link to common app essay
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
+    checklist = db.relationship('ChecklistItem')
 
     @staticmethod
     def generate_fake():
@@ -59,7 +60,8 @@ class StudentProfile(db.Model):
             colleges=random.sample(College.query.all(), 3),
             common_app_essay='https://google.com',
             essays=Essay.generate_fake(),
-            recommendation_letters=RecommendationLetter.generate_fake()
+            recommendation_letters=RecommendationLetter.generate_fake(),
+            checklist = ChecklistItem.generate_fake()
         )
         return profile
 
