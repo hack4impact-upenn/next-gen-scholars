@@ -153,7 +153,7 @@ def checklist():
         #create new checklist item from form data
         new_item = ChecklistItem(
                     text=form.item_text.data,
-                    assignee_id=current_user.id,
+                    assignee_id=0, #denotes counselor-created item
                     creator_role_id=3)
         db.session.add(new_item)
 
@@ -161,7 +161,7 @@ def checklist():
         for user in users:  
             #add new checklist to each user's account
             checklist_item = ChecklistItem(
-                assignee_id=user.id,
+                assignee_id=user.student_profile_id,
                 text=form.item_text.data,
                 is_deletable=False)
             db.session.add(checklist_item)

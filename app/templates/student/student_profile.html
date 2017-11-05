@@ -17,7 +17,15 @@
 
             <p><strong>Test Scores:</strong></p>
             {% for item in user.student_profile.test_scores %}
-                <p><li>{{ item.name + ': ' + item.score|string}}</li></p>
+                <p><li>{{ item.name + ': ' + item.score|string}}
+                    <a class="ui small basic icon button" href="{{ url_for('student.edit_test_score', item_id=item.id) }}">
+                            <i class="write icon"></i>
+                    </a>
+
+                    <a class="ui small basic icon button" href="{{ url_for('student.delete_test_score', item_id=item.id) }}">
+                            <i class="remove icon"></i>
+                    </a>
+                </li></p>
             {% endfor %}
 
             <p><strong>Majors of Interest:</strong>
@@ -27,16 +35,44 @@
 
             <p><strong>Colleges of Interest:</strong>
             {% for item in user.student_profile.colleges %}
-                <p><li>{{ item.name }}</li></p>
+                <p><li>{{ item.name }} 
+                    <a class="ui small basic icon button" href="{{ url_for('student.edit_college', item_id=item.id) }}">
+                            <i class="write icon"></i>
+                    </a>
+
+                    <a class="ui small basic icon button" href="{{ url_for('student.delete_college', item_id=item.id) }}">
+                            <i class="remove icon"></i>
+                    </a>
+                </li> </p>
             {% endfor %}
 
 
         <h2>College Application Information:</h2>
-            <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
+            {% if user.student_profile.common_app_essay|string() == ''|string()%}
+            <!-- there is no common app essay so show an add buton and maybe a message-->
+                <p><strong>CommonApp Essay</strong>:</p>
+            {% else %}
+                <p><strong>CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view
+                <a class="ui small basic icon button" href="{{ url_for('student.edit_common_app_essay') }}">
+                                <i class="write icon"></i>
+                </a>
+                <a class="ui small basic icon button" href="{{ url_for('student.delete_common_app_essay') }}">
+                                <i class="remove icon"></i>
+                </a></p>
+            {% endif %}
+            
 
             <p><strong>Supplemental Essays:</strong>
             {% for item in user.student_profile.essays %}
-                <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view</li></p>
+                <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view
+                    <a class="ui small basic icon button" href="{{ url_for('student.edit_supplemental_essay', item_id=item.id) }}">
+                            <i class="write icon"></i>
+                    </a>
+
+                    <a class="ui small basic icon button" href="{{ url_for('student.delete_supplemental_essay', item_id=item.id) }}">
+                            <i class="remove icon"></i>
+                    </a>
+                </li></p>
             {% endfor %}
 
 
