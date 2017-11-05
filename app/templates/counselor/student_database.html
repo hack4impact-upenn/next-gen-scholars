@@ -7,7 +7,8 @@
         <div class="four wide column">
             <br /><br /><br /><br />
             <h3 class="ui header">
-                Add Checklist Item
+                Add Checklist Item to <br />
+                Selected Students
             </h3>
             {% set flashes = {
                'error':   get_flashed_messages(category_filter=['form-error']),
@@ -83,6 +84,8 @@
                   </div>
                 </div>
                 <button class="ui button" type="submit">Filter</button>
+                <button id="select-all" class="ui button">Select All</button>
+                <button id="select-none" class="ui button">Select None</button>
             </div>
             <br />
             <div style="overflow-x: scroll;">
@@ -146,6 +149,24 @@
                     $('td.positive').removeClass('positive');
                     $('tr.hidden').removeClass('hidden').show();
                 }
+            });
+
+            $('#select-all').click(function () {
+                selectedProfileIds = new Set();
+                $('.student-row').each(function( index ) {
+                    studentProfileId = this.getAttribute('data-profile-id');
+                    selectedProfileIds.add(studentProfileId);
+                    $(this).addClass('active');
+                });
+            });
+
+            $('#select-none').click(function () {
+                selectedProfileIds = new Set();
+                $('.student-row').each(function( index ) {
+                    studentProfileId = this.getAttribute('data-profile-id');
+                    selectedProfileIds.delete(studentProfileId);
+                    $(this).removeClass('active');
+                });
             });
         });
     </script>
