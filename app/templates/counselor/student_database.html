@@ -5,10 +5,104 @@
 {% block content %}
     <div class="ui stackable centered grid container">
         <div class="four wide column">
-            <br /><br /><br /><br />
+            <br /><br />
+            <h4 class="ui header">Search</h4>
+            <div class="ui input focus">
+                <div class="ui icon input">
+                    <input id="search-students" type="text" placeholder="Search students...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+            <h4 class="ui header">Filter</h4>
+            <div id="filter-form" class="ui form">
+                <div class="field">
+                    <label>FAFSA Status</label>
+                    <select class="ui dropdown">
+                        <option value="all">All</option>
+                        <option value="incomplete">Incomplete</option>
+                        <option value="complete">Complete</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Colleges</label>
+                    <select multiple="" class="ui fluid search dropdown">
+                        {% for c in colleges %}
+                            <option value="{{ c.name }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <h5 class="ui header">Common App Essay Status</h5>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden">
+                      <label>Waiting</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="1" class="hidden">
+                      <label>Reviewed</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="2" class="hidden">
+                      <label>Edited</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="3" class="hidden">
+                      <label>Done</label>
+                    </div>
+                </div>
+
+                <h5 class="ui header">Supplemental Essay Status</h5>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="0" class="hidden">
+                      <label>Waiting</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="1" class="hidden">
+                      <label>Reviewed</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="2" class="hidden">
+                      <label>Edited</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                      <input type="checkbox" tabindex="3" class="hidden">
+                      <label>Done</label>
+                    </div>
+                </div>
+
+                <h5 class="ui header">Essay Status</h5>
+                <div class="inline field">
+                  <div class="ui checkbox">
+                    <input type="checkbox" tabindex="0" class="hidden">
+                    <label>No essays uploaded</label>
+                  </div>
+                </div>
+                <button class="ui primary button" type="submit">Filter</button><br /><br />
+            </div>
+        </div>
+        <div class="twelve wide column">
+            <br />
+            <h2 class="ui header">
+                Student Database
+                <div class="sub header">
+                    View and filter through student profiles.
+                </div>
+            </h2>
             <h3 class="ui header">
-                Add Checklist Item to <br />
-                Selected Students
+                Add Checklist Item to Selected Students
             </h3>
             {% set flashes = {
                'error':   get_flashed_messages(category_filter=['form-error']),
@@ -20,73 +114,8 @@
             {{ f.render_form_field(checklist_form.submit) }}
             {{ checklist_form.assignee_ids }}
             {{ f.end_form(checklist_form) }}
-        </div>
-        <div class="twelve wide column">
-            <br />
-            <h2 class="ui header">
-                Student Database
-                <div class="sub header">
-                    View and filter through student profiles.
-                </div>
-            </h2>
-            <div class="ui menu">
-                <div class="ui search item">
-                    <div class="ui transparent icon input">
-                        <input id="search-students" type="text" placeholder="Search students...">
-                        <i class="search icon"></i>
-                    </div>
-                </div>
-            </div>
-            <div id="filter-form" class="ui form">
-                <div class="two fields">
-                    <div class="four wide field">
-                        <label>FAFSA Status</label>
-                        <select class="ui dropdown">
-                            <option value="all">All</option>
-                            <option value="incomplete">Incomplete</option>
-                            <option value="complete">Complete</option>
-                        </select>
-                    </div>
-                    <div class="twelve wide field">
-                        <label>Colleges</label>
-                            <select multiple="" class="ui dropdown">
-                                {% for c in colleges %}
-                                    <option value="{{ c.name }}">{{ c.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                </div>
-                <div class="two fields">
-                    <div class="field">
-                        <label>Common App Essay Status</label>
-                        <select multiple="" class="ui dropdown">
-                            <option value="waiting">Waiting Review</option>
-                            <option value="reviewed">Reviewed</option>
-                            <option value="edited">Edited</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>Supplemental Essay Status</label>
-                        <select multiple="" class="ui dropdown">
-                            <option value="waiting">Waiting Review</option>
-                            <option value="reviewed">Reviewed</option>
-                            <option value="edited">Edited</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="inline field">
-                    <label>Essay Status</label><br /><br />
-                  <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>No essays uploaded</label>
-                  </div>
-                </div>
-                <button class="ui button" type="submit">Filter</button>
-                <button id="select-all" class="ui button">Select All</button>
-                <button id="select-none" class="ui button">Select None</button>
-            </div>
+            <button id="select-all" class="ui small button">Select All</button>
+            <button id="select-none" class="ui small button">Deselect All</button><br />
             <br />
             <div style="overflow-x: scroll;">
                 <table class="ui searchable unstackable sortable selectable celled table">
@@ -97,7 +126,7 @@
                             <th>Grad Year</th>
                             <th>High School</th>
                             <th>GPA</th>
-                            <th>Student Profile</th>
+                            <th class="no-sort">Student Profile</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,7 +137,7 @@
                             <td>{{ s.graduation_year }}</td>
                             <td>{{ s.high_school }}</td>
                             <td>{{ s.gpa }}</td>
-                            <td><div class="ui button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
+                            <td><div class="ui primary button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -152,20 +181,23 @@
             });
 
             $('#select-all').click(function () {
-                selectedProfileIds = new Set();
                 $('.student-row').each(function( index ) {
-                    studentProfileId = this.getAttribute('data-profile-id');
-                    selectedProfileIds.add(studentProfileId);
-                    $(this).addClass('active');
+                    if ($(this).css('display') != 'none') {
+                        studentProfileId = this.getAttribute('data-profile-id');
+                        selectedProfileIds.add(studentProfileId);
+                        $(this).addClass('active');
+                    }
                 });
             });
 
             $('#select-none').click(function () {
                 selectedProfileIds = new Set();
                 $('.student-row').each(function( index ) {
-                    studentProfileId = this.getAttribute('data-profile-id');
-                    selectedProfileIds.delete(studentProfileId);
-                    $(this).removeClass('active');
+                    if ($(this).css('display') != 'none') {
+                        studentProfileId = this.getAttribute('data-profile-id');
+                        selectedProfileIds.delete(studentProfileId);
+                        $(this).removeClass('active');
+                    }
                 });
             });
         });
