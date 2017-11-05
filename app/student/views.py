@@ -122,6 +122,7 @@ def delete_college(item_id):
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def checklist(student_profile_id):
+    #only allows the student or counselors/admins to see a student's profile
     if student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
         checklist_items = ChecklistItem.query.filter_by(assignee_id=student_profile_id)
         completed_items = [item for item in checklist_items if item.is_checked]
@@ -186,7 +187,6 @@ def update_checklist_item(item_id):
     if item:
         form = EditChecklistItemForm(item_text=item.text)
         if form.validate_on_submit():
-            #update checklist item's text
             item.text=form.item_text.data
             db.session.add(item)
             db.session.commit()
