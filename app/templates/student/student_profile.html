@@ -117,7 +117,7 @@
             Majors of Interest &nbsp <i class="blue link edit icon"></i>
             </div>
             <div class="ui bulleted list">
-                {% for major in user.student_profile.majors %}
+                {% for major in user.student_profile.majors|sort(attribute='name') %}
                 <div class="item" style="font-size:1.1em">
                     <div style="display:none" class="ui basic red icon mini circular button"><i class="x icon"></i></div>
                     {{ major.name }}
@@ -129,23 +129,23 @@
             Colleges of Interest
             </div>
             <div class="ui bulleted list">
-            {% for item in user.student_profile.colleges %}
+            {% for item in user.student_profile.colleges|sort(attribute='name') %}
                 <p><li>{{ item.name }}</li></p>
             {% endfor %}
             </div>
 
 
             <h2>College Application Information:</h2>
-            <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
+            <p><strong>Link to Common App Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
 
             <p><strong>Supplemental Essays:</strong>
-            {% for item in user.student_profile.essays %}
+            {% for item in user.student_profile.essays|sort(attribute='name') %}
                 <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view</li></p>
             {% endfor %}
 
 
             <p><strong>Recommendation Letters:</strong>
-            {% for item in user.student_profile.recommendation_letters %}
+            {% for item in user.student_profile.recommendation_letters|sort(attribute='name') %}
                 <p> <strong>Name: </strong>{{ item.name }}<br>
                 <strong>Position: </strong>{{ item.category }}<br>
                 <strong>Status: </strong>{{ item.status }}</br></p>
