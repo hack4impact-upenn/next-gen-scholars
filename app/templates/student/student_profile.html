@@ -57,7 +57,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            <h3>Academic Information</h3>
+            <h3>Academic Information &nbsp <i class="blue link edit icon"></i></h3>
             </div>
         </div>
     </div>
@@ -72,12 +72,12 @@
                 <div class="statistic">
                     <div class="label">SAT</div>
                     <span style="padding:0.25em"></span>
-                    <div class="value">2350</div>
+                    <div class="value">{{ sat }}</div>
                 </div>
                 <div class="statistic">
                     <div class="label">ACT</div>
                     <span style="padding:0.25em"></span>
-                    <div class="value">35</div>
+                    <div class="value">{{ act }}</div>
                 </div>
             </div>
         </div>
@@ -90,7 +90,7 @@
             <span style="padding:0.2em"></span>
             <div class="ui three cards">
                 {% for test in user.student_profile.test_scores %}
-                <div class="green card">
+                <div class="orange card">
                     <div class="content">
                         <div class="description">
                             <div class="ui mini one statistics">
@@ -102,24 +102,29 @@
                             </div>
                         </div>
                     </div>
-                    <div class="extra content">
-                        <div class="ui two buttons">
-                        <div class="ui basic blue icon button"><i class="edit icon"></i></div>
-                        <div class="ui basic red icon button"><i class="delete icon"></i></div>
+                    <div class="ui bottom attached orange basic button">
+                        <i class="edit icon"></i>Edit
                     </div>
-                  </div>
                 </div>
                 {% endfor %}
+                <a class="green card">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <br /><i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45"><strong>Add Test Score</strong></span>
+                        </div>
+                    </div>
+                </a>
             </div>
             <br />
 
             <div class="ui horizontal divider">
             Majors of Interest &nbsp <i class="blue link edit icon"></i>
             </div>
-            <div class="ui bulleted list">
+            <div class="ui list">
                 {% for major in user.student_profile.majors|sort(attribute='name') %}
                 <div class="item" style="font-size:1.1em">
-                    <div style="display:none" class="ui basic red icon mini circular button"><i class="x icon"></i></div>
+                    <div class="ui basic red icon mini circular button"><i class="x icon"></i></div>
                     {{ major.name }}
                 </div>
                 {% endfor %}
@@ -128,51 +133,123 @@
             <div class="ui horizontal divider">
             Colleges of Interest &nbsp <i class="blue link edit icon"></i>
             </div>
-            <div class="ui three cards">
-                {% for test in user.student_profile.test_scores %}
-                <a class="blue card">
-                    <div class="content">
+            <div class="ui four cards">
+                {% for college in user.student_profile.colleges|sort(attribute='name') %}
+                <div class="ui blue link card">
+                    <div class="center aligned content">
                         <div class="description">
-                            <div class="ui mini one statistics">
-                                <div class="statistic">
-                                    <div class="label">{{ test.name }}</div>
-                                    <span style="padding:0.25em"></span>
-                                    <div class="value">{{ test.score|string }}</div>
-                                </div>
-                            </div>
+                            <h4 class="ui header">{{ college.name }}</h4>
                         </div>
                     </div>
                     <div class="ui bottom attached red basic button">
                         <i class="x icon"></i>Remove
                     </div>
+                </div>
+                {% endfor %}
+                <div class="ui green link card">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45"><strong>Add College</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            <h3>College Application Information</h3>
+            </div>
+
+            <div class="ui horizontal divider">Essays</div>
+
+            <div class="ui four cards">
+                <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="purple card">
+                    <div class="center aligned content">
+                        <div class="description">
+                            <h4 class="ui header">Common App Essay</h4>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached purple basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
+                </a>
+                {% for essay in user.student_profile.essays|sort(attribute='name') %}
+                <a href="{{ essay.link }}" target="_blank" class="purple card">
+                    <div class="center aligned content">
+                        <div class="description">
+                            <h4 class="ui header">{{ essay.name }}</h4>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached purple basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
                 </a>
                 {% endfor %}
+                <a class="green card">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <h3></h3><i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45"><strong>Add Essay</strong></span>
+                        </div>
+                    </div>
+                </a>
             </div>
-
-            <div class="ui bulleted list">
-            {% for item in user.student_profile.colleges|sort(attribute='name') %}
-                <p><li>{{ item.name }}</li></p>
-            {% endfor %}
-            </div>
-
-
-            <h2>College Application Information:</h2>
-            <p><strong>Link to Common App Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
-
-            <p><strong>Supplemental Essays:</strong>
-            {% for item in user.student_profile.essays|sort(attribute='name') %}
-                <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view</li></p>
-            {% endfor %}
-
-
-            <p><strong>Recommendation Letters:</strong>
-            {% for item in user.student_profile.recommendation_letters|sort(attribute='name') %}
-                <p> <strong>Name: </strong>{{ item.name }}<br>
-                <strong>Position: </strong>{{ item.category }}<br>
-                <strong>Status: </strong>{{ item.status }}</br></p>
-            {% endfor %}
         </div>
     </div>
 
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">Recommendation Letters</div>
+
+            <div class="ui three cards">
+                {% for letter in user.student_profile.recommendation_letters|sort(attribute='name') %}
+                <div class="black card">
+                    <div class="center aligned content">
+                        <div class="header">
+                            {{ letter.name }}
+                        </div>
+                        <div class="meta">
+                            {{ letter.category }}
+                        </div>
+                        <div class="description">
+                            {% if letter.status=='Incomplete' %}
+                            <span style="color:#db2828">
+                            {% elif letter.status=='Pending' %}
+                            <span style="color:#eaae00">
+                            {% elif letter.status=='Submitted' %}
+                            <span style="color:#21ba45">
+                            {% else %}
+                            <span>
+                            {% endif %}
+                            <strong>{{ letter.status }}</strong></span>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached black basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
+                </div>
+                {% endfor %}
+                <a class="green card">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <br /><i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45"><strong>Add Letter</strong></span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script type="text/javascript">
+$(".card .button").click(function(e) {
+        e.stopPropagation();
+   });
+
+</script>
 {% endblock %}
