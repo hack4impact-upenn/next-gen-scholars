@@ -16,6 +16,7 @@
             <p><strong>GPA</strong>: {{ user.student_profile.gpa }} </p>
 
             <p><strong>Test Scores:</strong></p>
+             <a class="ui small basic icon button" href="{{ url_for('student.add_test_score') }}">Add Test Score</a>
             {% for item in user.student_profile.test_scores %}
                 <p><li>{{ item.name + ': ' + item.score|string}}</li></p>
             {% endfor %}
@@ -34,13 +35,15 @@
         <h2>College Application Information:</h2>
             <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
 
-            <p><strong>Supplemental Essays:</strong>
+            <p><strong>Supplemental Essays:</strong></p>
+            <a class="ui small basic icon button" href="{{ url_for('student.add_essay') }}">Add Essay</a>
             {% for item in user.student_profile.essays %}
                 <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view</li></p>
             {% endfor %}
 
 
-            <p><strong>Recommendation Letters:</strong>
+            <p><strong>Recommendation Letters:</strong></p>
+            <a class="ui small basic icon button" href="{{ url_for('student.add_recommendation_letter') }}">Add Recommendation Letter</a>
             {% for item in user.student_profile.recommendation_letters %}
                 <p> <strong>Name: </strong>{{ item.name }}<br>
                 <strong>Position: </strong>{{ item.category }}<br>
