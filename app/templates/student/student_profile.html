@@ -83,7 +83,7 @@
             </div>
             <span style="padding:0.2em"></span>
             <div class="ui three cards">
-                {% for test in user.student_profile.test_scores %}
+                {% for test in user.student_profile.test_scores|sort(attribute='name') %}
                 <div class="orange card">
                     <div class="content">
                         <div class="description">
