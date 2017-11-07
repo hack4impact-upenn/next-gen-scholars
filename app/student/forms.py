@@ -1,7 +1,9 @@
 from flask import url_for
+import calendar
+from datetime import datetime
 from flask_wtf import Form
 from wtforms import ValidationError
-from wtforms.fields import (StringField, IntegerField, SubmitField)
+from wtforms.fields import (StringField, IntegerField, SubmitField, SelectField)
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
 class EditCommonAppEssayForm(Form):
@@ -15,12 +17,17 @@ class EditCollegeForm(Form):
     submit = SubmitField('Update college name')
 
 class EditTestScoreForm(Form):
+    month_choices = []
+    for i in range(1, 13):
+        month_choices.append((calendar.month_name[i], calendar.month_name[i]))
+    year_choices = []
+    today = datetime.today()
+    for i in range(0, 8):
+        year_choices.append((str(today.year - 8 + i), str(today.year - 8 + i)))
     test_name = StringField(
-        'Test Name', validators=[InputRequired(), Length(1, 64)])
-    month = StringField(
-        'Month', validators=[InputRequired(), Length(1, 64)])
-    year = StringField(
-        'Year', validators=[InputRequired(), Length(1, 64)])
+        'Test Name', validators=[InputRequired()])
+    month = SelectField(u'Month', choices=month_choices, validators=[InputRequired()])
+    year = SelectField(u'Year', choices=year_choices, validators=[InputRequired()])
     score = IntegerField(
         'Test Score', validators=[InputRequired()])
     submit = SubmitField('Update test score')
