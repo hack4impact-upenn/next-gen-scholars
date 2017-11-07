@@ -1,37 +1,141 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-    <div class="ui text container">
-      <h1>{{ user.full_name() }}'s Profile:</h1>
-        <h2>Personal Information:</h2>
-            <p><strong>First Name</strong>: {{ user.first_name }}</p>
-            <p><strong>Last Name</strong>: {{ user.last_name }}</p>
-            <p><strong>Email Address</strong>: {{ user.email }}</p>
-            <p><strong>District</strong>: {{ user.student_profile.district }}</p>
-            <p><strong>Residence</strong>: {{ user.student_profile.city}}, {{ user.student_profile.state}}</p>
-            <p><strong>Graduation Year</strong>: {{ user.student_profile.graduation_year}} </p>
-        <h2>Academic Information:</h2>
-            <p><strong>High School</strong>: {{ user.student_profile.high_school }}</p>
-            <p><strong>Grade</strong>: {{ user.student_profile.grade }}th </p>
-            <p><strong>GPA</strong>: {{ user.student_profile.gpa }} </p>
+<div class="ui stackable centered grid container">
 
-            <p><strong>Test Scores:</strong></p>
-            {% for item in user.student_profile.test_scores %}
-                <p><li>{{ item.name + ': ' + item.score|string}}</li></p>
-            {% endfor %}
+    <div style="margin:auto;text-align:left">
+        <br />
+        <div class="ui items">
+            <div class="item">
+                <div class="ui small image">
+                    <img src="/static/images/user-avatar.jpg"/>
+                </div>
+                <div class="middle aligned content">
+                    <div class="header">
+                        <h1 class="ui header">{{ user.full_name() }}</h1>
+                    </div>
+                    <div class="description" style="font-size:1.1em">
+                        <div class="ui list">
+                            <div class="item">
+                                <i class="mail icon"></i>
+                                <div class="content">
+                                    &nbsp<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <i class="calendar outline icon"></i>
+                                <div class="content">
+                                    &nbsp{{ user.student_profile.grade }}th Grade
+                                </div>
+                            </div>
+                            <div class="item">
+                                <i class="student icon"></i>
+                                <div class="content">
+                                    {{ user.student_profile.high_school }}, {{ user.student_profile.graduation_year }}
+                                </div>
+                            </div>
+                            <div class="item">
+                                <i class="marker icon"></i>
+                                <div class="content">
+                                    &nbsp{{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ui compact secondary menu">
+            <button class="ui primary button">Edit Profile</button>
+            <button class="ui button">Add Test</button>
+            <button class="ui button">Add Major</button>
+            <button class="ui button">Add College</button>
+            <button class="ui button">Add Essay</button>
+            <button class="ui button">Add Rec Letter</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            <h3>Academic Information</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding:0">
+        <div class="eight wide column">
+            <div class="ui mini three statistics">
+                <div class="statistic">
+                    <div class="label">GPA</div>
+                    <span style="padding:0.25em"></span>
+                    <div class="value">{{ user.student_profile.gpa }}</div>
+                </div>
+                <div class="statistic">
+                    <div class="label">SAT</div>
+                    <span style="padding:0.25em"></span>
+                    <div class="value">2350</div>
+                </div>
+                <div class="statistic">
+                    <div class="label">ACT</div>
+                    <span style="padding:0.25em"></span>
+                    <div class="value">35</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            Test Scores
+            </div>
+            <span style="padding:0.2em"></span>
+            <div class="ui three cards">
+                {% for test in user.student_profile.test_scores %}
+                <div class="teal card">
+                    <div class="content">
+                        <div class="description">
+                            <div class="ui mini one statistics">
+                                <div class="statistic">
+                                    <div class="label">{{ test.name }}</div>
+                                    <span style="padding:0.25em"></span>
+                                    <div class="value">{{ test.score|string }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <div class="ui two buttons">
+                        <div class="ui basic blue icon button"><i class="large edit icon"></i></div>
+                        <div class="ui basic red icon button"><i class="large delete icon"></i></div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+            </div>
+            <br />
 
-            <p><strong>Majors of Interest:</strong>
-            {% for item in user.student_profile.majors %}
-                <p><li>{{ item.name }}</li></p>
-            {% endfor %}
+            <div class="ui horizontal divider">
+            Majors of Interest &nbsp <i class="blue link edit icon"></i>
+            </div>
+            <div class="ui bulleted list">
+                {% for major in user.student_profile.majors %}
+                <div class="item" style="font-size:1.1em">
+                    <div style="display:none" class="ui basic red icon mini circular button"><i class="x icon"></i></div>
+                    {{ major.name }}
+                </div>
+                {% endfor %}
+            </div>
 
-            <p><strong>Colleges of Interest:</strong>
+            <div class="ui horizontal divider">
+            Colleges of Interest
+            </div>
+            <div class="ui bulleted list">
             {% for item in user.student_profile.colleges %}
                 <p><li>{{ item.name }}</li></p>
             {% endfor %}
+            </div>
 
 
-        <h2>College Application Information:</h2>
+            <h2>College Application Information:</h2>
             <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
 
             <p><strong>Supplemental Essays:</strong>
@@ -46,6 +150,8 @@
                 <strong>Position: </strong>{{ item.category }}<br>
                 <strong>Status: </strong>{{ item.status }}</br></p>
             {% endfor %}
-
+        </div>
     </div>
+
+</div>
 {% endblock %}
