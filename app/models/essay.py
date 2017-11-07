@@ -13,11 +13,14 @@ class Essay(db.Model):
         nullable=False,
         index=True
     )
+    # status can be "waiting", "reviewed", "edited", and "done"
+    status = db.Column(db.String, index=True)
     link = db.Column(db.String, index=True)
 
     @staticmethod
     def generate_fake(count=2):
         fake = Faker()
+        status=['waiting', 'reviewed', 'edited', 'done']
         essay_names = random.sample([
             'UPenn Why Essay',
             'Dartmouth Supplemental Essay',
@@ -34,7 +37,8 @@ class Essay(db.Model):
         for i in range(count):
             essays.append(Essay(
                 name=essay_names[i],
-                link="https://google.com"
+                status=random.choice(status),
+                link='https://google.com'
             ))
         return essays
 

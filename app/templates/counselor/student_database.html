@@ -26,6 +26,7 @@
                 <div class="field">
                     <label>Colleges</label>
                     <select multiple="" class="ui fluid search dropdown">
+                        <option value="">Search colleges...</option>
                         {% for c in colleges %}
                             <option value="{{ c.name }}">{{ c.name }}</option>
                         {% endfor %}

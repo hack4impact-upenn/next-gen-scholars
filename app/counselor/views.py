@@ -141,7 +141,7 @@ def student_database():
             db.session.add(checklist_item)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
-        return redirect(url_for('counselor.student-database'))
+        return redirect(url_for('counselor.student_database'))
 
     student_profiles = StudentProfile.query.all()
     colleges = College.query.all()
