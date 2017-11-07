@@ -1,54 +1,298 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-    <div class="ui text container">
-      <h1>{{ user.full_name() }}'s Profile:</h1>
-        <h2>Personal Information:</h2>
-            <p><strong>First Name</strong>: {{ user.first_name }}</p>
-            <p><strong>Last Name</strong>: {{ user.last_name }}</p>
-            <p><strong>Email Address</strong>: {{ user.email }}</p>
-            <p><strong>District</strong>: {{ user.student_profile.district }}</p>
-            <p><strong>Residence</strong>: {{ user.student_profile.city}}, {{ user.student_profile.state}}</p>
-            <p><strong>Graduation Year</strong>: {{ user.student_profile.graduation_year}} </p>
-        <h2>Academic Information:</h2>
-            <p><strong>High School</strong>: {{ user.student_profile.high_school }}</p>
-            <p><strong>Grade</strong>: {{ user.student_profile.grade }}th </p>
-            <p><strong>GPA</strong>: {{ user.student_profile.gpa }} </p>
+<div class="ui stackable centered grid container">
 
-            <p><strong>Test Scores:</strong></p>
-             <a class="ui small basic icon button" href="{{ url_for('student.add_test_score') }}">Add Test Score</a>
-            {% for item in user.student_profile.test_scores %}
-                <p><li>{{ item.name + ': ' + item.score|string}}</li></p>
-            {% endfor %}
+    <div style="margin:auto;text-align:left">
+        <br />
+        <div class="ui items">
+            <div class="item">
+                <div class="ui small image">
+                    <img src="/static/images/user-avatar.jpg"/>
+                </div>
+                <div class="middle aligned content">
+                    <div class="header">
+                        <h1 class="ui header">{{ user.full_name() }}</h1>
+                    </div>
+                    <button class="right floated ui blue basic button">Edit Profile</button>
+                    <div class="description" style="font-size:1.1em">
 
-            <p><strong>Majors of Interest:</strong>
-            {% for item in user.student_profile.majors %}
-                <p><li>{{ item.name }}</li></p>
-            {% endfor %}
-
-            <p><strong>Colleges of Interest:</strong>
-            {% for item in user.student_profile.colleges %}
-                <p><li>{{ item.name }}</li></p>
-            {% endfor %}
-
-
-        <h2>College Application Information:</h2>
-            <p><strong>Link to CommonApp Essay</strong>: Click <a href="{{ user.student_profile.common_app_essay }}" target="_blank">here</a> to view</p>
-
-            <p><strong>Supplemental Essays:</strong></p>
-            <a class="ui small basic icon button" href="{{ url_for('student.add_essay') }}">Add Essay</a>
-            {% for item in user.student_profile.essays %}
-                <p><li><strong>{{ item.name + ': '}}</strong> Click <a href = "{{ item.link }}" target="_blank" >here</a> to view</li></p>
-            {% endfor %}
-
-
-            <p><strong>Recommendation Letters:</strong></p>
-            <a class="ui small basic icon button" href="{{ url_for('student.add_recommendation_letter') }}">Add Recommendation Letter</a>
-            {% for item in user.student_profile.recommendation_letters %}
-                <p> <strong>Name: </strong>{{ item.name }}<br>
-                <strong>Position: </strong>{{ item.category }}<br>
-                <strong>Status: </strong>{{ item.status }}</br></p>
-            {% endfor %}
-
+                        <div class="ui list">
+                            <div class="item">
+                                <i class="mail icon"></i>
+                                <div class="content">
+                                    &nbsp<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <i class="calendar outline icon"></i>
+                                <div class="content">
+                                    &nbsp{{ user.student_profile.grade }}th Grade
+                                </div>
+                            </div>
+                            <div class="item">
+                                <i class="student icon"></i>
+                                <div class="content">
+                                    {{ user.student_profile.high_school }}, {{ user.student_profile.graduation_year }}
+                                </div>
+                            </div>
+                            <div class="item">
+                                <i class="marker icon"></i>
+                                <div class="content">
+                                    &nbsp{{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            <h3>Academic Information &nbsp <i class="blue link edit icon"></i></h3>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding:0">
+        <div class="eight wide column">
+            <div class="ui mini three statistics">
+                <div class="statistic">
+                    <div class="label">GPA</div>
+                    <span style="padding:0.25em"></span>
+                    <div class="value">{{ user.student_profile.gpa }}</div>
+                </div>
+                <div class="statistic">
+                    <div class="label">SAT</div>
+                    <span style="padding:0.25em"></span>
+                    <div class="value">{{ sat }}</div>
+                </div>
+                <div class="statistic">
+                    <div class="label">ACT</div>
+                    <span style="padding:0.25em"></span>
+                    <div class="value">{{ act }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            Test Scores
+            </div>
+            <span style="padding:0.2em"></span>
+            <div class="ui three cards">
+                {% for test in user.student_profile.test_scores %}
+                <div class="orange card">
+                    <div class="content">
+                        <div class="description">
+                            <div class="ui mini one statistics">
+                                <div class="statistic">
+                                    <div class="label">{{ test.name }}</div>
+                                    <span style="padding:0.25em"></span>
+                                    <div class="value">{{ test.score|string }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached orange basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
+                </div>
+                {% endfor %}
+                <a class="green card" href="{{ url_for('student.add_test_score') }}">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <br /><i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45">Add Test Score</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            Majors of Interest &nbsp <i class="blue link edit icon" id="edit-majors"></i>
+            </div>
+        </div>
+        <div class="ten wide column">
+            <div class="ui bulleted list" id="majors-list">
+                {% for major in user.student_profile.majors|sort(attribute='name') %}
+                <div class="item" style="font-size:1.1em">
+                    <div style="display:none" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
+                    {{ major.name }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="two wide column">
+            <a class="ui right floated green basic button">Add Major</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            Colleges of Interest &nbsp <i class="blue link edit icon" id="edit-colleges"></i>
+            </div>
+            <div class="ui four cards">
+                {% for college in user.student_profile.colleges|sort(attribute='name') %}
+                <div class="ui blue link card college-card">
+                    <div class="center aligned content">
+                        <div class="description">
+                            <h4 class="ui header">{{ college.name }}</h4>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached blue basic button college-button">
+                        <i class="external icon"></i>View Profile
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="ui green link card">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45">Add College</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">
+            <h3>College Application Information</h3>
+            </div>
+
+            <div class="ui horizontal divider">Essays</div>
+
+            <div class="ui four cards">
+                <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="purple card">
+                    <div class="center aligned content">
+                        <div class="description">
+                            <h4 class="ui header">Common App Essay</h4>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached purple basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
+                </a>
+                {% for essay in user.student_profile.essays|sort(attribute='name') %}
+                <a href="{{ essay.link }}" target="_blank" class="purple card">
+                    <div class="center aligned content">
+                        <div class="description">
+                            <h4 class="ui header">{{ essay.name }}</h4>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached purple basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
+                </a>
+                {% endfor %}
+                <a class="green card" href="{{ url_for('student.add_essay') }}">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <h3></h3><i class="big green plus icon"></i><br />
+                        <span style="color:#21ba45">Add Essay</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="twelve wide column">
+            <div class="ui horizontal divider">Recommendation Letters</div>
+
+            <div class="ui three cards">
+                {% for letter in user.student_profile.recommendation_letters|sort(attribute='name') %}
+                <div class="black card">
+                    <div class="center aligned content">
+                        <div class="header">
+                            {{ letter.name }}
+                        </div>
+                        <div class="meta">
+                            {{ letter.category }}
+                        </div>
+                        <div class="description">
+                            {% if letter.status=='Incomplete' %}
+                            <span style="color:#db2828">
+                            {% elif letter.status=='Pending' %}
+                            <span style="color:#eaae00">
+                            {% elif letter.status=='Submitted' %}
+                            <span style="color:#21ba45">
+                            {% else %}
+                            <span>
+                            {% endif %}
+                            <strong>{{ letter.status }}</strong></span>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached black basic button">
+                        <i class="edit icon"></i>Edit
+                    </div>
+                </div>
+                {% endfor %}
+                <a class="green card" href="{{ url_for('student.add_recommendation_letter') }}">
+                    <div class="content" style="text-align:center">
+                        <div class="description" style="margin:0 auto">
+                            <br /><i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45">Add Letter</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+$(document).ready(function () {
+    var editingMajors = false;
+    var editingColleges = false;
+
+    $('#edit-majors').click(function () {
+        editingMajors = !editingMajors;
+        if (editingMajors) {
+            $('#edit-majors').removeClass('blue edit');
+            $('#edit-majors').addClass('green check');
+            $('#majors-list').removeClass('bulleted');
+        } else {
+            $('#edit-majors').removeClass('green check');
+            $('#edit-majors').addClass('blue edit');
+            $('#majors-list').addClass('bulleted');
+        }
+        $('.major-delete-button').toggle()
+    });
+
+    $('#edit-colleges').click(function () {
+        editingColleges = !editingColleges;
+        if (editingColleges) {
+            $('#edit-colleges').removeClass('blue edit');
+            $('#edit-colleges').addClass('green check');
+            $('.college-button').removeClass('blue');
+            $('.college-button').addClass('red');
+            $('.college-card').removeClass('blue');
+            $('.college-card').addClass('red');
+            $('.college-button').html('<i class="remove icon"></i>Remove');
+        } else {
+            $('#edit-colleges').removeClass('green check');
+            $('#edit-colleges').addClass('blue edit');
+            $('.college-button').removeClass('red');
+            $('.college-button').addClass('blue');
+            $('.college-card').removeClass('red');
+            $('.college-card').addClass('blue');
+            $('.college-button').html('<i class="external icon"></i>View Profile');
+        }
+    });
+});
+
+</script>
 {% endblock %}
