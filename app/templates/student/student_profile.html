@@ -90,7 +90,7 @@
             <span style="padding:0.2em"></span>
             <div class="ui three cards">
                 {% for test in user.student_profile.test_scores %}
-                <div class="teal card">
+                <div class="green card">
                     <div class="content">
                         <div class="description">
                             <div class="ui mini one statistics">
@@ -104,8 +104,8 @@
                     </div>
                     <div class="extra content">
                         <div class="ui two buttons">
-                        <div class="ui basic blue icon button"><i class="large edit icon"></i></div>
-                        <div class="ui basic red icon button"><i class="large delete icon"></i></div>
+                        <div class="ui basic blue icon button"><i class="edit icon"></i></div>
+                        <div class="ui basic red icon button"><i class="delete icon"></i></div>
                     </div>
                   </div>
                 </div>
@@ -126,8 +126,29 @@
             </div>
 
             <div class="ui horizontal divider">
-            Colleges of Interest
+            Colleges of Interest &nbsp <i class="blue link edit icon"></i>
             </div>
+            <div class="ui three cards">
+                {% for test in user.student_profile.test_scores %}
+                <a class="blue card">
+                    <div class="content">
+                        <div class="description">
+                            <div class="ui mini one statistics">
+                                <div class="statistic">
+                                    <div class="label">{{ test.name }}</div>
+                                    <span style="padding:0.25em"></span>
+                                    <div class="value">{{ test.score|string }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui bottom attached red basic button">
+                        <i class="x icon"></i>Remove
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
             <div class="ui bulleted list">
             {% for item in user.student_profile.colleges|sort(attribute='name') %}
                 <p><li>{{ item.name }}</li></p>
