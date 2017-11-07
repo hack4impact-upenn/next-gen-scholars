@@ -14,7 +14,7 @@
                     <div class="header">
                         <h1 class="ui header">{{ user.full_name() }}</h1>
                     </div>
-                    <button class="right floated ui primary button">Edit Profile</button>
+                    <button class="right floated ui blue basic button">Edit Profile</button>
                     <div class="description" style="font-size:1.1em">
 
                         <div class="ui list">
@@ -110,33 +110,45 @@
                     </div>
                 </a>
             </div>
-            <br />
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Majors of Interest &nbsp <i class="blue link edit icon"></i>
+            Majors of Interest &nbsp <i class="blue link edit icon" id="edit-majors"></i>
             </div>
-            <div class="ui list">
+        </div>
+        <div class="ten wide column">
+            <div class="ui bulleted list" id="majors-list">
                 {% for major in user.student_profile.majors|sort(attribute='name') %}
                 <div class="item" style="font-size:1.1em">
-                    <div class="ui basic red icon mini circular button"><i class="x icon"></i></div>
+                    <div style="display:none" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
                     {{ major.name }}
                 </div>
                 {% endfor %}
             </div>
+        </div>
+        <div class="two wide column">
+            <a class="ui right floated green basic button">Add Major</a>
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Colleges of Interest &nbsp <i class="blue link edit icon"></i>
+            Colleges of Interest &nbsp <i class="blue link edit icon" id="edit-colleges"></i>
             </div>
             <div class="ui four cards">
                 {% for college in user.student_profile.colleges|sort(attribute='name') %}
-                <div class="ui blue link card">
+                <div class="ui blue link card college-card">
                     <div class="center aligned content">
                         <div class="description">
                             <h4 class="ui header">{{ college.name }}</h4>
                         </div>
                     </div>
-                    <div class="ui bottom attached red basic button">
-                        <i class="x icon"></i>Remove
+                    <div class="ui bottom attached blue basic button college-button">
+                        <i class="external icon"></i>View Profile
                     </div>
                 </div>
                 {% endfor %}
@@ -241,9 +253,46 @@
 </div>
 
 <script type="text/javascript">
-$(".card .button").click(function(e) {
-        e.stopPropagation();
-   });
+
+$(document).ready(function () {
+    var editingMajors = false;
+    var editingColleges = false;
+
+    $('#edit-majors').click(function () {
+        editingMajors = !editingMajors;
+        if (editingMajors) {
+            $('#edit-majors').removeClass('blue edit');
+            $('#edit-majors').addClass('green check');
+            $('#majors-list').removeClass('bulleted');
+        } else {
+            $('#edit-majors').removeClass('green check');
+            $('#edit-majors').addClass('blue edit');
+            $('#majors-list').addClass('bulleted');
+        }
+        $('.major-delete-button').toggle()
+    });
+
+    $('#edit-colleges').click(function () {
+        editingColleges = !editingColleges;
+        if (editingColleges) {
+            $('#edit-colleges').removeClass('blue edit');
+            $('#edit-colleges').addClass('green check');
+            $('.college-button').removeClass('blue');
+            $('.college-button').addClass('red');
+            $('.college-card').removeClass('blue');
+            $('.college-card').addClass('red');
+            $('.college-button').html('<i class="remove icon"></i>Remove');
+        } else {
+            $('#edit-colleges').removeClass('green check');
+            $('#edit-colleges').addClass('blue edit');
+            $('.college-button').removeClass('red');
+            $('.college-button').addClass('blue');
+            $('.college-card').removeClass('red');
+            $('.college-card').addClass('blue');
+            $('.college-button').html('<i class="external icon"></i>View Profile');
+        }
+    });
+});
 
 </script>
 {% endblock %}
