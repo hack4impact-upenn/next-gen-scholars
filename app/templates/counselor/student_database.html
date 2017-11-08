@@ -17,15 +17,15 @@
             <form id="filter-form" class="ui form">
                 <div class="field">
                     <label>FAFSA Status</label>
-                    <select class="ui dropdown">
+                    <select class="ui dropdown" id='fafsa-field'>
                         <option value="all">All</option>
-                        <option value="incomplete">Incomplete</option>
-                        <option value="complete">Complete</option>
+                        <option value="Incomplete">Incomplete</option>
+                        <option value="Complete">Complete</option>
                     </select>
                 </div>
                 <div class="field">
                     <label>Colleges</label>
-                    <select multiple="" class="ui fluid search dropdown">
+                    <select multiple="" class="ui fluid search dropdown" id='colleges-field'>
                         <option value="">Search colleges...</option>
                         {% for c in colleges %}
                             <option value="{{ c.name }}">{{ c.name }}</option>
@@ -37,7 +37,7 @@
                 {% for s in essay_statuses %}
                 <div class="field">
                     <div class="ui checkbox">
-                      <input type="checkbox" tabindex="0" class="hidden">
+                      <input type="checkbox" tabindex="0" class="hidden" id='c-{{s}}'>
                       <label>{{ s }}</label>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                 {% for s in essay_statuses %}
                 <div class="field">
                     <div class="ui checkbox">
-                      <input type="checkbox" tabindex="0" class="hidden">
+                      <input type="checkbox" tabindex="0" class="hidden" id='s-{{s}}'>
                       <label>{{ s }}</label>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                 <h5 class="ui header">Essay Status</h5>
                 <div class="inline field">
                   <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
+                    <input type="checkbox" tabindex="0" class="hidden" id='essays-uploaded-field'>
                     <label>No essays uploaded</label>
                   </div>
                 </div>
@@ -109,22 +109,22 @@
                             <td>{{ s.user[0].last_name }}</td>
                             <td>{{ s.grade|string }}th</td>
                             <td>{{ s.high_school }}</td>
-                            <td style="text-align:center">
+                            <td style="text-align:center" class='td-fafsa' data-fafsa={{s.fafsa_status}}>
                                 {% if s.fafsa_status == 'Incomplete' %}
                                 <i class="red x icon"></i></td>
                                 {% else %}
                                 <i class="green check icon"></i>
                                 {% endif %}
                             </td>
-                            <td style="text-align:center">
+                            <td style="text-align:center" class='td-essays-uploaded'>
                                 {% if s.essays|length == 0 and s.common_app_essay == '' %}
                                 <i class="red x icon"></i></td>
                                 {% else %}
                                 <i class="green check icon"></i>
                                 {% endif %}
                             </td>
-                            <td>{{ s.common_app_essay_status }}</td>
-                            <td>{{ get_essay_statuses(s)|sort|join(', ') }}</td>
+                            <td class='td-common-app-status'>{{ s.common_app_essay_status }}</td>
+                            <td class='td-supplemental-status'>{{ get_essay_statuses(s)|sort|join(', ') }}</td>
                             <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}
@@ -145,7 +145,16 @@
             var selectedProfileIds = new Set(); // these are student profile ids
 
             function filterStudents() {
+                $('.student-row').each(function () {
+                    $this = $(this);
+                    $fafsa = $(this).find('.td-fafsa').data('fafsa');
+                    fafsaFilter = $('#fafsa-field').val();
 
+                    $this.removeClass('hidden').show();
+                    if (fafsaFilter != 'all' && $fafsa != fafsaFilter) {
+                        $this.hide();
+                    }
+                })
             }
 
             $('#filter-form').submit(function (e) {
