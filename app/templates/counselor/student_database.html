@@ -54,12 +54,11 @@
                 {% endfor %}
 
                 <h5 class="ui header">Essay Status</h5>
-                <div class="inline field">
-                  <div class="ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden" id='essays-uploaded-field'>
+                <div class="ui checkbox" id='essays-uploaded-field'>
+                    <input type="checkbox" tabindex="0" class="hidden">
                     <label>No essays uploaded</label>
-                  </div>
                 </div>
+                <br /><br />
                 <button class="ui primary button" type="submit">Filter</button><br /><br />
             </form>
         </div>
@@ -116,7 +115,7 @@
                                 <i class="green check icon"></i>
                                 {% endif %}
                             </td>
-                            <td style="text-align:center" class='td-essays-uploaded'>
+                            <td style="text-align:center" class='td-essays-uploaded' data-uploaded={{ s.essays|length == 0 and s.common_app_essay == '' }}>
                                 {% if s.essays|length == 0 and s.common_app_essay == '' %}
                                 <i class="red x icon"></i></td>
                                 {% else %}
@@ -145,16 +144,24 @@
             var selectedProfileIds = new Set(); // these are student profile ids
 
             function filterStudents() {
+                fafsaFilter = $('#fafsa-field').val();
+                essaysUploadedFilter = $('#essays-uploaded-field').checkbox('is checked');
                 $('.student-row').each(function () {
                     $this = $(this);
-                    $fafsa = $(this).find('.td-fafsa').data('fafsa');
-                    fafsaFilter = $('#fafsa-field').val();
-
                     $this.removeClass('hidden').show();
+
+                    // Filter by FAFSA status
+                    $fafsa = $(this).find('.td-fafsa').data('fafsa');
                     if (fafsaFilter != 'all' && $fafsa != fafsaFilter) {
                         $this.hide();
                     }
-                })
+
+                    // Filter by essays uploaded
+                    essaysUploaded = $(this).find('.td-essays-uploaded').data('uploaded');
+                    if (essaysUploadedFilter && essaysUploaded) {
+                        $this.hide();
+                    }
+                });
             }
 
             $('#filter-form').submit(function (e) {
