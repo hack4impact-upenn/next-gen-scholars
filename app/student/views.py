@@ -24,9 +24,9 @@ def view_user_profile():
         test_scores = student_profile.test_scores
         for t in test_scores:
             if t.name == 'SAT':
-                sat = t.score
+                sat = max(sat, t.score) if sat != '––' else t.score
             if t.name == 'ACT':
-                act = t.score
+                act = max(act, t.score) if act != '––' else t.score
         return render_template('student/student_profile.html', user=current_user, sat=sat, act=act)
 
 
