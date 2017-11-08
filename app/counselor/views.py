@@ -145,7 +145,14 @@ def student_database():
 
     student_profiles = StudentProfile.query.all()
     colleges = College.query.all()
-    return render_template('counselor/student_database.html', student_profiles=student_profiles, checklist_form=checklist_form, colleges=colleges)
+    essay_statuses = ['Waiting', 'Reviewed', 'Edited', 'Done']
+    return render_template(
+        'counselor/student_database.html',
+        student_profiles=student_profiles,
+        checklist_form=checklist_form,
+        colleges=colleges,
+        essay_statuses=essay_statuses
+    )
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])

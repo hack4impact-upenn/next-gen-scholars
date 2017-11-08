@@ -14,7 +14,7 @@
                 </div>
             </div>
             <h4 class="ui header">Filter</h4>
-            <div id="filter-form" class="ui form">
+            <form id="filter-form" class="ui form">
                 <div class="field">
                     <label>FAFSA Status</label>
                     <select class="ui dropdown">
@@ -32,57 +32,26 @@
                         {% endfor %}
                     </select>
                 </div>
+
                 <h5 class="ui header">Common App Essay Status</h5>
+                {% for s in essay_statuses %}
                 <div class="field">
                     <div class="ui checkbox">
                       <input type="checkbox" tabindex="0" class="hidden">
-                      <label>Waiting</label>
+                      <label>{{ s }}</label>
                     </div>
                 </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="1" class="hidden">
-                      <label>Reviewed</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="2" class="hidden">
-                      <label>Edited</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="3" class="hidden">
-                      <label>Done</label>
-                    </div>
-                </div>
+                {% endfor %}
 
                 <h5 class="ui header">Supplemental Essay Status</h5>
+                {% for s in essay_statuses %}
                 <div class="field">
                     <div class="ui checkbox">
                       <input type="checkbox" tabindex="0" class="hidden">
-                      <label>Waiting</label>
+                      <label>{{ s }}</label>
                     </div>
                 </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="1" class="hidden">
-                      <label>Reviewed</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="2" class="hidden">
-                      <label>Edited</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="3" class="hidden">
-                      <label>Done</label>
-                    </div>
-                </div>
+                {% endfor %}
 
                 <h5 class="ui header">Essay Status</h5>
                 <div class="inline field">
@@ -92,7 +61,7 @@
                   </div>
                 </div>
                 <button class="ui primary button" type="submit">Filter</button><br /><br />
-            </div>
+            </form>
         </div>
         <div class="twelve wide column">
             <br />
@@ -115,8 +84,8 @@
             {{ f.render_form_field(checklist_form.submit) }}
             {{ checklist_form.assignee_ids }}
             {{ f.end_form(checklist_form) }}
-            <button id="select-all" class="ui small button">Select All</button>
-            <button id="select-none" class="ui small button">Deselect All</button><br />
+            <button id="select-all" class="ui small basic button">Select All</button>
+            <button id="select-none" class="ui small basic button">Deselect All</button><br />
             <br />
             <div style="overflow-x: scroll;">
                 <table class="ui searchable unstackable sortable selectable celled table">
@@ -124,9 +93,10 @@
                         <tr>
                             <th>First name</th>
                             <th>Last name</th>
-                            <th>Grad Year</th>
+                            <th>Grade</th>
                             <th>High School</th>
-                            <th>GPA</th>
+                            <th>FAFSA</th>
+                            <th>Essays Uploaded</th>
                             <th class="no-sort">Student Profile</th>
                         </tr>
                     </thead>
@@ -135,10 +105,23 @@
                         <tr class="student-row" data-profile-id={{s.id}}>
                             <td>{{ s.user[0].first_name }}</td>
                             <td>{{ s.user[0].last_name }}</td>
-                            <td>{{ s.graduation_year }}</td>
+                            <td>{{ s.grade|string }}th</td>
                             <td>{{ s.high_school }}</td>
-                            <td>{{ s.gpa }}</td>
-                            <td><div class="ui primary button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
+                            <td style="text-align:center">
+                                {% if s.fafsa_status == 'Incomplete' %}
+                                <i class="red x icon"></i></td>
+                                {% else %}
+                                <i class="green check icon"></i>
+                                {% endif %}
+                            </td>
+                            <td style="text-align:center">
+                                {% if s.essays|length == 0 and s.common_app_essay == '' %}
+                                <i class="red x icon"></i></td>
+                                {% else %}
+                                <i class="green check icon"></i>
+                                {% endif %}
+                            </td>
+                            <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -156,6 +139,16 @@
             $('.ui.checkbox').checkbox();
 
             var selectedProfileIds = new Set(); // these are student profile ids
+
+            function filterStudents() {
+
+            }
+
+            $('#filter-form').submit(function (e) {
+                filterStudents();
+                return false;
+            })
+
             $('.student-row').click(function (e) {
                 studentProfileId = this.getAttribute('data-profile-id');
                 if (selectedProfileIds.has(studentProfileId)) {

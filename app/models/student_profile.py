@@ -38,7 +38,8 @@ class StudentProfile(db.Model):
     colleges = db.relationship('College', secondary=student_colleges,
                                backref=db.backref('student_profiles', lazy='dynamic'))
     # APPLICATION INFO
-    fafsa_completed = db.Column(db.Boolean, index=True, default=False)
+    # either 'Incomplete' or 'Complete'
+    fafsa_status = db.Column(db.String, index=True, default='Incomplete')
     common_app_essay = db.Column(db.String, index=True) # link to common app essay
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
@@ -47,6 +48,7 @@ class StudentProfile(db.Model):
     def generate_fake():
         fake = Faker()
         year = random.choice([['2018', '12'], ['2019', '11'], ['2020', '10']])
+        fafsa_status = random.choice(['Incomplete', 'Complete'])
         profile = StudentProfile(
             high_school='{} High School'.format(fake.street_name()),
             district='{} District'.format(fake.city()),
@@ -57,6 +59,7 @@ class StudentProfile(db.Model):
             gpa=round(random.uniform(2, 4), 2),
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),
+            fafsa_status=fafsa_status,
             colleges=random.sample(College.query.all(), 3),
             common_app_essay='https://google.com',
             essays=Essay.generate_fake(),
@@ -75,6 +78,7 @@ class StudentProfile(db.Model):
         s += 'Test Scores: {}\n'.format(self.test_scores)
         s += 'Majors: {}\n'.format(','.join([m.name for m in self.majors]))
         s += 'Colleges: {}\n'.format(','.join([c.name for c in self.colleges]))
+        s += 'FAFSA Status {}\n'.format(self.fafsa_status)
         s += 'Common App Essay: {}\n'.format(self.common_app_essay)
         s += 'Essays: {}\n'.format(self.essays)
         s += 'Recommendation Letters: {}'.format(
