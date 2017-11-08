@@ -21,13 +21,13 @@
                             <div class="item">
                                 <i class="mail icon"></i>
                                 <div class="content">
-                                    &nbsp<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                                    &nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
                                 </div>
                             </div>
                             <div class="item">
                                 <i class="calendar outline icon"></i>
                                 <div class="content">
-                                    &nbsp{{ user.student_profile.grade }}th Grade
+                                    &nbsp;{{ user.student_profile.grade }}th Grade
                                 </div>
                             </div>
                             <div class="item">
@@ -39,7 +39,7 @@
                             <div class="item">
                                 <i class="marker icon"></i>
                                 <div class="content">
-                                    &nbsp{{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
+                                    &nbsp;{{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
                                 </div>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            <h3>Academic Information &nbsp <i class="blue link edit icon"></i></h3>
+            <h3>Academic Information &nbsp; <i class="blue link edit icon"></i></h3>
             </div>
         </div>
     </div>
@@ -85,12 +85,12 @@
             <div class="ui three cards">
                 {% for test in user.student_profile.test_scores|sort(attribute='name') %}
                 <div class="orange card">
-                    <div class="content">
+                    <div class="center aligned content">
+                        <div class="header">{{ test.name }}</div>
+                        <div class="meta">{{ test.month }} {{ test.year }}</div>
                         <div class="description">
                             <div class="ui mini one statistics">
                                 <div class="statistic">
-                                    <div class="label">{{ test.name }}</div>
-                                    <span style="padding:0.25em"></span>
                                     <div class="value">{{ test.score|string }}</div>
                                 </div>
                             </div>
@@ -116,7 +116,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Majors of Interest &nbsp <i class="blue link edit icon" id="edit-majors"></i>
+            Majors of Interest &nbsp; <i class="blue link edit icon" id="edit-majors"></i>
             </div>
         </div>
         <div class="ten wide column">
@@ -137,7 +137,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Colleges of Interest &nbsp <i class="blue link edit icon" id="edit-colleges"></i>
+            Colleges of Interest &nbsp; <i class="blue link edit icon" id="edit-colleges"></i>
             </div>
             <div class="ui four cards">
                 {% for college in user.student_profile.colleges|sort(attribute='name') %}
