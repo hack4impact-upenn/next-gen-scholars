@@ -177,6 +177,7 @@
                     let fafsa = $this.find('.td-fafsa').data('fafsa');
                     if (fafsaFilter != 'All' && fafsa != fafsaFilter) {
                         $this.hide();
+
                     }
 
                     // Filter by essays uploaded
@@ -249,6 +250,7 @@
                 $('td.positive').removeClass('positive');
                 if (searchText.length > 0) {
                     $('tbody .searchable-td:icontains(' + searchText + ')').addClass('positive');
+                    $('.positive').closest('tr').addClass('matches');
                     $('tbody tr').not('.matches').hide();
                 }
             });
