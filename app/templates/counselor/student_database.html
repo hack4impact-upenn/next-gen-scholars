@@ -18,7 +18,7 @@
                 <div class="field">
                     <label>FAFSA Status</label>
                     <select class="ui dropdown" id='fafsa-field'>
-                        <option value="all">All</option>
+                        <option value="All">All</option>
                         <option value="Incomplete">Incomplete</option>
                         <option value="Complete">Complete</option>
                     </select>
@@ -27,7 +27,7 @@
                     <label>Colleges</label>
                     <select multiple="" class="ui fluid search dropdown" id='colleges-field'>
                         <option value="">Search colleges...</option>
-                        {% for c in colleges %}
+                        {% for c in colleges|sort(attribute='name') %}
                             <option value="{{ c.name }}">{{ c.name }}</option>
                         {% endfor %}
                     </select>
@@ -93,22 +93,23 @@
                             <th>First name</th>
                             <th>Last name</th>
                             <th>Grade</th>
-                            <th>High School</th>
+                            <th>High School &emsp;</th>
                             <th>FAFSA</th>
                             <th>Essays Uploaded</th>
                             <th>Common App Essay</th>
                             <th>Supplemental Essays</th>
+                            <th style="display:none">Colleges</th>
                             <th class="no-sort">Student Profile</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for s in student_profiles %}
-                        <tr class="student-row" data-profile-id={{s.id}}>
+                        <tr class="student-row">
                             <td>{{ s.user[0].first_name }}</td>
                             <td>{{ s.user[0].last_name }}</td>
                             <td>{{ s.grade|string }}th</td>
                             <td>{{ s.high_school }}</td>
-                            <td style="text-align:center" class='td-fafsa' data-fafsa={{s.fafsa_status}}>
+                            <td style="text-align:center" class='td-fafsa' data-fafsa={{ s.fafsa_status }}>
                                 {% if s.fafsa_status == 'Incomplete' %}
                                 <i class="red x icon"></i></td>
                                 {% else %}
@@ -124,6 +125,7 @@
                             </td>
                             <td class='td-common-app-status'>{{ s.common_app_essay_status }}</td>
                             <td class='td-supplemental-status'>{{ get_essay_statuses(s)|sort|join(', ') }}</td>
+                            <td style="display:none" class='td-colleges'>{{ get_colleges(s) }}</td>
                             <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}
@@ -137,27 +139,53 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+            // Semantic UI function calls to make elements dynamic
             $('table').tablesort();
             $('select.dropdown').dropdown();
             $('.ui.checkbox').checkbox();
 
-            var selectedProfileIds = new Set(); // these are student profile ids
+            // Allows counselor to send checklist items to selected student profile ids
+            var selectedProfileIds = new Set();
 
+            // Apply current filters to table
             function filterStudents() {
-                fafsaFilter = $('#fafsa-field').val();
-                essaysUploadedFilter = $('#essays-uploaded-field').checkbox('is checked');
+                // 'All', 'Incomplete', and 'Complete'
+                let fafsaFilter = $('#fafsa-field').val();
+                // list of college names, null if no colleges are selected
+                var temp = $('#colleges-field').dropdown('get value');
+                let collegesFilter = temp[temp.length - 1]
+                // true or false
+                let essaysUploadedFilter = $('#essays-uploaded-field').checkbox('is checked');
                 $('.student-row').each(function () {
                     $this = $(this);
                     $this.removeClass('hidden').show();
 
                     // Filter by FAFSA status
-                    $fafsa = $(this).find('.td-fafsa').data('fafsa');
-                    if (fafsaFilter != 'all' && $fafsa != fafsaFilter) {
+                    let fafsa = $this.find('.td-fafsa').data('fafsa');
+                    if (fafsaFilter != 'All' && fafsa != fafsaFilter) {
                         $this.hide();
                     }
 
+                    // Filter by colleges
+                    if (collegesFilter != null) {
+                        let colleges = $this.find('.td-colleges').html().split(';');
+                        var matchesCollegesFilter = false;
+                        for (var i = 0; i < collegesFilter.length; i++) {
+                            if (colleges.includes(collegesFilter[i])) {
+                                matchesCollegesFilter = true;
+                            }
+                        }
+                        if (!matchesCollegesFilter) {
+                            $this.hide();
+                        }
+                    }
+
+                    // Filter by common app essay
+
+                    // Filter by supplemental essays
+
                     // Filter by essays uploaded
-                    essaysUploaded = $(this).find('.td-essays-uploaded').data('uploaded');
+                    let essaysUploaded = $this.find('.td-essays-uploaded').data('uploaded');
                     if (essaysUploadedFilter && essaysUploaded) {
                         $this.hide();
                     }
@@ -169,6 +197,7 @@
                 return false;
             })
 
+            // Allows counselor to select students
             $('.student-row').click(function (e) {
                 studentProfileId = this.getAttribute('data-profile-id');
                 if (selectedProfileIds.has(studentProfileId)) {
@@ -181,6 +210,7 @@
                 $('#assignee_ids').val(Array.from(selectedProfileIds));
             });
 
+            // Search through students (with the filter applied)
             $('#search-students').keyup(function () {
                 var searchText = $(this).val();
                 if (searchText.length > 0) {
@@ -194,6 +224,7 @@
                 }
             });
 
+            // Select all filtered students
             $('#select-all').click(function () {
                 $('.student-row').each(function( index ) {
                     if ($(this).css('display') != 'none') {
@@ -204,11 +235,12 @@
                 });
             });
 
+            // Deselect all filtered students
             $('#select-none').click(function () {
-                selectedProfileIds = new Set();
+                var selectedProfileIds = new Set();
                 $('.student-row').each(function( index ) {
                     if ($(this).css('display') != 'none') {
-                        studentProfileId = this.getAttribute('data-profile-id');
+                        let studentProfileId = this.getAttribute('data-profile-id');
                         selectedProfileIds.delete(studentProfileId);
                         $(this).removeClass('active');
                     }

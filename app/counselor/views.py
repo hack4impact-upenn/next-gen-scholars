@@ -127,11 +127,11 @@ def change_user_email(user_id):
 @counselor.context_processor
 def processor():
     def get_essay_statuses(student_profile):
-        s = set()
-        for e in student_profile.essays:
-            s.add(e.status)
-        return list(s)
-    return dict(get_essay_statuses=get_essay_statuses)
+        return list(set([e.status for e in student_profile.essays]))
+    def get_colleges(student_profile):
+        return ';'.join([c.name for c in student_profile.colleges])
+
+    return dict(get_essay_statuses=get_essay_statuses, get_colleges=get_colleges)
 
 @counselor.route('/student-database', methods=['GET', 'POST'])
 @login_required
