@@ -36,8 +36,8 @@
                 <h5 class="ui header">Common App Essay Status</h5>
                 {% for s in essay_statuses %}
                 <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="0" class="hidden" id='c-{{s}}'>
+                    <div class="ui checkbox"  id='c-{{s}}'>
+                      <input type="checkbox" tabindex="0" class="hidden">
                       <label>{{ s }}</label>
                     </div>
                 </div>
@@ -46,8 +46,8 @@
                 <h5 class="ui header">Supplemental Essay Status</h5>
                 {% for s in essay_statuses %}
                 <div class="field">
-                    <div class="ui checkbox">
-                      <input type="checkbox" tabindex="0" class="hidden" id='s-{{s}}'>
+                    <div class="ui checkbox" id='s-{{s}}'>
+                      <input type="checkbox" tabindex="0" class="hidden">
                       <label>{{ s }}</label>
                     </div>
                 </div>
@@ -153,8 +153,21 @@
                 let fafsaFilter = $('#fafsa-field').val();
                 // list of college names, null if no colleges are selected
                 var temp = $('#colleges-field').dropdown('get value');
-                let collegesFilter = temp[temp.length - 1]
-                // true or false
+                let collegesFilter = temp[temp.length - 1];
+                // list of selected common app and supplemental essay statuses
+                let essay_statuses = ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'];
+                var commonAppFilter = [];
+                var supplementalFilter = [];
+                for (var i in essay_statuses) {
+                    let status = essay_statuses[i];
+                    if ($('#c-' + status).checkbox('is checked')) {
+                        commonAppFilter.push(status);
+                    }
+                    if ($('#s-' + status).checkbox('is checked')) {
+                        supplementalFilter.push(status);
+                    }
+                }
+                // uploaded filter is true or false
                 let essaysUploadedFilter = $('#essays-uploaded-field').checkbox('is checked');
                 $('.student-row').each(function () {
                     $this = $(this);
@@ -164,6 +177,34 @@
                     let fafsa = $this.find('.td-fafsa').data('fafsa');
                     if (fafsaFilter != 'All' && fafsa != fafsaFilter) {
                         $this.hide();
+                    }
+
+                    // Filter by essays uploaded
+                    let essaysUploaded = $this.find('.td-essays-uploaded').data('uploaded');
+                    if (essaysUploadedFilter && essaysUploaded) {
+                        $this.hide();
+                    }
+
+                    // Filter by common app essay
+                    if (commonAppFilter.length > 0) {
+                        let commonAppStatus = $this.find('.td-common-app-status').html();
+                        if (!commonAppFilter.includes(commonAppStatus)) {
+                            $this.hide();
+                        }
+                    }
+
+                    // Filter by supplemental essays
+                    if (supplementalFilter.length > 0) {
+                        let supplementalStatus = $this.find('.td-supplemental-status').html().split(', ');
+                        var matchesSupplementalFilter = false;
+                        for (i in supplementalFilter) {
+                            if (supplementalStatus.includes(supplementalFilter[i])) {
+                                matchesSupplementalFilter = true;
+                            }
+                        }
+                        if (!matchesSupplementalFilter) {
+                            $this.hide();
+                        }
                     }
 
                     // Filter by colleges
@@ -178,16 +219,6 @@
                         if (!matchesCollegesFilter) {
                             $this.hide();
                         }
-                    }
-
-                    // Filter by common app essay
-
-                    // Filter by supplemental essays
-
-                    // Filter by essays uploaded
-                    let essaysUploaded = $this.find('.td-essays-uploaded').data('uploaded');
-                    if (essaysUploadedFilter && essaysUploaded) {
-                        $this.hide();
                     }
                 });
             }
