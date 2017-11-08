@@ -1,6 +1,8 @@
 import random
 from faker import Faker
 from .. import db
+from sqlalchemy.orm import validates
+
 
 
 class RecommendationLetter(db.Model):
@@ -13,6 +15,11 @@ class RecommendationLetter(db.Model):
     category = db.Column(db.String, index=True)
     # statuses include 'Submitted', 'Pending', 'Incomplete'
     status = db.Column(db.String, index=True)
+
+    @validates('status')
+    def validate_status(self, key, status):
+        assert status in ['Submitted', 'Pending', 'Incomplete']
+        return status
 
     @staticmethod
     def generate_fake(count=2):
