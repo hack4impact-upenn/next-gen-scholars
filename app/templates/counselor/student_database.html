@@ -105,10 +105,10 @@
                     <tbody>
                     {% for s in student_profiles %}
                         <tr class="student-row">
-                            <td>{{ s.user[0].first_name }}</td>
-                            <td>{{ s.user[0].last_name }}</td>
-                            <td>{{ s.grade|string }}th</td>
-                            <td>{{ s.high_school }}</td>
+                            <td class="searchable-td">{{ s.user[0].first_name }}</td>
+                            <td class="searchable-td">{{ s.user[0].last_name }}</td>
+                            <td class="searchable-td">{{ s.grade|string }}th</td>
+                            <td class="searchable-td">{{ s.high_school }}</td>
                             <td style="text-align:center" class='td-fafsa' data-fafsa={{ s.fafsa_status }}>
                                 {% if s.fafsa_status == 'Incomplete' %}
                                 <i class="red x icon"></i></td>
@@ -171,7 +171,7 @@
                 let essaysUploadedFilter = $('#essays-uploaded-field').checkbox('is checked');
                 $('.student-row').each(function () {
                     $this = $(this);
-                    $this.removeClass('hidden').show();
+                    $this.show();
 
                     // Filter by FAFSA status
                     let fafsa = $this.find('.td-fafsa').data('fafsa');
@@ -243,15 +243,13 @@
 
             // Search through students (with the filter applied)
             $('#search-students').keyup(function () {
+                filterStudents();
                 var searchText = $(this).val();
+                $('.matches').removeClass('matches');
+                $('td.positive').removeClass('positive');
                 if (searchText.length > 0) {
-                    $('tbody td:icontains(' + searchText + ')').addClass('positive');
-                    $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
-                    $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
-                    $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
-                } else {
-                    $('td.positive').removeClass('positive');
-                    $('tr.hidden').removeClass('hidden').show();
+                    $('tbody .searchable-td:icontains(' + searchText + ')').addClass('positive');
+                    $('tbody tr').not('.matches').hide();
                 }
             });
 
