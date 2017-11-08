@@ -97,6 +97,8 @@
                             <th>High School</th>
                             <th>FAFSA</th>
                             <th>Essays Uploaded</th>
+                            <th>Common App Essay</th>
+                            <th>Supplemental Essays</th>
                             <th class="no-sort">Student Profile</th>
                         </tr>
                     </thead>
@@ -121,6 +123,8 @@
                                 <i class="green check icon"></i>
                                 {% endif %}
                             </td>
+                            <td>{{ s.common_app_essay_status }}</td>
+                            <td>{{ get_essay_statuses(s)|sort|join(', ') }}</td>
                             <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('counselor.view_user_profile', user_id=s.user[0].id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}

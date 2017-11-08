@@ -19,13 +19,13 @@ class Essay(db.Model):
 
     @validates('status')
     def validate_status(self, key, status):
-        assert status in ['Waiting', 'Reviewed', 'Edited', 'Done']
+        assert status in ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
         return status
 
     @staticmethod
     def generate_fake(count=2):
         fake = Faker()
-        status=['Waiting', 'Reviewed', 'Edited', 'Done']
+        status=['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
         essay_names = random.sample([
             'UPenn Why Essay',
             'Dartmouth Supplemental Essay',

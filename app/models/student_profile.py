@@ -2,6 +2,7 @@ import random
 from faker import Faker
 from . import College, Essay, Major, RecommendationLetter, TestScore
 from .. import db
+from sqlalchemy.orm import validates
 
 
 student_colleges = db.Table('student_colleges',
@@ -40,15 +41,22 @@ class StudentProfile(db.Model):
     # APPLICATION INFO
     # either 'Incomplete' or 'Complete'
     fafsa_status = db.Column(db.String, index=True, default='Incomplete')
-    common_app_essay = db.Column(db.String, index=True) # link to common app essay
+    common_app_essay = db.Column(db.String, index=True, default='') # link to common app essay
+    common_app_essay_status = db.Column(db.String, index=True, default='Incomplete')
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
+
+    @validates('common_app_essay_status')
+    def validate_status(self, key, status):
+        assert status in ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
+        return status
 
     @staticmethod
     def generate_fake():
         fake = Faker()
         year = random.choice([['2018', '12'], ['2019', '11'], ['2020', '10']])
         fafsa_status = random.choice(['Incomplete', 'Complete'])
+        essay_status = random.choice(['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'])
         profile = StudentProfile(
             high_school='{} High School'.format(fake.street_name()),
             district='{} District'.format(fake.city()),
@@ -62,6 +70,7 @@ class StudentProfile(db.Model):
             fafsa_status=fafsa_status,
             colleges=random.sample(College.query.all(), 3),
             common_app_essay='https://google.com',
+            common_app_essay_status=essay_status,
             essays=Essay.generate_fake(),
             recommendation_letters=RecommendationLetter.generate_fake()
         )

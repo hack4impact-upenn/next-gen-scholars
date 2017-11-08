@@ -124,6 +124,15 @@ def change_user_email(user_id):
     return render_template('counselor/manage_user.html', user=user, form=form)
 
 
+@counselor.context_processor
+def processor():
+    def get_essay_statuses(student_profile):
+        s = set()
+        for e in student_profile.essays:
+            s.add(e.status)
+        return list(s)
+    return dict(get_essay_statuses=get_essay_statuses)
+
 @counselor.route('/student-database', methods=['GET', 'POST'])
 @login_required
 @counselor_required
@@ -145,7 +154,7 @@ def student_database():
 
     student_profiles = StudentProfile.query.all()
     colleges = College.query.all()
-    essay_statuses = ['Waiting', 'Reviewed', 'Edited', 'Done']
+    essay_statuses = ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
     return render_template(
         'counselor/student_database.html',
         student_profiles=student_profiles,
