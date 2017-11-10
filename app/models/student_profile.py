@@ -43,6 +43,7 @@ class StudentProfile(db.Model):
     fafsa_status = db.Column(db.String, index=True, default='Incomplete')
     common_app_essay = db.Column(db.String, index=True, default='') # link to common app essay
     common_app_essay_status = db.Column(db.String, index=True, default='Incomplete')
+    early_deadline = db.Column(db.Boolean, default=False)
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
 
@@ -71,6 +72,7 @@ class StudentProfile(db.Model):
             colleges=random.sample(College.query.all(), 3),
             common_app_essay='https://google.com',
             common_app_essay_status=essay_status,
+            early_deadline=bool(random.getrandbits(1)),
             essays=Essay.generate_fake(),
             recommendation_letters=RecommendationLetter.generate_fake()
         )
