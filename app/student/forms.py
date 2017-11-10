@@ -1,7 +1,7 @@
 from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import PasswordField, StringField, SubmitField, IntegerField
+from wtforms.fields import PasswordField, StringField, SubmitField, IntegerField, FloatField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
@@ -43,6 +43,10 @@ class EditStudentProfile(Form):
         'High School', validators=[InputRequired(), Length(1, 100)])
     graduation_year = IntegerField(
         'Graduation Year', validators=[InputRequired()])
+    gpa = FloatField(
+        'GPA', validators=[InputRequired()])
+    fafsa_status = StringField(
+        'FAFSA Status', validators=[InputRequired(), Length(1, 100)])
     district = StringField(
         'District', validators=[InputRequired(), Length(1, 100)])
     city = StringField(
