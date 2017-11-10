@@ -87,6 +87,18 @@ def add_essay():
 
     return render_template('student/add_essay.html', form=form)
 
+def string_to_bool(str):
+    if str == 'True':
+        return True
+    if str == 'False':
+        return False
+
+def bool_to_string(bool):
+    if bool:
+        return 'True'
+    else:
+        return 'False'
+
 @student.route('/profile/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
@@ -103,7 +115,7 @@ def edit_profile():
             state=student_profile.state,
             fafsa_status=student_profile.fafsa_status,
             gpa=student_profile.gpa,
-            early_deadline=student_profile.early_deadline)
+            early_deadline=bool_to_string(student_profile.early_deadline))
         if form.validate_on_submit():
             # Update user profile information.
             student_profile.grade=form.grade.data
@@ -114,7 +126,7 @@ def edit_profile():
             student_profile.state=form.state.data
             student_profile.fafsa_status=form.fafsa_status.data
             student_profile.gpa=form.gpa.data
-            student_profile.early_deadline=form.early_deadline.data
+            student_profile.early_deadline=string_to_bool(form.early_deadline.data)
             db.session.add(student_profile)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))

@@ -55,13 +55,15 @@ class EditStudentProfile(Form):
         'FAFSA Status', choices=[('Incomplete', 'Incomplete'),
                                  ('Submitted', 'Submitted'),
                                  ('In Progress', 'In Progress')])
+    early_deadline = SelectField(
+        'Have Early Deadline',
+        choices=[('True', 'Yes'), ('False', 'No')])
     district = StringField(
         'District', validators=[InputRequired(), Length(1, 100)])
     city = StringField(
         'City', validators=[InputRequired(), Length(1, 100)])
     state = StringField(
         'State', validators=[InputRequired(), Length(1, 100)])
-    early_deadline = BooleanField('I Have An Early Deadline')
     submit = SubmitField('Update Profile')
 
 class AddCollegeForm(Form):
