@@ -102,8 +102,7 @@ def bool_to_string(bool):
 @student.route('/profile/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    ''' allow user to update basic profile information including:
-        grade, graduation year, high school, district, county, city, state'''
+    # Allow user to update basic profile information.
     student_profile = current_user.student_profile
     if student_profile:
         form = EditStudentProfile(
