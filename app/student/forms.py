@@ -51,3 +51,7 @@ class EditStudentProfile(Form):
 		'State', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Update Profile')
 
+class AddCollegeForm(Form):
+	name = StringField(
+		'College Name', validators=[InputRequired(), Length(1, 100)])
+	submit = SubmitField('Add College')

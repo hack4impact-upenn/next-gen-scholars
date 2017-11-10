@@ -1,8 +1,8 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from .forms import (
-    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm, EditStudentProfile)
-from ..models import TestScore, RecommendationLetter, Essay
+    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm, EditStudentProfile, AddCollegeForm)
+from ..models import TestScore, RecommendationLetter, Essay, College
 from .. import db
 from . import student
 
@@ -114,3 +114,24 @@ def edit_profile():
         return render_template('student/update_profile.html', form=form)
     flash('Profile could not be updated.', 'error')
     return redirect(url_for('student.view_user_profile'))
+
+@student.route('/profile/add_college', methods=['GET', 'POST'])
+@login_required
+def add_college():
+    # Add a college student is interested in.
+    form = AddCollegeForm()
+    student_profile = current_user.student_profile
+    if form.validate_on_submit():
+        if form.name.data not in student_profile.colleges:
+            # Only check to add college if not already in their list.
+            college_name = College.query.filter_by(name=form.name.data).first()
+            if college_name is not None:
+                # College already exists in database.
+                student_profile.colleges.append(college_name)
+            else:
+                student_profile.colleges.append(College(name=form.name.data))
+            db.session.add(student_profile)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+
+    return render_template('student/add_college.html', form=form)
