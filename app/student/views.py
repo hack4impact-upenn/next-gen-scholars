@@ -1,8 +1,9 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from .forms import (
-    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm, EditStudentProfile, AddCollegeForm)
-from ..models import TestScore, RecommendationLetter, Essay, College
+    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm,
+    EditStudentProfile, AddCollegeForm, AddMajorForm)
+from ..models import TestScore, RecommendationLetter, Essay, College, Major
 from .. import db
 from . import student
 
@@ -139,3 +140,24 @@ def add_college():
             return redirect(url_for('student.view_user_profile'))
 
     return render_template('student/add_college.html', form=form)
+
+@student.route('/profile/add_major', methods=['GET', 'POST'])
+@login_required
+def add_major():
+    # Add a major student is interested in.
+    form = AddMajorForm()
+    student_profile = current_user.student_profile
+    if form.validate_on_submit():
+        if form.major.data not in student_profile.majors:
+            # Only check to add major if not already in their list.
+            major_name = Major.query.filter_by(name=form.major.data).first()
+            if major_name is not None:
+                # Major already exists in database.
+                student_profile.majors.append(major_name)
+            else:
+                student_profile.majors.append(Major(name=form.major.data))
+            db.session.add(student_profile)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+
+    return render_template('student/add_major.html', form=form)

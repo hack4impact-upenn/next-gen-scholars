@@ -59,3 +59,8 @@ class AddCollegeForm(Form):
     name = StringField(
         'College Name', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Add College')
+
+class AddMajorForm(Form):
+    major = StringField(
+        'Major', validators=[InputRequired(), Length(1, 100)])
+    submit = SubmitField('Add Major')
