@@ -40,18 +40,18 @@ class EditStudentProfile(Form):
     grade = IntegerField(
         'Grade', validators=[InputRequired()])
     high_school = StringField(
-		'High School', validators=[InputRequired(), Length(1, 100)])
+        'High School', validators=[InputRequired(), Length(1, 100)])
     graduation_year = IntegerField(
         'Graduation Year', validators=[InputRequired()])
     district = StringField(
-		'District', validators=[InputRequired(), Length(1, 100)])
+        'District', validators=[InputRequired(), Length(1, 100)])
     city = StringField(
-		'City', validators=[InputRequired(), Length(1, 100)])
+        'City', validators=[InputRequired(), Length(1, 100)])
     state = StringField(
-		'State', validators=[InputRequired(), Length(1, 100)])
+        'State', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Update Profile')
 
 class AddCollegeForm(Form):
-	name = StringField(
-		'College Name', validators=[InputRequired(), Length(1, 100)])
-	submit = SubmitField('Add College')
+    name = StringField(
+        'College Name', validators=[InputRequired(), Length(1, 100)])
+    submit = SubmitField('Add College')
