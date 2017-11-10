@@ -102,7 +102,8 @@ def edit_profile():
             city=student_profile.city,
             state=student_profile.state,
             fafsa_status=student_profile.fafsa_status,
-            gpa=student_profile.gpa)
+            gpa=student_profile.gpa,
+            early_deadline=student_profile.early_deadline)
         if form.validate_on_submit():
             # Update user profile information.
             student_profile.grade=form.grade.data
@@ -113,6 +114,7 @@ def edit_profile():
             student_profile.state=form.state.data
             student_profile.fafsa_status=form.fafsa_status.data
             student_profile.gpa=form.gpa.data
+            student_profile.early_deadline=form.early_deadline.data
             db.session.add(student_profile)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
