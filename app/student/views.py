@@ -114,7 +114,3 @@ def edit_profile():
         return render_template('student/update_profile.html', form=form)
     flash('Profile could not be updated.', 'error')
     return redirect(url_for('student.view_user_profile'))
-
-
-
-

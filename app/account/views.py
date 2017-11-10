@@ -289,7 +289,7 @@ def checklist():
         db.session.add(checklist_item)
         db.session.commit()
         return redirect(url_for('account.checklist'))
-    return render_template('account/checklist.html', form=form, checklist=checklist_items, 
+    return render_template('account/checklist.html', form=form, checklist=checklist_items,
         completed=completed_items)
 
 
@@ -328,7 +328,6 @@ def undo_checklist_item(item_id):
         return redirect(url_for('account.checklist'))
     flash('Item could not be undone', 'error')
     return redirect(url_for('account.checklist'))
-
 
 @account.route('/checklist/update/<int:item_id>', methods=['GET', 'POST'])
 @login_required
