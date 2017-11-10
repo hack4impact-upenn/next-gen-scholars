@@ -26,8 +26,10 @@ class AddRecommendationLetterForm(Form):
 		'Name', validators=[InputRequired(), Length(1, 100)])
 	category = StringField(
 		'Position', validators=[InputRequired(), Length(1, 100)])
-	status = StringField(
-		'Status', validators=[InputRequired(), Length(1, 100)])
+	status = SelectField(
+        'Status', choices=[('Incomplete', 'Incomplete'),
+                           ('Submitted', 'Submitted'),
+                           ('Pending', 'Pending')])
 	submit = SubmitField('Add Recommendation Letter')
 
 class AddEssayForm(Form):
@@ -51,7 +53,7 @@ class EditStudentProfile(Form):
         'GPA', validators=[InputRequired()])
     fafsa_status = SelectField(
         'FAFSA Status', choices=[('Incomplete', 'Incomplete'),
-                                 ('Complete', 'Complete'),
+                                 ('Submitted', 'Submitted'),
                                  ('In Progress', 'In Progress')])
     district = StringField(
         'District', validators=[InputRequired(), Length(1, 100)])
