@@ -1,7 +1,7 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from .forms import (
-    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm)
+    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm, EditStudentProfile)
 from ..models import TestScore, RecommendationLetter, Essay
 from .. import db
 from . import student
@@ -85,3 +85,36 @@ def add_essay():
         return redirect(url_for('student.view_user_profile'))
 
     return render_template('student/add_essay.html', form=form)
+
+@student.route('/profile/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    ''' allow user to update basic profile information including:
+        grade, graduation year, high school, district, county, city, state'''
+    student_profile = current_user.student_profile
+    if student_profile:
+        form = EditStudentProfile(
+            grade=student_profile.grade,
+            high_school=student_profile.high_school,
+            graduation_year=student_profile.graduation_year,
+            district=student_profile.district,
+            city=student_profile.city,
+            state=student_profile.state)
+        if form.validate_on_submit():
+            # Update user profile information.
+            student_profile.grade=form.grade.data
+            student_profile.high_school=form.high_school.data
+            student_profile.graduation_year=form.graduation_year.data
+            student_profile.district=form.district.data
+            student_profile.city=form.city.data
+            student_profile.state=form.state.data
+            db.session.add(student_profile)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+        return render_template('student/update_profile.html', form=form)
+    flash('Profile could not be updated.', 'error')
+    return redirect(url_for('student.view_user_profile'))
+
+
+
+

@@ -35,3 +35,19 @@ class AddEssayForm(Form):
 	link = StringField(
 		'Link', validators=[InputRequired(), Length(1, 100)])
 	submit = SubmitField('Add Essay')
+
+class EditStudentProfile(Form):
+    grade = IntegerField(
+        'Grade', validators=[InputRequired()])
+    high_school = StringField(
+		'High School', validators=[InputRequired(), Length(1, 100)])
+    graduation_year = IntegerField(
+        'Graduation Year', validators=[InputRequired()])
+    district = StringField(
+		'District', validators=[InputRequired(), Length(1, 100)])
+    city = StringField(
+		'City', validators=[InputRequired(), Length(1, 100)])
+    state = StringField(
+		'State', validators=[InputRequired(), Length(1, 100)])
+    submit = SubmitField('Update Profile')
+
