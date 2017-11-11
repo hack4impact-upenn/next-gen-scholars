@@ -4,7 +4,9 @@ from datetime import datetime
 from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import (StringField, IntegerField, SubmitField, SelectField, PasswordField)
+from wtforms.fields import (PasswordField, StringField, SubmitField,
+                            IntegerField, FloatField, SelectField, BooleanField)
+from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 from wtforms.fields.html5 import EmailField
 
@@ -44,11 +46,13 @@ class EditSupplementalEssayForm(Form):
 class AddChecklistItemForm(Form):
     item_text = StringField(
         'Checklist Item', validators=[InputRequired(), Length(1, 64)])
+    date = DateField('Deadline', format='%Y-%m-%d', validators=[InputRequired()])
     submit = SubmitField('Add checklist item')
 
 class EditChecklistItemForm(Form):
     item_text = StringField(
         'New text', validators=[InputRequired(), Length(1, 64)])
+    date = DateField('Deadline', format='%Y-%m-%d', validators=[InputRequired()])
     submit = SubmitField('Update checklist item')
 
 
@@ -68,8 +72,10 @@ class AddRecommendationLetterForm(Form):
 		'Name', validators=[InputRequired(), Length(1, 100)])
 	category = StringField(
 		'Position', validators=[InputRequired(), Length(1, 100)])
-	status = StringField(
-		'Status', validators=[InputRequired(), Length(1, 100)])
+	status = SelectField(
+        'Status', choices=[('Incomplete', 'Incomplete'),
+                           ('Submitted', 'Submitted'),
+                           ('Pending', 'Pending')])
 	submit = SubmitField('Add Recommendation Letter')
 
 class AddEssayForm(Form):
@@ -78,3 +84,40 @@ class AddEssayForm(Form):
 	link = StringField(
 		'Link', validators=[InputRequired(), Length(1, 100)])
 	submit = SubmitField('Add Essay')
+
+class EditStudentProfile(Form):
+    grade = SelectField(
+        'Grade', choices=[('9', '9th Grade'),
+                          ('10', '10th Grade'),
+                          ('11', '11th Grade'),
+                          ('12', '12th Grade')])
+    high_school = StringField(
+        'High School', validators=[InputRequired(), Length(1, 100)])
+    graduation_year = IntegerField(
+        'Graduation Year', validators=[InputRequired()])
+    gpa = FloatField(
+        'GPA', validators=[InputRequired()])
+    fafsa_status = SelectField(
+        'FAFSA Status', choices=[('Incomplete', 'Incomplete'),
+                                 ('Submitted', 'Submitted'),
+                                 ('In Progress', 'In Progress')])
+    early_deadline = SelectField(
+        'Have Early Deadline',
+        choices=[('True', 'Yes'), ('False', 'No')])
+    district = StringField(
+        'District', validators=[InputRequired(), Length(1, 100)])
+    city = StringField(
+        'City', validators=[InputRequired(), Length(1, 100)])
+    state = StringField(
+        'State', validators=[InputRequired(), Length(1, 100)])
+    submit = SubmitField('Update Profile')
+
+class AddCollegeForm(Form):
+    name = StringField(
+        'College Name', validators=[InputRequired(), Length(1, 100)])
+    submit = SubmitField('Add College')
+
+class AddMajorForm(Form):
+    major = StringField(
+        'Major', validators=[InputRequired(), Length(1, 100)])
+    submit = SubmitField('Add Major')

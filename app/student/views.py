@@ -1,7 +1,12 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
+from .forms import (
+    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm,
+    EditStudentProfile, AddCollegeForm, AddMajorForm)
+from ..models import TestScore, RecommendationLetter, Essay, College, Major
 from .. import db
 from . import student
+from datetime import datetime
 from .forms import (AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm, EditCollegeForm, 
     EditSupplementalEssayForm, EditTestScoreForm, EditCommonAppEssayForm, AddChecklistItemForm, 
     EditChecklistItemForm)
@@ -135,7 +140,8 @@ def checklist(student_profile_id):
             checklist_item = ChecklistItem(
                 assignee_id=student_profile_id,
                 text=form.item_text.data,
-                is_deletable=True)
+                is_deletable=True,
+                deadline=form.date.data)
             db.session.add(checklist_item)
             db.session.commit()
             return redirect(url_for('student.checklist', student_profile_id=student_profile_id))
@@ -187,9 +193,10 @@ def undo_checklist_item(item_id):
 def update_checklist_item(item_id):
     item = ChecklistItem.query.filter_by(id=item_id).first()
     if item:
-        form = EditChecklistItemForm(item_text=item.text)
+        form = EditChecklistItemForm(item_text=item.text, date=item.deadline)
         if form.validate_on_submit():
             item.text=form.item_text.data
+            item.deadline=form.date.data
             db.session.add(item)
             db.session.commit()
             return redirect(url_for('student.checklist', student_profile_id=item.assignee_id))
@@ -203,9 +210,9 @@ def update_checklist_item(item_id):
         test_scores = student_profile.test_scores
         for t in test_scores:
             if t.name == 'SAT':
-                sat = t.score
+                sat = max(sat, t.score) if sat != '––' else t.score
             if t.name == 'ACT':
-                act = t.score
+                act = max(act, t.score) if act != '––' else t.score
         return render_template('student/student_profile.html', user=current_user, sat=sat, act=act)
 
 
@@ -264,3 +271,91 @@ def add_essay():
         return redirect(url_for('student.view_user_profile'))
 
     return render_template('student/add_essay.html', form=form)
+
+def string_to_bool(str):
+    if str == 'True':
+        return True
+    if str == 'False':
+        return False
+
+def bool_to_string(bool):
+    if bool:
+        return 'True'
+    else:
+        return 'False'
+
+@student.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    # Allow user to update basic profile information.
+    student_profile = current_user.student_profile
+    if student_profile:
+        form = EditStudentProfile(
+            grade=student_profile.grade,
+            high_school=student_profile.high_school,
+            graduation_year=student_profile.graduation_year,
+            district=student_profile.district,
+            city=student_profile.city,
+            state=student_profile.state,
+            fafsa_status=student_profile.fafsa_status,
+            gpa=student_profile.gpa,
+            early_deadline=bool_to_string(student_profile.early_deadline))
+        if form.validate_on_submit():
+            # Update user profile information.
+            student_profile.grade=form.grade.data
+            student_profile.high_school=form.high_school.data
+            student_profile.graduation_year=form.graduation_year.data
+            student_profile.district=form.district.data
+            student_profile.city=form.city.data
+            student_profile.state=form.state.data
+            student_profile.fafsa_status=form.fafsa_status.data
+            student_profile.gpa=form.gpa.data
+            student_profile.early_deadline=string_to_bool(form.early_deadline.data)
+            db.session.add(student_profile)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+        return render_template('student/update_profile.html', form=form)
+    flash('Profile could not be updated.', 'error')
+    return redirect(url_for('student.view_user_profile'))
+
+@student.route('/profile/add_college', methods=['GET', 'POST'])
+@login_required
+def add_college():
+    # Add a college student is interested in.
+    form = AddCollegeForm()
+    student_profile = current_user.student_profile
+    if form.validate_on_submit():
+        if form.name.data not in student_profile.colleges:
+            # Only check to add college if not already in their list.
+            college_name = College.query.filter_by(name=form.name.data).first()
+            if college_name is not None:
+                # College already exists in database.
+                student_profile.colleges.append(college_name)
+            else:
+                student_profile.colleges.append(College(name=form.name.data))
+            db.session.add(student_profile)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+
+    return render_template('student/add_college.html', form=form)
+
+@student.route('/profile/add_major', methods=['GET', 'POST'])
+@login_required
+def add_major():
+    # Add a major student is interested in.
+    form = AddMajorForm()
+    student_profile = current_user.student_profile
+    if form.validate_on_submit():
+        if form.major.data not in student_profile.majors:
+            # Only check to add major if not already in their list.
+            major_name = Major.query.filter_by(name=form.major.data).first()
+            if major_name is not None:
+                # Major already exists in database.
+                student_profile.majors.append(major_name)
+            else:
+                student_profile.majors.append(Major(name=form.major.data))
+            db.session.add(student_profile)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+
+    return render_template('student/add_major.html', form=form)

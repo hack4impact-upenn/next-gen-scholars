@@ -1,6 +1,7 @@
 import random
 from faker import Faker
 from .. import db
+from sqlalchemy.orm import validates
 
 
 class Essay(db.Model):
@@ -13,11 +14,18 @@ class Essay(db.Model):
         nullable=False,
         index=True
     )
+    status = db.Column(db.String, index=True)
     link = db.Column(db.String, index=True)
+
+    @validates('status')
+    def validate_status(self, key, status):
+        assert status in ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
+        return status
 
     @staticmethod
     def generate_fake(count=2):
         fake = Faker()
+        status=['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
         essay_names = random.sample([
             'UPenn Why Essay',
             'Dartmouth Supplemental Essay',
@@ -34,7 +42,8 @@ class Essay(db.Model):
         for i in range(count):
             essays.append(Essay(
                 name=essay_names[i],
-                link="https://google.com"
+                status=random.choice(status),
+                link='https://google.com'
             ))
         return essays
 

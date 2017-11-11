@@ -1,45 +1,46 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-
 <div class="ui stackable centered grid container">
-    <div style="margin:auto;text-align:left">
-        <br />
-        <div class="ui items">
-            <div class="item">
-                <div class="ui small image">
-                    <img src="/static/images/user-avatar.jpg"/>
-                </div>
-                <div class="middle aligned content">
-                    <div class="header">
-                        <h1 class="ui header">{{ user.full_name() }}</h1>
+    <div class="ten wide column">
+        <div style="margin:auto;text-align:left">
+            <br />
+            <div class="ui items">
+                <div class="item">
+                    <div class="ui small image">
+                        <img src="/static/images/user-avatar.jpg"/>
                     </div>
-                    <button class="right floated ui blue basic button">Edit Profile</button>
-                    <div class="description" style="font-size:1.1em">
+                    <div class="middle aligned content">
+                        <div class="header">
+                            <h1 class="ui header">{{ user.full_name() }}</h1>
+                        </div>
+                        <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.edit_profile') }}';">Edit Profile</button>
+                        <div class="description" style="font-size:1.1em">
+                            <div class="ui list">
+                                <div class="item">
+                                    <i class="mail icon"></i>
+                                    <div class="content">
+                                        &nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <i class="calendar outline icon"></i>
+                                    <div class="content">
+                                        &nbsp;{{ user.student_profile.grade }}th Grade
+                                    </div>
 
-                        <div class="ui list">
-                            <div class="item">
-                                <i class="mail icon"></i>
-                                <div class="content">
-                                    &nbsp<a href="mailto:{{ user.email }}">{{ user.email }}</a>
                                 </div>
-                            </div>
-                            <div class="item">
-                                <i class="calendar outline icon"></i>
-                                <div class="content">
-                                    &nbsp{{ user.student_profile.grade }}th Grade
+                                <div class="item">
+                                    <i class="student icon"></i>
+                                    <div class="content">
+                                        {{ user.student_profile.high_school }}, {{ user.student_profile.graduation_year }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="item">
-                                <i class="student icon"></i>
-                                <div class="content">
-                                    {{ user.student_profile.high_school }}, {{ user.student_profile.graduation_year }}
-                                </div>
-                            </div>
-                            <div class="item">
-                                <i class="marker icon"></i>
-                                <div class="content">
-                                    &nbsp{{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
+                                <div class="item">
+                                    <i class="marker icon"></i>
+                                    <div class="content">
+                                        &nbsp; {{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -51,7 +52,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            <h3>Academic Information &nbsp <i class="blue link edit icon"></i></h3>
+            <h3>Academic Information &nbsp; <i class="blue link edit icon"></i></h3>
             </div>
         </div>
     </div>
@@ -79,26 +80,26 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Test Scores
+            Test Scores &nbsp; <i class="blue link edit icon" id="edit-test-scores"></i>
             </div>
             <span style="padding:0.2em"></span>
             <div class="ui three cards">
                 {% for test in user.student_profile.test_scores|sort(attribute='name') %}
-                <div class="orange card">
-                    <div class="content">
+                <div class="orange card test-card">
+                    <div class="center aligned content">
+                        <div class="header">{{ test.name }}</div>
+                        <div class="meta">{{ test.month }} {{ test.year }}</div>
                         <div class="description">
                             <div class="ui mini one statistics">
                                 <div class="statistic">
-                                    <div class="label">{{ test.name }}</div>
-                                    <span style="padding:0.25em"></span>
                                     <div class="value">{{ test.score|string }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="ui bottom attached orange basic button">
+                    <a href="{{ url_for('student.edit_test_score', item_id=test.id) }}" class="ui bottom attached orange basic button">
                         <i class="edit icon"></i>Edit
-                    </div>
+                    </a>
                 </div>
                 {% endfor %}
                 <a class="green card" href="{{ url_for('student.add_test_score') }}">
@@ -116,7 +117,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Majors of Interest &nbsp <i class="blue link edit icon" id="edit-majors"></i>
+            Majors of Interest &nbsp; <i class="blue link edit icon" id="edit-majors"></i>
             </div>
         </div>
         <div class="ten wide column">
@@ -130,14 +131,14 @@
             </div>
         </div>
         <div class="two wide column">
-            <a class="ui right floated green basic button">Add Major</a>
+            <a class="ui right floated green basic button" onclick="window.location.href='{{ url_for('student.add_major') }}';">Add Major</a>
         </div>
     </div>
 
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            Colleges of Interest &nbsp <i class="blue link edit icon" id="edit-colleges"></i>
+            Colleges of Interest &nbsp; <i class="blue link edit icon" id="edit-colleges"></i>
             </div>
             <div class="ui four cards">
                 {% for college in user.student_profile.colleges|sort(attribute='name') %}
@@ -152,7 +153,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <div class="ui green link card">
+                <div class="ui green link card" onclick="window.location.href='{{ url_for('student.add_college') }}';">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
                             <i class="big green plus icon"></i><br />
@@ -250,6 +251,28 @@
             </div>
         </div>
     </div>
+    <div id="modaldiv" class="ui modal">
+                  <i class="close icon"></i>
+                  <div class="header">
+                    Profile Picture
+                  </div>
+                  <div class="content">
+                    <div class="description">
+                      <div class="ui header">We've auto-chosen a profile image for you.</div>
+                      <p>We've grabbed the following image from the <a href="https://www.gravatar.com" target="_blank">gravatar</a> image associated with your registered e-mail address.</p>
+                      <p>Is it okay to use this photo?</p>
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <div class="ui black button">
+                      Nope
+                    </div>
+                    <div class="ui positive right labeled icon button">
+                      Yep, that's me
+                      <i class="checkmark icon"></i>
+                    </div>
+                  </div>
+                </div>
 </div>
 
 <script type="text/javascript">
@@ -257,6 +280,7 @@
 $(document).ready(function () {
     var editingMajors = false;
     var editingColleges = false;
+    var editingTestScores = false;
 
     $('#edit-majors').click(function () {
         editingMajors = !editingMajors;
@@ -274,6 +298,7 @@ $(document).ready(function () {
 
     $('#edit-colleges').click(function () {
         editingColleges = !editingColleges;
+        $('#modaldiv').modal('show');  
         if (editingColleges) {
             $('#edit-colleges').removeClass('blue edit');
             $('#edit-colleges').addClass('green check');

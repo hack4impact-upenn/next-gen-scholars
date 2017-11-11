@@ -58,9 +58,28 @@
         <div class="stretched divided very relaxed row">
             <div class="eight wide column">
             	{{ render_checklist(checklist) }}
-                {{ f.render_form(form, extra_classes='fluid') }}
+                <button class="ui button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
                 {{ completed_list(completed) }}
             </div>
         </div>
     </div>
+
+    <div id="modaldiv" class="ui tiny modal">
+        <div class="ui segment">
+            {{ f.render_form(form, extra_classes='fluid') }}
+        </div>
+    </div>
+
+
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $('#add-checklist-item').click(function () { 
+        $('#modaldiv').modal('show');  
+    });
+});
+
+</script>
 {% endblock %}
