@@ -99,7 +99,7 @@ def bool_to_string(bool):
     else:
         return 'False'
 
-@student.route('/profile/edit_profile', methods=['GET', 'POST'])
+@student.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     # Allow user to update basic profile information.
