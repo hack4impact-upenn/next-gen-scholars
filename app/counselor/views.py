@@ -211,3 +211,10 @@ def checklist():
         db.session.commit()
         return redirect(url_for('counselor.checklist'))
     return render_template('counselor/checklist.html', form=form, checklist=default_items)
+
+@counselor.route('/calendar')
+@login_required
+@counselor_required
+def calendar():
+    """ See a calendar """
+    return render_template('counselor/calendar.html')

@@ -18,7 +18,7 @@ def checklist():
 @student.route('/profile')
 @login_required
 def view_user_profile():
-    sat = '––'
+    sat = '__'
     act = '––'
     student_profile = current_user.student_profile
     if student_profile is not None:
