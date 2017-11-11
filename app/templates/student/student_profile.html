@@ -14,7 +14,7 @@
                         <div class="header">
                             <h1 class="ui header">{{ user.full_name() }}</h1>
                         </div>
-                        <button class="right floated ui blue basic button">Edit Profile</button>
+                        <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.edit_profile') }}';">Edit Profile</button>
                         <div class="description" style="font-size:1.1em">
                             <div class="ui list">
                                 <div class="item">
@@ -131,7 +131,7 @@
             </div>
         </div>
         <div class="two wide column">
-            <a class="ui right floated green basic button">Add Major</a>
+            <a class="ui right floated green basic button" onclick="window.location.href='{{ url_for('student.add_major') }}';">Add Major</a>
         </div>
     </div>
 
@@ -153,7 +153,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <div class="ui green link card">
+                <div class="ui green link card" onclick="window.location.href='{{ url_for('student.add_college') }}';">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
                             <i class="big green plus icon"></i><br />
