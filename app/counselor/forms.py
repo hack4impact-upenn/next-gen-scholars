@@ -2,7 +2,7 @@ from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import PasswordField, StringField, SubmitField, HiddenField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
 from .. import db
@@ -61,5 +61,6 @@ class NewUserForm(InviteUserForm):
 class AddChecklistItemForm(Form):
     item_text = StringField(
         'Checklist Item', validators=[InputRequired(), Length(1, 64)])
+    date = DateField('Deadline', format='%Y-%m-%d', validators=[InputRequired()])
     assignee_ids = HiddenField('Assignee Ids')
     submit = SubmitField('Add checklist item')

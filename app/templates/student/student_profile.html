@@ -1,4 +1,5 @@
 {% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
 
 {% block content %}
 <div class="ui stackable centered grid container">
@@ -174,21 +175,63 @@
             <div class="ui horizontal divider">Essays</div>
 
             <div class="ui four cards">
-                <div class="purple card">
+                {% if user.student_profile.common_app_essay|length > 1 %}
+                    <div class="purple card">
                     <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="center aligned content" >
                         <div class="description">
                             <h4 class="ui header">Common App Essay</h4>
+                            {% if user.student_profile.common_app_essay_status=='Incomplete' %}
+                            <span style="color:#db2828">
+                            {% elif user.student_profile.common_app_essay_status=='Waiting' %}
+                            <span style="color:#eaae00">
+                            {% elif user.student_profile.common_app_essay_status=='Reviewed' %}
+                            <span style="color:#eaae00">
+                            {% elif user.student_profile.common_app_essay_status=='Edited' %}
+                            <span style="color:#eaae00">
+                            {% elif user.student_profile.common_app_essay_status=='Done' %}
+                            <span style="color:#21ba45">
+                            {% else %}
+                            <span>
+                            {% endif %}
+                            <strong>{{ user.student_profile.common_app_essay_status }}</strong></span>
                         </div>
                     </a>
                     <a href="{{ url_for('student.edit_common_app_essay') }}" class="ui bottom attached purple basic button">
                         <i class="edit icon"></i>Edit
                     </a>
-                </div>
+                    </div>
+                {% else %}
+                    <a class="green card" href="{{ url_for('student.add_common_app_essay') }}">
+                        <div class="content" style="text-align:center">
+                            <div class="description" style="margin:0 auto">
+                                <h3></h3><i class="big green plus icon"></i><br />
+                            <span style="color:#21ba45">Add Common App Essay</span>
+                            </div>
+                        </div>
+                    </a>
+                {% endif %}
+                
+                
+                
                 {% for essay in user.student_profile.essays|sort(attribute='name') %}
                 <div class="purple card">
                     <a href="{{ essay.link }}" target="_blank" class="center aligned content" >
                         <div class="description">
                             <h4 class="ui header">{{ essay.name }}</h4>
+                            {% if essay.status=='Incomplete' %}
+                            <span style="color:#db2828">
+                            {% elif essay.status=='Waiting' %}
+                            <span style="color:#eaae00">
+                            {% elif essay.status=='Reviewed' %}
+                            <span style="color:#eaae00">
+                            {% elif essay.status=='Edited' %}
+                            <span style="color:#eaae00">
+                            {% elif essay.status=='Done' %}
+                            <span style="color:#21ba45">
+                            {% else %}
+                            <span>
+                            {% endif %}
+                            <strong>{{ essay.status }}</strong></span>
                         </div>
                     </a>
                     <a href="{{ url_for('student.edit_supplemental_essay', item_id=essay.id) }}" class="ui bottom attached purple basic button">
@@ -196,11 +239,11 @@
                     </a>
                 </div>
                 {% endfor %}
-                <a class="green card" href="{{ url_for('student.add_essay') }}">
+                <a class="green card" href="{{ url_for('student.add_supplemental_essay') }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
                             <h3></h3><i class="big green plus icon"></i><br />
-                        <span style="color:#21ba45">Add Essay</span>
+                        <span style="color:#21ba45">Add Supplemental Essay</span>
                         </div>
                     </div>
                 </a>
@@ -235,9 +278,9 @@
                             <strong>{{ letter.status }}</strong></span>
                         </div>
                     </div>
-                    <div class="ui bottom attached black basic button">
+                    <a href="{{ url_for('student.edit_recommendation_letter', item_id=letter.id) }}" class="ui bottom attached black basic button">
                         <i class="edit icon"></i>Edit
-                    </div>
+                    </a>
                 </div>
                 {% endfor %}
                 <a class="green card" href="{{ url_for('student.add_recommendation_letter') }}">
@@ -251,28 +294,6 @@
             </div>
         </div>
     </div>
-    <div id="modaldiv" class="ui modal">
-                  <i class="close icon"></i>
-                  <div class="header">
-                    Profile Picture
-                  </div>
-                  <div class="content">
-                    <div class="description">
-                      <div class="ui header">We've auto-chosen a profile image for you.</div>
-                      <p>We've grabbed the following image from the <a href="https://www.gravatar.com" target="_blank">gravatar</a> image associated with your registered e-mail address.</p>
-                      <p>Is it okay to use this photo?</p>
-                    </div>
-                  </div>
-                  <div class="actions">
-                    <div class="ui black button">
-                      Nope
-                    </div>
-                    <div class="ui positive right labeled icon button">
-                      Yep, that's me
-                      <i class="checkmark icon"></i>
-                    </div>
-                  </div>
-                </div>
 </div>
 
 <script type="text/javascript">
@@ -297,8 +318,7 @@ $(document).ready(function () {
     });
 
     $('#edit-colleges').click(function () {
-        editingColleges = !editingColleges;
-        $('#modaldiv').modal('show');  
+        editingColleges = !editingColleges;  
         if (editingColleges) {
             $('#edit-colleges').removeClass('blue edit');
             $('#edit-colleges').addClass('green check');

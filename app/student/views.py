@@ -1,15 +1,12 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
-from .forms import (
-    AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm,
-    EditStudentProfile, AddCollegeForm, AddMajorForm)
 from ..models import TestScore, RecommendationLetter, Essay, College, Major
 from .. import db
 from . import student
-from datetime import datetime
-from .forms import (AddTestScoreForm, AddRecommendationLetterForm, AddEssayForm, EditCollegeForm, 
+from .forms import (AddTestScoreForm, AddRecommendationLetterForm, AddSupplementalEssayForm, EditCollegeForm, 
     EditSupplementalEssayForm, EditTestScoreForm, EditCommonAppEssayForm, AddChecklistItemForm, 
-    EditChecklistItemForm)
+    EditChecklistItemForm, EditStudentProfile, AddMajorForm, AddCollegeForm, EditRecommendationLetterForm, 
+    AddCommonAppEssayForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem, RecommendationLetter)
 
 @student.route('/profile')
@@ -28,7 +25,7 @@ def edit_college(item_id):
             db.session.add(college)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
-        return render_template('student/edit_profile_info.html', form=form)
+        return render_template('student/edit_academic_info.html', form=form, header="Edit College")
     flash('Item could not be updated', 'error')
     return redirect(url_for('student.view_user_profile'))
 
@@ -47,8 +44,39 @@ def edit_test_score(item_id):
             db.session.add(test_score)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
-        return render_template('student/edit_profile_info.html', form=form)
+        return render_template('student/edit_academic_info.html', form=form, header="Edit Test Score")
     flash('Item could not be updated', 'error')
+    return redirect(url_for('student.view_user_profile'))
+
+
+@student.route('/profile/recommendation_letter/edit/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def edit_recommendation_letter(item_id):
+    letter = RecommendationLetter.query.filter_by(id=item_id).first()
+    if letter:
+        form = EditRecommendationLetterForm(name=letter.name, category=letter.category, status=letter.status)
+        if form.validate_on_submit():
+            letter.name=form.name.data 
+            letter.category=form.category.data
+            letter.status=form.status.data
+            db.session.add(letter)
+            db.session.commit()
+            return redirect(url_for('student.view_user_profile'))
+        return render_template('student/edit_academic_info.html', form=form, header="Edit Recommendation Letter")
+    flash('Item could not be updated', 'error')
+    return redirect(url_for('student.view_user_profile'))
+
+
+@student.route('/profile/recommendation_letter/delete/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def delete_recommendation_letter(item_id):
+    letter = RecommendationLetter.query.filter_by(id=item_id).first()
+    if letter:
+        db.session.delete(letter)
+        db.session.commit()
+        db.session.commit()
+        return redirect(url_for('student.view_user_profile'))
+    flash('Item could not be deleted', 'error')
     return redirect(url_for('student.view_user_profile'))
 
 
@@ -61,10 +89,11 @@ def edit_supplemental_essay(item_id):
         if form.validate_on_submit():
             essay.name=form.essay_name.data
             essay.link=form.link.data
+            essay.status=form.status.data
             db.session.add(essay)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
-        return render_template('student/edit_profile_info.html', form=form)
+        return render_template('student/edit_academic_info.html', form=form, header="Edit Supplemental Essay")
     flash('Item could not be updated', 'error')
     return redirect(url_for('student.view_user_profile'))
 
@@ -74,10 +103,11 @@ def edit_common_app_essay():
     form = EditCommonAppEssayForm(link=current_user.student_profile.common_app_essay)
     if form.validate_on_submit():
         current_user.student_profile.common_app_essay=form.link.data
+        current_user.student_profile.common_app_essay_status=form.status.data
         db.session.add(current_user)
         db.session.commit()
         return redirect(url_for('student.view_user_profile'))
-    return render_template('student/edit_profile_info.html', form=form)
+    return render_template('student/edit_academic_info.html', form=form, header="Edit Common App Essay")
 
 
 @student.route('/profile/test_score/delete/<int:item_id>', methods=['GET', 'POST'])
@@ -219,21 +249,19 @@ def update_checklist_item(item_id):
 @student.route('/profile/add_test_score', methods=['GET', 'POST'])
 @login_required
 def add_test_score():
-    # display list of default checklist items and option to add a new one
     form = AddTestScoreForm()
     if form.validate_on_submit():
         # create new test score from form data
         new_item = TestScore(
             student_profile_id=current_user.student_profile_id,
             name=form.test_name.data,
-            score=form.test_score.data,
-            month=form.test_month.data,
-            year=form.test_year.data)
+            month=form.month.data,
+            year=form.year.data,
+            score=form.score.data)
         db.session.add(new_item)
         db.session.commit()
         return redirect(url_for('student.view_user_profile'))
-
-    return render_template('student/add_test_score.html', form=form)
+    return render_template('student/add_academic_info.html', form=form, header="Add Test Score")
 
 
 @student.route('/profile/add_recommendation_letter', methods=['GET', 'POST'])
@@ -252,25 +280,38 @@ def add_recommendation_letter():
         db.session.commit()
         return redirect(url_for('student.view_user_profile'))
 
-    return render_template('student/add_recommendation_letter.html', form=form)
+    return render_template('student/add_academic_info.html', form=form, header="Add Recommendation Letter")
 
 
-@student.route('/profile/add_essay', methods=['GET', 'POST'])
+@student.route('/profile/add_supplemental_essay', methods=['GET', 'POST'])
 @login_required
-def add_essay():
-    # display list of default checklist items and option to add a new one
-    form = AddEssayForm()
+def add_supplemental_essay():
+    form = AddSupplementalEssayForm()
     if form.validate_on_submit():
-        # create new test score from form data
+        # create new essay from form data
         new_item = Essay(
             student_profile_id=current_user.student_profile_id,
             name=form.name.data,
-            link=form.link.data)
+            link=form.link.data,
+            status=form.status.data)
         db.session.add(new_item)
         db.session.commit()
         return redirect(url_for('student.view_user_profile'))
 
-    return render_template('student/add_essay.html', form=form)
+    return render_template('student/add_academic_info.html', form=form, header="Add Supplemental Essay")
+
+@student.route('/profile/add_common_app_essay', methods=['GET', 'POST'])
+@login_required
+def add_common_app_essay():
+    form = AddCommonAppEssayForm()
+    if form.validate_on_submit():
+        current_user.student_profile.common_app_essay=form.link.data
+        current_user.student_profile.common_app_essay_status=form.status.data
+        db.session.add(current_user)
+        db.session.commit()
+        return redirect(url_for('student.view_user_profile'))
+
+    return render_template('student/add_academic_info.html', form=form, header="Add Supplemental Essay")
 
 def string_to_bool(str):
     if str == 'True':
@@ -337,7 +378,7 @@ def add_college():
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
 
-    return render_template('student/add_college.html', form=form)
+    return render_template('student/add_academic_info.html', form=form, header="Add College")
 
 @student.route('/profile/add_major', methods=['GET', 'POST'])
 @login_required
@@ -358,4 +399,4 @@ def add_major():
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
 
-    return render_template('student/add_major.html', form=form)
+    return render_template('student/add_academic_info.html', form=form, header="Add Major")

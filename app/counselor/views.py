@@ -145,7 +145,8 @@ def student_database():
                 text=checklist_form.item_text.data,
                 assignee_id=assignee_id,
                 is_deletable=False,
-                creator_role_id=3
+                creator_role_id=3,
+                deadline=form.date.data
             )
             db.session.add(checklist_item)
         db.session.commit()
