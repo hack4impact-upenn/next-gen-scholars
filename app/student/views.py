@@ -1,18 +1,23 @@
-from flask import abort, flash, redirect, render_template, url_for, request
+from flask import (abort, flash, redirect, render_template, url_for, request,
+    jsonify)
 from flask_login import current_user, login_required
 from ..models import TestScore, RecommendationLetter, Essay, College, Major
-from .. import db
+from .. import db, csrf
 from . import student
-from .forms import (AddTestScoreForm, AddRecommendationLetterForm, AddSupplementalEssayForm, EditCollegeForm, 
-    EditSupplementalEssayForm, EditTestScoreForm, EditCommonAppEssayForm, AddChecklistItemForm, 
-    EditChecklistItemForm, EditStudentProfile, AddMajorForm, AddCollegeForm, EditRecommendationLetterForm, 
-    AddCommonAppEssayForm)
-from ..models import (User, College, Essay, TestScore, ChecklistItem, RecommendationLetter)
+from .forms import (AddTestScoreForm, AddRecommendationLetterForm, 
+    AddSupplementalEssayForm, EditCollegeForm, EditSupplementalEssayForm,
+    EditTestScoreForm, EditCommonAppEssayForm, AddChecklistItemForm, 
+    EditChecklistItemForm, EditStudentProfile, AddMajorForm, AddCollegeForm,
+    EditRecommendationLetterForm, AddCommonAppEssayForm)
+from ..models import (User, College, Essay, TestScore, ChecklistItem, 
+    RecommendationLetter)
+
 
 @student.route('/profile')
 @login_required
 def view_user_profile():
-	return render_template('student/student_profile.html', user = current_user)
+	return render_template('student/student_profile.html', user=current_user)
+
 
 @student.route('/profile/college/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
@@ -25,7 +30,8 @@ def edit_college(item_id):
             db.session.add(college)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))
-        return render_template('student/edit_academic_info.html', form=form, header="Edit College")
+        return render_template('student/edit_academic_info.html', form=form,
+            header="Edit College")
     flash('Item could not be updated', 'error')
     return redirect(url_for('student.view_user_profile'))
 
@@ -69,15 +75,15 @@ def edit_recommendation_letter(item_id):
 
 @student.route('/profile/recommendation_letter/delete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def delete_recommendation_letter(item_id):
     letter = RecommendationLetter.query.filter_by(id=item_id).first()
     if letter:
         db.session.delete(letter)
         db.session.commit()
         db.session.commit()
-        return redirect(url_for('student.view_user_profile'))
-    flash('Item could not be deleted', 'error')
-    return redirect(url_for('student.view_user_profile'))
+        return jsonify({"success" : "True"})
+    return jsonify({"success" : "False"})
 
 
 @student.route('/profile/supplemental_essay/edit/<int:item_id>', methods=['GET', 'POST'])
@@ -112,30 +118,31 @@ def edit_common_app_essay():
 
 @student.route('/profile/test_score/delete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def delete_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
         db.session.delete(test_score)
         db.session.commit()
-        return redirect(url_for('student.view_user_profile'))
-    flash('Item could not be deleted', 'error')
-    return redirect(url_for('student.view_user_profile'))
+        return jsonify({"success" : "True"})
+    return jsonify({"success" : "False"})
 
 
 @student.route('/profile/supplemental_essay/delete/<int:item_id>', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def delete_supplemental_essay(item_id):
     essay = Essay.query.filter_by(id=item_id).first()
     if essay:
         db.session.delete(essay)
         db.session.commit()
-        return redirect(url_for('student.view_user_profile'))
-    flash('Item could not be deleted', 'error')
-    return redirect(url_for('student.view_user_profile'))
+        return jsonify({"success" : "True"})
+    return jsonify({"success" : "False"})
 
 
 @student.route('/profile/common_app_essay/delete', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def delete_common_app_essay():
     current_user.student_profile.common_app_essay=''
     db.session.add(current_user)
@@ -143,17 +150,28 @@ def delete_common_app_essay():
     return redirect(url_for('student.view_user_profile'))
 
 
-@student.route('/profile/college/delete/<int:item_id>', methods=['GET', 'POST'])
+@student.route('/profile/college/delete/<int:item_id>', methods=['POST'])
 @login_required
+@csrf.exempt
 def delete_college(item_id):
     college = College.query.filter_by(id=item_id).first()
     if college:
         db.session.delete(college)
         db.session.commit()
-        return redirect(url_for('student.view_user_profile'))
-    flash('Item could not be deleted', 'error')
-    return redirect(url_for('student.view_user_profile'))
+        return jsonify({"success" : "True"})
+    return jsonify({"success" : "False"})
 
+
+@student.route('/profile/major/delete/<int:item_id>', methods=['POST'])
+@login_required
+@csrf.exempt
+def delete_major(item_id):
+    major = Major.query.filter_by(id=item_id).first()
+    if major:
+        db.session.delete(major)
+        db.session.commit()
+        return jsonify({"success" : "True"})
+    return jsonify({"success" : "False"})
 
 
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
@@ -300,18 +318,20 @@ def add_supplemental_essay():
 
     return render_template('student/add_academic_info.html', form=form, header="Add Supplemental Essay")
 
+
 @student.route('/profile/add_common_app_essay', methods=['GET', 'POST'])
 @login_required
 def add_common_app_essay():
     form = AddCommonAppEssayForm()
     if form.validate_on_submit():
-        current_user.student_profile.common_app_essay=form.link.data
-        current_user.student_profile.common_app_essay_status=form.status.data
+        current_user.student_profile.common_app_essay = form.link.data
+        current_user.student_profile.common_app_essay_status = form.status.data
         db.session.add(current_user)
         db.session.commit()
         return redirect(url_for('student.view_user_profile'))
 
     return render_template('student/add_academic_info.html', form=form, header="Add Supplemental Essay")
+
 
 def string_to_bool(str):
     if str == 'True':
@@ -319,11 +339,13 @@ def string_to_bool(str):
     if str == 'False':
         return False
 
+
 def bool_to_string(bool):
     if bool:
         return 'True'
     else:
         return 'False'
+
 
 @student.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
@@ -343,15 +365,15 @@ def edit_profile():
             early_deadline=bool_to_string(student_profile.early_deadline))
         if form.validate_on_submit():
             # Update user profile information.
-            student_profile.grade=form.grade.data
-            student_profile.high_school=form.high_school.data
-            student_profile.graduation_year=form.graduation_year.data
-            student_profile.district=form.district.data
-            student_profile.city=form.city.data
-            student_profile.state=form.state.data
-            student_profile.fafsa_status=form.fafsa_status.data
-            student_profile.gpa=form.gpa.data
-            student_profile.early_deadline=string_to_bool(form.early_deadline.data)
+            student_profile.grade = form.grade.data
+            student_profile.high_school = form.high_school.data
+            student_profile.graduation_year = form.graduation_year.data
+            student_profile.district = form.district.data
+            student_profile.city = form.city.data
+            student_profile.state = form.state.data
+            student_profile.fafsa_status = form.fafsa_status.data
+            student_profile.gpa = form.gpa.data
+            student_profile.early_deadline = string_to_bool(form.early_deadline.data)
             db.session.add(student_profile)
             db.session.commit()
             return redirect(url_for('student.view_user_profile'))

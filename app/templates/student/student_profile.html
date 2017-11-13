@@ -53,7 +53,7 @@
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
-            <h3>Academic Information &nbsp; <i class="blue link edit icon"></i></h3>
+            <h3>Academic Information</h3>
             </div>
         </div>
     </div>
@@ -98,9 +98,9 @@
                             </div>
                         </div>
                     </div>
-                    <a href="{{ url_for('student.edit_test_score', item_id=test.id) }}" class="ui bottom attached orange basic button">
+                    <div class="ui bottom attached orange basic button test-button" data-id="{{ test.id }}">
                         <i class="edit icon"></i>Edit
-                    </a>
+                    </div>
                 </div>
                 {% endfor %}
                 <a class="green card" href="{{ url_for('student.add_test_score') }}">
@@ -124,8 +124,8 @@
         <div class="ten wide column">
             <div class="ui bulleted list" id="majors-list">
                 {% for major in user.student_profile.majors|sort(attribute='name') %}
-                <div class="item" style="font-size:1.1em">
-                    <div style="display:none" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
+                <div class="item major-item" style="font-size:1.1em">
+                    <div style="display:none" data-id="{{ major.id }}" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
                     {{ major.name }}
                 </div>
                 {% endfor %}
@@ -149,7 +149,7 @@
                             <h4 class="ui header">{{ college.name }}</h4>
                         </div>
                     </div>
-                    <div class="ui bottom attached blue basic button college-button">
+                    <div class="ui bottom attached blue basic button college-button" data-id="{{ college.id }}">
                         <i class="external icon"></i>View Profile
                     </div>
                 </div>
@@ -163,42 +163,43 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
+
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
             <h3>College Application Information</h3>
             </div>
 
-            <div class="ui horizontal divider">Essays</div>
+            <div class="ui horizontal divider">Essays &nbsp; <i class="blue link edit icon" id="edit-essays"></i>
+            </div>
 
             <div class="ui four cards">
                 {% if user.student_profile.common_app_essay|length > 1 %}
-                    <div class="purple card">
-                    <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="center aligned content" >
-                        <div class="description">
-                            <h4 class="ui header">Common App Essay</h4>
-                            {% if user.student_profile.common_app_essay_status=='Incomplete' %}
-                            <span style="color:#db2828">
-                            {% elif user.student_profile.common_app_essay_status=='Waiting' %}
-                            <span style="color:#eaae00">
-                            {% elif user.student_profile.common_app_essay_status=='Reviewed' %}
-                            <span style="color:#eaae00">
-                            {% elif user.student_profile.common_app_essay_status=='Edited' %}
-                            <span style="color:#eaae00">
-                            {% elif user.student_profile.common_app_essay_status=='Done' %}
-                            <span style="color:#21ba45">
-                            {% else %}
-                            <span>
-                            {% endif %}
-                            <strong>{{ user.student_profile.common_app_essay_status }}</strong></span>
+                    <div class="purple card common-essay-card">
+                        <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="center aligned content" >
+                            <div class="description">
+                                <h4 class="ui header">Common App Essay</h4>
+                                {% if user.student_profile.common_app_essay_status=='Incomplete' %}
+                                <span style="color:#db2828">
+                                {% elif user.student_profile.common_app_essay_status=='Waiting' %}
+                                <span style="color:#eaae00">
+                                {% elif user.student_profile.common_app_essay_status=='Reviewed' %}
+                                <span style="color:#eaae00">
+                                {% elif user.student_profile.common_app_essay_status=='Edited' %}
+                                <span style="color:#eaae00">
+                                {% elif user.student_profile.common_app_essay_status=='Done' %}
+                                <span style="color:#21ba45">
+                                {% else %}
+                                <span>
+                                {% endif %}
+                                <strong>{{ user.student_profile.common_app_essay_status }}</strong></span>
+                            </div>
+                        </a>
+                        <div class="ui bottom attached purple basic button common-essay-button">
+                            <i class="edit icon"></i>Edit
                         </div>
-                    </a>
-                    <a href="{{ url_for('student.edit_common_app_essay') }}" class="ui bottom attached purple basic button">
-                        <i class="edit icon"></i>Edit
-                    </a>
                     </div>
                 {% else %}
                     <a class="green card" href="{{ url_for('student.add_common_app_essay') }}">
@@ -214,7 +215,7 @@
                 
                 
                 {% for essay in user.student_profile.essays|sort(attribute='name') %}
-                <div class="purple card">
+                <div class="purple card sup-essay-card">
                     <a href="{{ essay.link }}" target="_blank" class="center aligned content" >
                         <div class="description">
                             <h4 class="ui header">{{ essay.name }}</h4>
@@ -234,9 +235,9 @@
                             <strong>{{ essay.status }}</strong></span>
                         </div>
                     </a>
-                    <a href="{{ url_for('student.edit_supplemental_essay', item_id=essay.id) }}" class="ui bottom attached purple basic button">
+                    <div class="ui bottom attached purple basic button sup-essay-button" data-id="{{ essay.id }}">
                         <i class="edit icon"></i>Edit
-                    </a>
+                    </div>
                 </div>
                 {% endfor %}
                 <a class="green card" href="{{ url_for('student.add_supplemental_essay') }}">
@@ -253,9 +254,9 @@
 
     <div class="row">
         <div class="twelve wide column">
-            <div class="ui horizontal divider">Recommendation Letters</div>
+            <div class="ui horizontal divider">Recommendation Letters &nbsp; <i class="blue link edit icon" id="edit-letters"></i></div>
 
-            <div class="ui three cards">
+            <div class="ui three cards letter-card">
                 {% for letter in user.student_profile.recommendation_letters|sort(attribute='name') %}
                 <div class="black card">
                     <div class="center aligned content">
@@ -278,9 +279,9 @@
                             <strong>{{ letter.status }}</strong></span>
                         </div>
                     </div>
-                    <a href="{{ url_for('student.edit_recommendation_letter', item_id=letter.id) }}" class="ui bottom attached black basic button">
+                    <div class="ui bottom attached black basic button letter-button" data-id="{{ letter.id }}">
                         <i class="edit icon"></i>Edit
-                    </a>
+                    </div>
                 </div>
                 {% endfor %}
                 <a class="green card" href="{{ url_for('student.add_recommendation_letter') }}">
@@ -299,13 +300,15 @@
 <script type="text/javascript">
 
 $(document).ready(function () {
-    var editingMajors = false;
-    var editingColleges = false;
-    var editingTestScores = false;
+    var deletingMajors = false;
+    var deletingColleges = false;
+    var deletingTestScores = false;
+    var deletingEssays = false;
+    var deletingLetters = false;
 
     $('#edit-majors').click(function () {
-        editingMajors = !editingMajors;
-        if (editingMajors) {
+        deletingMajors = !deletingMajors;
+        if (deletingMajors) {
             $('#edit-majors').removeClass('blue edit');
             $('#edit-majors').addClass('green check');
             $('#majors-list').removeClass('bulleted');
@@ -317,9 +320,32 @@ $(document).ready(function () {
         $('.major-delete-button').toggle()
     });
 
+    $('.major-delete-button').click(function() {
+        if (deletingMajors) {
+            var url = '/student/profile/major/delete/' + $(this).data('id');
+            var that = this;
+            console.log(url);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function(data) {
+                    if (data.success) {
+                        if (data.success === "True") {
+                            $(that).parent().remove();
+                        } else {
+                            alert("Sorry there was an error, please try again.");
+                        }
+                        
+                    }
+                    
+                }
+            })
+        }
+    });
+
     $('#edit-colleges').click(function () {
-        editingColleges = !editingColleges;  
-        if (editingColleges) {
+        deletingColleges = !deletingColleges;  
+        if (deletingColleges) {
             $('#edit-colleges').removeClass('blue edit');
             $('#edit-colleges').addClass('green check');
             $('.college-button').removeClass('blue');
@@ -337,6 +363,189 @@ $(document).ready(function () {
             $('.college-button').html('<i class="external icon"></i>View Profile');
         }
     });
+
+    $('.college-button').click(function() {
+        if (deletingColleges) {
+            var url = '/student/profile/college/delete/' + $(this).data('id');
+            var that = this;
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function(data) {
+                    if (data.success) {
+                        if (data.success === "True") {
+                            $(that).parent().remove();
+                        } else {
+                            alert("Sorry there was an error, please try again.");
+                        }
+                        
+                    }
+                    
+                }
+            })
+        }
+    });
+
+    $('#edit-test-scores').click(function () {
+        deletingTestScores = !deletingTestScores;  
+        if (deletingTestScores) {
+            $('#edit-test-scores').removeClass('blue edit');
+            $('#edit-test-scores').addClass('green check');
+            $('.test-button').removeClass('blue');
+            $('.test-button').addClass('red');
+            $('.test-card').removeClass('blue');
+            $('.test-card').addClass('red');
+            $('.test-button').html('<i class="remove icon"></i>Remove');
+        } else {
+            $('#edit-test-scores').removeClass('green check');
+            $('#edit-test-scores').addClass('blue edit');
+            $('.test-button').removeClass('red');
+            $('.test-button').addClass('blue');
+            $('.test-card').removeClass('red');
+            $('.test-card').addClass('blue');
+            $('.test-button').html('<i class="edit icon"></i>Edit');
+        }
+    });
+
+    $('.test-button').click(function() {
+        if (deletingTestScores) {
+            var url = '/student/profile/test_score/delete/' + $(this).data('id');
+            var that = this;
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function(data) {
+                    if (data.success) {
+                        if (data.success === "True") {
+                            $(that).parent().remove();
+                        } else {
+                            alert("Sorry there was an error, please try again.");
+                        }
+                        
+                    }
+                    
+                }
+            })
+        } else {
+            var url = '/student/profile/test_score/edit/' + $(this).data('id');
+            location.href = url; 
+        }
+    });
+
+
+    $('#edit-essays').click(function () {
+        deletingEssays = !deletingEssays;  
+        if (deletingEssays) {
+            $('#edit-essays').removeClass('blue edit');
+            $('#edit-essays').addClass('green check');
+            $('.sup-essay-button').removeClass('blue');
+            $('.sup-essay-button').addClass('red');
+            $('.sup-essay-card').removeClass('blue');
+            $('.sup-essay-card').addClass('red');
+            $('.sup-essay-button').html('<i class="remove icon"></i>Remove');
+            $('.common-essay-button').removeClass('blue');
+            $('.common-essay-button').addClass('red');
+            $('.common-essay-card').removeClass('blue');
+            $('.common-essay-card').addClass('red');
+            $('.common-essay-button').html('<i class="remove icon"></i>Remove');
+        } else {
+            $('#edit-essays').removeClass('green check');
+            $('#edit-essays').addClass('blue edit');
+            $('.sup-essay-button').removeClass('red');
+            $('.sup-essay-button').addClass('blue');
+            $('.sup-essay-card').removeClass('red');
+            $('.sup-essay-card').addClass('blue');
+            $('.sup-essay-button').html('<i class="edit icon"></i>Edit');
+            $('.common-essay-button').removeClass('red');
+            $('.common-essay-button').addClass('blue');
+            $('.common-essay-card').removeClass('red');
+            $('.common-essay-card').addClass('blue');
+            $('.common-essay-button').html('<i class="edit icon"></i>Edit');
+        }
+    });
+
+    $('.common-essay-button').click(function() {
+        if (deletingEssays) {
+            var url = '/student/profile/common_app_essay/delete';
+            location.href = url; 
+        } else {
+            var url = '/student/profile/common_app_essay/edit';
+            location.href = url; 
+        }
+    });
+
+    $('.sup-essay-button').click(function() {
+        if (deletingEssays) {
+            var url = '/student/profile/supplemental_essay/delete/' + $(this).data('id');
+            var that = this;
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function(data) {
+                    if (data.success) {
+                        if (data.success === "True") {
+                            $(that).parent().remove();
+                        } else {
+                            alert("Sorry there was an error, please try again.");
+                        }
+                        
+                    }
+                    
+                }
+            })
+        } else {
+            var url = '/student/profile/supplemental_essay/edit/' + $(this).data('id');
+            location.href = url; 
+        }
+    });
+
+    $('#edit-letters').click(function () {
+        deletingLetters = !deletingLetters;  
+        if (deletingLetters) {
+            $('#edit-letters').removeClass('blue edit');
+            $('#edit-letters').addClass('green check');
+            $('.letter-button').removeClass('blue');
+            $('.letter-button').addClass('red');
+            $('.letter-card').removeClass('blue');
+            $('.letter-card').addClass('red');
+            $('.letter-button').html('<i class="remove icon"></i>Remove');
+        } else {
+            $('#edit-letters').removeClass('green check');
+            $('#edit-letters').addClass('blue edit');
+            $('.letter-button').removeClass('red');
+            $('.letter-button').addClass('blue');
+            $('.letter-card').removeClass('red');
+            $('.letter-card').addClass('blue');
+            $('.letter-button').html('<i class="edit icon"></i>Edit');
+        }
+    });
+
+    $('.letter-button').click(function() {
+        if (deletingLetters) {
+            var url = '/student/profile/recommendation_letter/delete/' + $(this).data('id');
+            var that = this;
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function(data) {
+                    if (data.success) {
+                        if (data.success === "True") {
+                            $(that).parent().remove();
+                        } else {
+                            alert("Sorry there was an error, please try again.");
+                        }
+                        
+                    }
+                    
+                }
+            })
+        } else {
+            var url = '/student/profile/recommendation_letter/edit/' + $(this).data('id');
+            location.href = url; 
+        }
+    });
+
+
 });
 
 </script>
