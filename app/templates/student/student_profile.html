@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="ui stackable centered grid container">
+    <!-- DISPLAY USER PROFILE INFORMATION -->
     <div class="ten wide column">
         <div style="margin:auto;text-align:left">
             <br />
@@ -50,6 +51,8 @@
             </div>
         </div>
     </div>
+
+    <!-- DISPLAY ACADEMIC INFORMATION -->
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
@@ -78,6 +81,8 @@
             </div>
         </div>
     </div>
+
+    <!-- DISPLAY TEST SCORES -->
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
@@ -103,6 +108,8 @@
                     </div>
                 </div>
                 {% endfor %}
+
+                <!-- DISPLAY BUTTON FOR ADDING TEST SCORE -->
                 <a class="green card" href="{{ url_for('student.add_test_score') }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
@@ -115,6 +122,7 @@
         </div>
     </div>
 
+    <!-- DISPLAY MAJORS -->
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
@@ -136,6 +144,7 @@
         </div>
     </div>
 
+    <!-- DISPLAY COLLEGES -->
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
@@ -166,6 +175,7 @@
         </div>
     </div>
 
+    <!-- DISPLAY ESSAYS -->
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">
@@ -176,6 +186,7 @@
             </div>
 
             <div class="ui four cards">
+                <!-- DISPLAY COMMON APP ESSAY IF STUDENT HAS ADDED IT-->
                 {% if user.student_profile.common_app_essay|length > 1 %}
                     <div class="purple card common-essay-card">
                         <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="center aligned content" >
@@ -202,6 +213,7 @@
                         </div>
                     </div>
                 {% else %}
+                    <!-- DISPLAY ADD OPTION OTHERWISE-->
                     <a class="green card" href="{{ url_for('student.add_common_app_essay') }}">
                         <div class="content" style="text-align:center">
                             <div class="description" style="margin:0 auto">
@@ -212,8 +224,7 @@
                     </a>
                 {% endif %}
                 
-                
-                
+                <!-- DISPLAY SUPPLEMENTAL ESSAYS -->
                 {% for essay in user.student_profile.essays|sort(attribute='name') %}
                 <div class="purple card sup-essay-card">
                     <a href="{{ essay.link }}" target="_blank" class="center aligned content" >
@@ -252,6 +263,7 @@
         </div>
     </div>
 
+    <!-- DISPLAY RECOMMENDATION LETTERS -->
     <div class="row">
         <div class="twelve wide column">
             <div class="ui horizontal divider">Recommendation Letters &nbsp; <i class="blue link edit icon" id="edit-letters"></i></div>
@@ -306,6 +318,7 @@ $(document).ready(function () {
     var deletingEssays = false;
     var deletingLetters = false;
 
+    // toggle between displaying and not displaying delete option to user for majors
     $('#edit-majors').click(function () {
         deletingMajors = !deletingMajors;
         if (deletingMajors) {
@@ -320,6 +333,7 @@ $(document).ready(function () {
         $('.major-delete-button').toggle()
     });
 
+    // when user deletes a major, send ajax request 
     $('.major-delete-button').click(function() {
         if (deletingMajors) {
             var url = '/student/profile/major/delete/' + $(this).data('id');
@@ -343,6 +357,7 @@ $(document).ready(function () {
         }
     });
 
+    // toggle between displaying edit option and delete option to user for colleges
     $('#edit-colleges').click(function () {
         deletingColleges = !deletingColleges;  
         if (deletingColleges) {
@@ -364,6 +379,7 @@ $(document).ready(function () {
         }
     });
 
+    // send ajax request when user deletes a college
     $('.college-button').click(function() {
         if (deletingColleges) {
             var url = '/student/profile/college/delete/' + $(this).data('id');
@@ -383,9 +399,12 @@ $(document).ready(function () {
                     
                 }
             })
+        } else {
+            //TODO: send user to college page
         }
     });
 
+    // toggle between displaying edit option and delete option to user for test scores
     $('#edit-test-scores').click(function () {
         deletingTestScores = !deletingTestScores;  
         if (deletingTestScores) {
@@ -407,6 +426,7 @@ $(document).ready(function () {
         }
     });
 
+    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
     $('.test-button').click(function() {
         if (deletingTestScores) {
             var url = '/student/profile/test_score/delete/' + $(this).data('id');
@@ -433,6 +453,7 @@ $(document).ready(function () {
     });
 
 
+    // toggle between displaying edit option and delete option to user for essays
     $('#edit-essays').click(function () {
         deletingEssays = !deletingEssays;  
         if (deletingEssays) {
@@ -464,6 +485,7 @@ $(document).ready(function () {
         }
     });
 
+    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
     $('.common-essay-button').click(function() {
         if (deletingEssays) {
             var url = '/student/profile/common_app_essay/delete';
@@ -474,6 +496,7 @@ $(document).ready(function () {
         }
     });
 
+    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
     $('.sup-essay-button').click(function() {
         if (deletingEssays) {
             var url = '/student/profile/supplemental_essay/delete/' + $(this).data('id');
@@ -499,6 +522,7 @@ $(document).ready(function () {
         }
     });
 
+    // toggle between displaying edit and delete option to user for rec. letters
     $('#edit-letters').click(function () {
         deletingLetters = !deletingLetters;  
         if (deletingLetters) {
@@ -520,6 +544,7 @@ $(document).ready(function () {
         }
     });
 
+    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
     $('.letter-button').click(function() {
         if (deletingLetters) {
             var url = '/student/profile/recommendation_letter/delete/' + $(this).data('id');
