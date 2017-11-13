@@ -66,7 +66,8 @@ def invite_user():
             subject='You Are Invited To Join',
             template='account/email/invite',
             user=user,
-            invite_link=invite_link, )
+            invite_link=invite_link,
+        )
         flash('User {} successfully invited'.format(user.full_name()),
               'form-success')
     return render_template('counselor/new_user.html', form=form)
@@ -119,8 +120,8 @@ def change_user_email(user_id):
         user.email = form.email.data
         db.session.add(user)
         db.session.commit()
-        flash('Email for user {} successfully changed to {}.'
-              .format(user.full_name(), user.email), 'form-success')
+        flash('Email for user {} successfully changed to {}.'.format(
+            user.full_name(), user.email), 'form-success')
     return render_template('counselor/manage_user.html', user=user, form=form)
 
 
@@ -128,10 +129,13 @@ def change_user_email(user_id):
 def processor():
     def get_essay_statuses(student_profile):
         return list(set([e.status for e in student_profile.essays]))
+
     def get_colleges(student_profile):
         return ';'.join([c.name for c in student_profile.colleges])
 
-    return dict(get_essay_statuses=get_essay_statuses, get_colleges=get_colleges)
+    return dict(
+        get_essay_statuses=get_essay_statuses, get_colleges=get_colleges)
+
 
 @counselor.route('/student-database', methods=['GET', 'POST'])
 @login_required
@@ -146,8 +150,7 @@ def student_database():
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=form.date.data
-            )
+                deadline=form.date.data)
             db.session.add(checklist_item)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
@@ -161,8 +164,7 @@ def student_database():
         student_profiles=student_profiles,
         checklist_form=checklist_form,
         colleges=colleges,
-        essay_statuses=essay_statuses
-    )
+        essay_statuses=essay_statuses)
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])
@@ -211,4 +213,5 @@ def checklist():
             db.session.add(checklist_item)
         db.session.commit()
         return redirect(url_for('counselor.checklist'))
-    return render_template('counselor/checklist.html', form=form, checklist=default_items)
+    return render_template(
+        'counselor/checklist.html', form=form, checklist=default_items)

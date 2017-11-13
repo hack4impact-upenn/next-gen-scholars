@@ -4,20 +4,17 @@ from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistI
 from .. import db
 from sqlalchemy.orm import validates
 
-
 student_colleges = db.Table('student_colleges',
                             db.Column('college_id', db.Integer,
                                       db.ForeignKey('college.id')),
                             db.Column('student_profile_id', db.Integer,
-                                      db.ForeignKey('student_profile.id'))
-                            )
+                                      db.ForeignKey('student_profile.id')))
 
 student_majors = db.Table('student_majors',
                           db.Column('major_id', db.Integer,
                                     db.ForeignKey('major.id')),
                           db.Column('student_profile_id', db.Integer,
-                                    db.ForeignKey('student_profile.id'))
-                          )
+                                    db.ForeignKey('student_profile.id')))
 
 
 class StudentProfile(db.Model):
@@ -34,15 +31,21 @@ class StudentProfile(db.Model):
     gpa = db.Column(db.Float, index=True)
     test_scores = db.relationship(
         'TestScore', backref='student_profile', lazy=True)
-    majors = db.relationship('Major', secondary=student_majors,
-                             backref=db.backref('student_profiles', lazy='dynamic'))
-    colleges = db.relationship('College', secondary=student_colleges,
-                               backref=db.backref('student_profiles', lazy='dynamic'))
+    majors = db.relationship(
+        'Major',
+        secondary=student_majors,
+        backref=db.backref('student_profiles', lazy='dynamic'))
+    colleges = db.relationship(
+        'College',
+        secondary=student_colleges,
+        backref=db.backref('student_profiles', lazy='dynamic'))
     # APPLICATION INFO
     # either 'Incomplete' or 'Complete'
     fafsa_status = db.Column(db.String, index=True, default='Incomplete')
-    common_app_essay = db.Column(db.String, index=True, default='') # link to common app essay
-    common_app_essay_status = db.Column(db.String, index=True, default='Incomplete')
+    common_app_essay = db.Column(
+        db.String, index=True, default='')  # link to common app essay
+    common_app_essay_status = db.Column(
+        db.String, index=True, default='Incomplete')
     early_deadline = db.Column(db.Boolean, default=False)
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
@@ -50,7 +53,9 @@ class StudentProfile(db.Model):
 
     @validates('common_app_essay_status')
     def validate_status(self, key, status):
-        assert status in ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
+        assert status in [
+            'Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'
+        ]
         return status
 
     @staticmethod
@@ -58,7 +63,8 @@ class StudentProfile(db.Model):
         fake = Faker()
         year = random.choice([['2018', '12'], ['2019', '11'], ['2020', '10']])
         fafsa_status = random.choice(['Incomplete', 'Complete'])
-        essay_status = random.choice(['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'])
+        essay_status = random.choice(
+            ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'])
         profile = StudentProfile(
             high_school='{} High School'.format(fake.street_name()),
             district='{} District'.format(fake.city()),
@@ -76,8 +82,7 @@ class StudentProfile(db.Model):
             early_deadline=bool(random.getrandbits(1)),
             essays=Essay.generate_fake(),
             recommendation_letters=RecommendationLetter.generate_fake(),
-            checklist = ChecklistItem.generate_fake()
-        )
+            checklist=ChecklistItem.generate_fake())
         return profile
 
     def __repr__(self):

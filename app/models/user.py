@@ -62,12 +62,10 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.String(20), index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    student_profile_id = db.Column(
-        db.Integer, db.ForeignKey('student_profile.id'))
+    student_profile_id = db.Column(db.Integer,
+                                   db.ForeignKey('student_profile.id'))
     student_profile = db.relationship(
-        "StudentProfile",
-        uselist=False,
-        back_populates="user")
+        "StudentProfile", uselist=False, back_populates="user")
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -171,7 +169,10 @@ class User(UserMixin, db.Model):
         return True
 
     @staticmethod
-    def generate_fake(num_students=10, num_counselors=5, num_admins=3, **kwargs):
+    def generate_fake(num_students=10,
+                      num_counselors=5,
+                      num_admins=3,
+                      **kwargs):
         """Generate a number of fake users for testing."""
         from sqlalchemy.exc import IntegrityError
         from random import seed, choice

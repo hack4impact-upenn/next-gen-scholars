@@ -9,10 +9,9 @@ class ChecklistItem(db.Model):
         db.Integer,
         db.ForeignKey('student_profile.id'),
         nullable=False,
-        index=True
-    )
-    deadline = db.Column(db.Date, index=True) 
-    text = db.Column(db.Text, index=True) 
+        index=True)
+    deadline = db.Column(db.Date, index=True)
+    text = db.Column(db.Text, index=True)
     is_checked = db.Column(db.Boolean, index=True, default=False)
     is_deletable = db.Column(db.Boolean, index=True, default=False)
     creator_role_id = db.Column(db.Integer, index=True, default=1)
@@ -29,9 +28,7 @@ class ChecklistItem(db.Model):
         ], count)
         checklist_items = []
         for i in range(count):
-            checklist_items.append(ChecklistItem(
-                text=checklist_item[i],
-            ))
+            checklist_items.append(ChecklistItem(text=checklist_item[i], ))
         return checklist_items
 
     def __repr__(self):
