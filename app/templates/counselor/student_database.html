@@ -80,6 +80,7 @@
 
             {{ f.begin_form(checklist_form, flashes) }}
             {{ f.render_form_field(checklist_form.item_text) }}
+            {{ f.render_form_field(checklist_form.date) }}
             {{ f.render_form_field(checklist_form.submit) }}
             {{ checklist_form.assignee_ids }}
             {{ f.end_form(checklist_form) }}

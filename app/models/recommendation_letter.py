@@ -4,11 +4,10 @@ from .. import db
 from sqlalchemy.orm import validates
 
 
-
 class RecommendationLetter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    student_profile_id = db.Column(db.Integer, db.ForeignKey(
-        'student_profile.id'), nullable=False)
+    student_profile_id = db.Column(
+        db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
     # name of reference
     name = db.Column(db.String, index=True)
     # category of reference, e.g. '12th grade Calculus teacher', '11th grade biology teacher'
@@ -38,12 +37,13 @@ class RecommendationLetter(db.Model):
         statuses = ['Submitted', 'Pending', 'Incomplete']
         rec_letters = []
         for i in range(count):
-            rec_letters.append(RecommendationLetter(
-                name=fake.name(),
-                category=categories[i],
-                status=random.choice(statuses)
-            ))
+            rec_letters.append(
+                RecommendationLetter(
+                    name=fake.name(),
+                    category=categories[i],
+                    status=random.choice(statuses)))
         return rec_letters
 
     def __repr__(self):
-        return '<RecommendationLetter {}, {}, {}>'.format(self.name, self.category, self.status)
+        return '<RecommendationLetter {}, {}, {}>'.format(
+            self.name, self.category, self.status)

@@ -6,7 +6,7 @@
     <div class="twelve wide column">
         <br />
         <a class="ui black basic button" href="{{ url_for('student.view_user_profile') }}">Cancel</a>
-        <div class="ui horizontal divider"><h1>Add Major</h1></div>
+        <div class="ui horizontal divider"><h1>{{ header }}</h1></div>
         {{ f.render_form(form, extra_classes='fluid') }}
     </div>
 </div>

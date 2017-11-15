@@ -5,8 +5,8 @@
 <div class="ui stackable centered grid container">
     <div class="twelve wide column">
         <br />
-        <a class="ui black basic button" href="{{ url_for('student.view_user_profile') }}">Cancel</a>
-        <div class="ui horizontal divider"><h1>Add College</h1></div>
+        <a class="ui black basic button" href="{{ url_for('student.checklist', student_profile_id=student_profile_id) }}">Cancel</a>
+        <div class="ui horizontal divider"><h1>Edit Checklist Item</h1></div>
         {{ f.render_form(form, extra_classes='fluid') }}
     </div>
 </div>
