@@ -73,3 +73,9 @@ class AddChecklistItemForm(Form):
         'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
     assignee_ids = HiddenField('Assignee Ids')
     submit = SubmitField('Add checklist item')
+
+class AddTestNameForm(Form):
+    name = StringField(
+        'Test Name', validators=[InputRequired(),
+                                 Length(1, 150)])
+    submit = SubmitField('Add Test Name')

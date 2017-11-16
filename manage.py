@@ -9,7 +9,8 @@ from redis import Redis
 from rq import Connection, Queue, Worker
 
 from app import create_app, db
-from app.models import Role, User, College, Major, StudentProfile, ChecklistItem
+from app.models import (Role, User, College, Major,
+                        StudentProfile, ChecklistItem, TestName)
 
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -77,6 +78,7 @@ def setup_general():
     College.insert_colleges()
     Major.insert_majors()
     Role.insert_roles()
+    TestName.insert_tests()
     admin_query = Role.query.filter_by(name='Administrator')
     if admin_query.first() is not None:
         if User.query.filter_by(email=Config.ADMIN_EMAIL).first() is None:
