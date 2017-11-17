@@ -11,7 +11,7 @@ from .forms import (
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
-                      RecommendationLetter)
+                      RecommendationLetter, TestName)
 
 
 @student.route('/profile')
@@ -98,7 +98,7 @@ def edit_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
         form = EditTestScoreForm(
-            test_name=test_score.name,
+            test_name= TestName.query.filter_by(name=test_score.name).first(),
             month=test_score.month,
             year=test_score.year,
             score=test_score.score)
