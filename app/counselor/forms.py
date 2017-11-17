@@ -1,7 +1,8 @@
 from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import PasswordField, StringField, SubmitField, HiddenField
+from wtforms.fields import (PasswordField, StringField, SubmitField, HiddenField,
+                            BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
@@ -97,6 +98,8 @@ class DeleteTestNameForm(Form):
         validators=[InputRequired()],
         get_label='name',
         query_factory=lambda: db.session.query(TestName).order_by('name'))
-
+    confirmation = BooleanField(
+        'Are you sure you want to delete this test? Doing so will remove it from all student profiles.',
+        validators=[InputRequired()])
     submit = SubmitField('Delete Test Name')
 
