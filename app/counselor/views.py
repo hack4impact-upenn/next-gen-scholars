@@ -3,7 +3,8 @@ from flask_login import current_user, login_required
 from flask_rq import get_queue
 
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
-                    NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm)
+                    NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
+                    DeleteTestNameForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
@@ -260,4 +261,18 @@ def edit_test_name():
                                                          , header='Edit Test Name')
 
 
+@counselor.route('/delete_test/', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def delete_test_name():
+    # Allows a counselor to delete a test name in the database.
+    form = DeleteTestNameForm()
+    if form.validate_on_submit():
+        test_name = form.old_test.data
+        db.session.delete(test_name)
+        db.session.commit()
+        flash('Test name successfully deleted.', 'form-success')
+        return redirect(url_for('counselor.index'))
+    return render_template('counselor/delete_test_name.html', form=form
+                                                         , header='Delete Test Name')
 

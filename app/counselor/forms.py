@@ -91,3 +91,12 @@ class EditTestNameForm(Form):
                                      Length(1, 150)])
     submit = SubmitField('Edit Test Name')
 
+class DeleteTestNameForm(Form):
+    old_test = QuerySelectField(
+        'Select test you wish to delete',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(TestName).order_by('name'))
+
+    submit = SubmitField('Delete Test Name')
+
