@@ -11,6 +11,9 @@ from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 from wtforms.fields.html5 import EmailField
 
+from .. import db
+from ..models import TestName
+
 
 class EditCommonAppEssayForm(Form):
     link = StringField(
@@ -40,7 +43,11 @@ class EditTestScoreForm(Form):
     today = datetime.today()
     for i in range(0, 8):
         year_choices.append((str(today.year - 8 + i), str(today.year - 8 + i)))
-    test_name = StringField('Test Name', validators=[InputRequired()])
+    test_name = QuerySelectField(
+        'Test Name',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(TestName).order_by('name'))
     month = SelectField(
         u'Month', choices=month_choices, validators=[InputRequired()])
     year = SelectField(
