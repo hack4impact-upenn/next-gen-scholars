@@ -67,7 +67,7 @@ def add_test_score():
         # create new test score from form data
         new_item = TestScore(
             student_profile_id=current_user.student_profile_id,
-            name=form.test_name.data,
+            name=form.test_name.data.name,
             month=form.month.data,
             year=form.year.data,
             score=form.score.data)
@@ -103,7 +103,7 @@ def edit_test_score(item_id):
             year=test_score.year,
             score=test_score.score)
         if form.validate_on_submit():
-            test_score.name = form.test_name.data
+            test_score.name = form.test_name.data.name
             test_score.month = form.month.data
             test_score.year = form.year.data
             test_score.score = form.score.data
