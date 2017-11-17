@@ -79,3 +79,15 @@ class AddTestNameForm(Form):
         'Test Name', validators=[InputRequired(),
                                  Length(1, 150)])
     submit = SubmitField('Add Test Name')
+
+class EditTestNameForm(Form):
+    old_test = QuerySelectField(
+        'Select test you wish to edit',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(TestName).order_by('name'))
+    new_name = StringField(
+        'New Test Name', validators=[InputRequired(),
+                                     Length(1, 150)])
+    submit = SubmitField('Edit Test Name')
+
