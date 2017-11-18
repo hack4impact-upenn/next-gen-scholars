@@ -99,7 +99,7 @@ class DeleteTestNameForm(Form):
         get_label='name',
         query_factory=lambda: db.session.query(TestName).order_by('name'))
     confirmation = BooleanField(
-        'Are you sure you want to delete this test? Doing so will remove it from all student profiles.',
+        'Are you sure you want to delete this test?',
         validators=[InputRequired()])
     submit = SubmitField('Delete Test Name')
 
