@@ -12,3 +12,4 @@ from .recommendation_letter import *
 from .test_score import *
 from .student_profile import *
 from .user import *
+from .college_status import *

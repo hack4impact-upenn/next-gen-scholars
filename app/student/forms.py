@@ -181,3 +181,14 @@ class AddCollegeForm(Form):
 class AddMajorForm(Form):
     major = StringField('Major', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Add Major')
+
+class AddCollegeStatusForm(Form):
+    college_name = StringField('College Name', validators = [InputRequired(), Length(1, 500)])
+    status = SelectField(
+        'Status',
+        choices=[('Accepted', 'Accepted'), ('Denied', 'Denied'),
+                 ('Waitlisted or Deferred(Withdrew App)', 'Waitlisted or Deffered (Withdrew App)'),
+                 ('Waitlisted or Deferred(Accepted)', 'Waitlisted or Deffered (Accepted)'),
+                 ('Waitlisted or Deferred(Denied)', 'Waitlisted or Deffered (Denied)'),],
+        validators=[InputRequired()])
+    submit = SubmitField('Add College Status')

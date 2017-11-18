@@ -9,9 +9,9 @@ from .forms import (
     EditCollegeForm, EditSupplementalEssayForm, EditTestScoreForm,
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
-    EditRecommendationLetterForm, AddCommonAppEssayForm)
+    EditRecommendationLetterForm, AddCommonAppEssayForm, AddCollegeStatusForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
-                      RecommendationLetter)
+                      RecommendationLetter, CollegeStatus)
 
 
 @student.route('/profile')
@@ -505,6 +505,22 @@ def update_checklist_item(item_id):
             user=current_user,
             sat=sat,
             act=act)
+
+@student.route('/profile/add_college_status', methods=['GET', 'POST'])
+@login_required
+def add_college_status():
+    form = AddCollegeStatusForm()
+    if form.validate_on_submit():
+        # create new college status form from data
+        new_item = CollegeStatus(
+            student_profile_id=current_user.student_profile_id,
+            name=form.college_name.data,
+            status=form.status.data)
+        db.session.add(new_item)
+        db.session.commit()
+        return redirect(url_for('student.view_user_profile'))
+    return render_template(
+        'student/add_college_status.html', form=form, header="Add College Status")
 
 
 def string_to_bool(str):
