@@ -24,31 +24,31 @@ class TestScore(db.Model):
                 'max_score': 36
             },
             {
-                'name': 'SAT Literature',
+                'name': 'SAT Subject Test - Math Level 2',
                 'max_score': 800
             },
             {
-                'name': 'SAT US History',
+                'name': 'SAT Subject Test - Math Level 1',
                 'max_score': 800
             },
             {
-                'name': 'SAT World History',
+                'name': 'SAT Subject Test - Physics',
                 'max_score': 800
             },
             {
-                'name': 'SAT Biology',
-                'max_score': 800
+                'name': 'AP Physics 1',
+                'max_score': 5
             },
             {
-                'name': 'SAT Physics',
-                'max_score': 800
+                'name': 'AP English Language & Composition',
+                'max_score': 5
             },
             {
-                'name': 'SAT Chemistry',
-                'max_score': 800
+                'name': 'AP Computer Science A',
+                'max_score': 5
             },
             {
-                'name': 'SAT Mathematics',
+                'name': 'SAT Subject Test - Chemistry',
                 'max_score': 800
             },
         ]
