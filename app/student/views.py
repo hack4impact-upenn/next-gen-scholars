@@ -17,7 +17,22 @@ from ..models import (User, College, Essay, TestScore, ChecklistItem,
 @student.route('/profile')
 @login_required
 def view_user_profile():
-    return render_template('student/student_profile.html', user=current_user)
+    sat = '––'
+    act = '––'
+    student_profile = current_user.student_profile
+    if student_profile is not None:
+        test_scores = student_profile.test_scores
+        for t in test_scores:
+            print (t.name)
+            if t.name == 'SAT':
+                sat = max(sat, t.score) if sat != '––' else t.score
+            if t.name == 'ACT':
+                act = max(act, t.score) if act != '––' else t.score
+        return render_template(
+            'student/student_profile.html',
+            user=current_user,
+            sat=sat,
+            act=act)
 
 
 @student.route('/profile/edit', methods=['GET', 'POST'])
@@ -490,21 +505,6 @@ def update_checklist_item(item_id):
             student_profile_id=item.assignee_id)
     flash('Item could not be updated', 'error')
     return redirect(url_for('main.index'))
-    sat = '––'
-    act = '––'
-    student_profile = current_user.student_profile
-    if student_profile is not None:
-        test_scores = student_profile.test_scores
-        for t in test_scores:
-            if t.name == 'SAT':
-                sat = max(sat, t.score) if sat != '––' else t.score
-            if t.name == 'ACT':
-                act = max(act, t.score) if act != '––' else t.score
-        return render_template(
-            'student/student_profile.html',
-            user=current_user,
-            sat=sat,
-            act=act)
 
 
 def string_to_bool(str):
