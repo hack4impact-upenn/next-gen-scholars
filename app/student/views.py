@@ -12,12 +12,19 @@ from .forms import (
     EditRecommendationLetterForm, AddCommonAppEssayForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter)
+from apiclient.discovery import build
 
 
 @student.route('/profile')
 @login_required
 def view_user_profile():
     return render_template('student/student_profile.html', user=current_user)
+
+
+@student.route('/calendar')
+@login_required
+def calendar():
+    return render_template('student/calendar.html')
 
 
 @student.route('/profile/edit', methods=['GET', 'POST'])
