@@ -1,5 +1,6 @@
 from flask_wtf import Form
 from wtforms import ValidationError
+from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField, HiddenField,
                             BooleanField)
@@ -7,7 +8,7 @@ from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
 from .. import db
-from ..models import Role, User, TestName
+from ..models import Role, User, TestName, College
 
 
 class ChangeUserEmailForm(Form):
@@ -102,4 +103,53 @@ class DeleteTestNameForm(Form):
         'Are you sure you want to delete this test?',
         validators=[InputRequired()])
     submit = SubmitField('Delete Test Name')
+
+class AddCollegeProfileForm(Form):
+    name = StringField('College/University Name',
+        validators=[InputRequired(), Length(1, 200)])
+    description = StringField(u'Description', widget=TextArea())
+    # Input not required for either deadline.
+    early_deadline = DateField('Early Deadline (mm-dd-yyyy)',
+        format='%m-%d-%Y')
+    regular_deadline = DateField('Regular Deadline (mm-dd-yyyy)',
+        format='%m-%d-%Y')
+    submit = SubmitField('Add College Profile')
+
+
+class EditCollegeProfileStep1Form(Form):
+    name = QuerySelectField(
+        'Select college you wish to edit',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
+    submit = SubmitField('Continue')
+
+
+class EditCollegeProfileStep2Form(Form):
+    name = StringField('College/University Name',
+        validators=[InputRequired(), Length(1, 200)])
+    description = StringField(u'Description', widget=TextArea())
+    # Input not required for either deadline.
+    early_deadline = DateField('Early Deadline (mm-dd-yyyy)',
+        format='%m-%d-%Y')
+    regular_deadline = DateField('Regular Deadline (mm-dd-yyyy)',
+        format='%m-%d-%Y')
+    submit = SubmitField('Edit College Profile')
+
+class DeleteCollegeProfileForm(Form):
+    name = QuerySelectField(
+        'Select college you wish to delete',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
+    confirmation = BooleanField(
+        'Are you sure you want to delete this college?',
+        validators=[InputRequired()])
+    submit = SubmitField('Delete College Profile')
+
+
+
+
+
+
 
