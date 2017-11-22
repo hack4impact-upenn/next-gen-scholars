@@ -506,6 +506,12 @@ def update_checklist_item(item_id):
     flash('Item could not be updated', 'error')
     return redirect(url_for('main.index'))
 
+@student.route('/college_profile/<int:college_id>')
+@login_required
+def view_college_profile(college_id):
+    current_college = College.query.filter_by(id=college_id).first()
+    return render_template('main/college_profile.html', college = current_college)
+
 
 def string_to_bool(str):
     if str == 'True':

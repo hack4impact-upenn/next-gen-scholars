@@ -356,9 +356,3 @@ def delete_college():
     return render_template('counselor/delete_college.html', form=form
                                                           , header='Delete College Profile')
 
-
-
-
-
-
-
