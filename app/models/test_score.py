@@ -24,31 +24,31 @@ class TestScore(db.Model):
                 'max_score': 36
             },
             {
-                'name': 'SAT Literature',
+                'name': 'SAT Subject Test - Math Level 2',
                 'max_score': 800
             },
             {
-                'name': 'SAT US History',
+                'name': 'SAT Subject Test - Math Level 1',
                 'max_score': 800
             },
             {
-                'name': 'SAT World History',
+                'name': 'SAT Subject Test - Physics',
                 'max_score': 800
             },
             {
-                'name': 'SAT Biology',
-                'max_score': 800
+                'name': 'AP Physics 1',
+                'max_score': 5
             },
             {
-                'name': 'SAT Physics',
-                'max_score': 800
+                'name': 'AP English Language & Composition',
+                'max_score': 5
             },
             {
-                'name': 'SAT Chemistry',
-                'max_score': 800
+                'name': 'AP Computer Science A',
+                'max_score': 5
             },
             {
-                'name': 'SAT Mathematics',
+                'name': 'SAT Subject Test - Chemistry',
                 'max_score': 800
             },
         ]
@@ -61,7 +61,7 @@ class TestScore(db.Model):
                 # student_profile_id=student_profile.id,
                 name=test['name'],
                 score=random.randint(
-                    (test['max_score'] * 0.75), test['max_score']) // 10 * 10,
+                    round((test['max_score'] * 0.75), 0), test['max_score']) // 10 * 10,
                 month=fake.month_name(),
                 year=random.choice(years))
             test_scores += [test_score]

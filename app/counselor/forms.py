@@ -1,12 +1,13 @@
 from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import PasswordField, StringField, SubmitField, HiddenField
+from wtforms.fields import (PasswordField, StringField, SubmitField, HiddenField,
+                            BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length
 
 from .. import db
-from ..models import Role, User
+from ..models import Role, User, TestName
 
 
 class ChangeUserEmailForm(Form):
@@ -73,3 +74,32 @@ class AddChecklistItemForm(Form):
         'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
     assignee_ids = HiddenField('Assignee Ids')
     submit = SubmitField('Add checklist item')
+
+class AddTestNameForm(Form):
+    name = StringField(
+        'Test Name', validators=[InputRequired(),
+                                 Length(1, 150)])
+    submit = SubmitField('Add Test Name')
+
+class EditTestNameForm(Form):
+    old_test = QuerySelectField(
+        'Select test you wish to edit',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(TestName).order_by('name'))
+    new_name = StringField(
+        'New Test Name', validators=[InputRequired(),
+                                     Length(1, 150)])
+    submit = SubmitField('Edit Test Name')
+
+class DeleteTestNameForm(Form):
+    old_test = QuerySelectField(
+        'Select test you wish to delete',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(TestName).order_by('name'))
+    confirmation = BooleanField(
+        'Are you sure you want to delete this test?',
+        validators=[InputRequired()])
+    submit = SubmitField('Delete Test Name')
+
