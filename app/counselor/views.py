@@ -241,11 +241,13 @@ def add_test_name():
             test = TestName(name=form.name.data)
             db.session.add(test)
             db.session.commit()
+        else:
+            flash('Test could not be added - already existed in database.', 'error')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/add_test_name.html', form=form)
 
 
-@counselor.route('/edit_test/', methods=['GET', 'POST'])
+@counselor.route('/edit_test', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def edit_test_name():
@@ -262,7 +264,7 @@ def edit_test_name():
                                                          , header='Edit Test Name')
 
 
-@counselor.route('/delete_test/', methods=['GET', 'POST'])
+@counselor.route('/delete_test', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def delete_test_name():
