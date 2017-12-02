@@ -27,19 +27,22 @@
     {% set user = [] %}
     {% set calendar = [] %}
     {% set resources = [] %}
-    {% set scattergram = [] %}
     {% set colleges = [] %}
     {% if current_user.is_authenticated %}
-      {% set user = ([(current_user.role.index + '.index', current_user.role.name + ' Dashboard', 'user')]) %}
       {% set calendar = ([('main.calendar', 'Calendar', 'info')]) %}
-      {% set scattergram = ([('main.scattergram', 'Scattegram', 'info')]) %}
+      {% set colleges = ([('student.colleges', 'Colleges', 'info')]) %}
       {% set resources = ([('main.resources', 'Resources', 'info')]) %}
       {% if current_user.is_admin() or current_user.is_counselor() %}
+        {% set user = ([(current_user.role.index, 'Student Database', 'user')]) %}
         {% set calendar = ([('counselor.calendar', 'Calendar', 'info')]) %}
         {% set colleges = ([('counselor.colleges', 'Colleges', 'info')]) %}
       {% endif %}
+      {% if current_user.is_student() %}
+        {% set user = ([(current_user.role.index, 'Student Checklist', 'user')]) %}
+        {% set colleges = ([('student.colleges', 'Colleges', 'info')]) %}
+      {% endif %}
     {% endif %}
-    {{ render_menu_items( endpoints +  user + calendar + resources + scattergram + colleges) }}
+    {{ render_menu_items( endpoints +  user + calendar + resources + colleges) }}
 {% endmacro %}
 
 {# This renders the right hand side of the navigation bar. If the user is logged in, it links to
