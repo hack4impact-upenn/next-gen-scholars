@@ -156,9 +156,9 @@ def student_database():
                 creator_role_id=3,
                 deadline=checklist_form.date.data)
             db.session.add(checklist_item)
-            notif_text = '{} {} added "{}" to your checklist.'.format(
+            notif_text = '{} {} added "{}" to your checklist'.format(
                 current_user.first_name, current_user.last_name, checklist_item.text)
-            notification = Notification(text=notif_text, user_id=assignee_id)
+            notification = Notification(text=notif_text, student_profile_id=assignee_id)
             db.session.add(notification)
         db.session.commit()
         flash('Checklist item added.', 'form-success')

@@ -1,3 +1,4 @@
+import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
@@ -11,7 +12,7 @@ from .forms import (
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
-                      RecommendationLetter, TestName)
+                      RecommendationLetter, TestName, Notification)
 
 
 @student.route('/profile')
@@ -113,7 +114,7 @@ def edit_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
         form = EditTestScoreForm(
-            test_name= TestName.query.filter_by(name=test_score.name).first(),
+            test_name=TestName.query.filter_by(name=test_score.name).first(),
             month=test_score.month,
             year=test_score.year,
             score=test_score.score)
@@ -406,7 +407,7 @@ def delete_major(item_id):
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def checklist(student_profile_id):
-    #only allows the student or counselors/admins to see a student's profile
+    # only allows the student or counselors/admins to see a student's profile
     if student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
         checklist_items = ChecklistItem.query.filter_by(
             assignee_id=student_profile_id)
@@ -414,9 +415,10 @@ def checklist(student_profile_id):
         checklist_items = [
             item for item in checklist_items if not item.is_checked
         ]
+        #### form to add checklist item ###
         form = AddChecklistItemForm()
         if form.validate_on_submit():
-            #add new checklist item to user's account
+            # add new checklist item to user's account
             checklist_item = ChecklistItem(
                 assignee_id=student_profile_id,
                 text=form.item_text.data,
@@ -427,11 +429,39 @@ def checklist(student_profile_id):
             return redirect(
                 url_for(
                     'student.checklist',
-                    student_profile_id=student_profile_id))
+                    student_profile_id=3))
+        ### pull student notifications ###
+        now = datetime.datetime.utcnow()
+        all_notifs = Notification.get_user_notifications(
+            student_profile_id=current_user.student_profile_id)
+        current_notifs = []
+        for n in all_notifs:
+            time_diff = now - n.created_at
+            if time_diff.days > 14 and n.seen:
+                db.session.delete(n)
+            else:
+                ago_str = ''
+                if time_diff.days > 0:
+                    ago_str = '{} days ago'.format(time_diff.days)
+                elif time_diff.seconds >= 3600:
+                    hours = time_diff.seconds // 3600
+                    ago_str = '1 hour ago' if hours == 1 else '{} hours ago'.format(hours)
+                elif time_diff.seconds >= 60:
+                    mins = time_diff.seconds // 60
+                    ago_str = '1 minute ago' if mins == 1 else '{} minutes ago'.format(mins)
+                else:
+                    ago_str = '1 second ago' if timetime_diff.seconds == 1 else '{} seconds ago'.format(time_diff.seconds)
+                current_notifs += [(n, ago_str)]
+                n.seen = True
+        db.session.commit()
+        if len(current_notifs) == 0:
+            current_notifs = None
+        ### return student dashboard checklist ###
         return render_template(
             'student/checklist.html',
             form=form,
             checklist=checklist_items,
+            notifications=current_notifs,
             completed=completed_items,
             student_profile_id=student_profile_id)
     flash('You do not have access to this page', 'error')
@@ -506,11 +536,12 @@ def update_checklist_item(item_id):
     flash('Item could not be updated', 'error')
     return redirect(url_for('main.index'))
 
+
 @student.route('/college_profile/<int:college_id>')
 @login_required
 def view_college_profile(college_id):
     current_college = College.query.filter_by(id=college_id).first()
-    return render_template('main/college_profile.html', college = current_college)
+    return render_template('main/college_profile.html', college=current_college)
 
 
 def string_to_bool(str):
