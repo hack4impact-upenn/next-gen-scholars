@@ -220,6 +220,13 @@ def add_college():
     return render_template(
         'student/add_academic_info.html', form=form, header="Add College")
 
+@student.route('/colleges')
+@login_required
+def colleges():
+    """View all colleges."""
+    colleges = College.query.all()
+    return render_template(
+        'student/colleges.html', colleges=colleges)
 
 @student.route('/profile/college/delete/<int:item_id>', methods=['POST'])
 @login_required
@@ -400,6 +407,16 @@ def delete_major(item_id):
 
 # checklist methods
 
+
+@student.route('/checklist')
+@login_required
+def checklist_default():
+    # get the logged-in user's profile id
+    if current_user.student_profile_id:
+        return redirect(url_for('student.checklist',
+                    student_profile_id=current_user.student_profile_id))
+    else:
+        return redirect(url_for('main.index'))
 
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
