@@ -424,36 +424,46 @@ def checklist(student_profile_id):
                 text=form.item_text.data,
                 is_deletable=True,
                 deadline=form.date.data)
+            ### if counselor is adding checklist item, send a notification
+            if current_user.role_id != 1:
+                notif_text = '{} {} added "{}" to your checklist'.format(
+                    current_user.first_name, current_user.last_name, checklist_item.text)
+                notification = Notification(text=notif_text, student_profile_id=student_profile_id)
+                db.session.add(notification)
             db.session.add(checklist_item)
             db.session.commit()
             return redirect(
                 url_for(
                     'student.checklist',
-                    student_profile_id=3))
+                    student_profile_id=student_profile_id))
         ### pull student notifications ###
-        now = datetime.datetime.utcnow()
-        all_notifs = Notification.get_user_notifications(
-            student_profile_id=current_user.student_profile_id)
         current_notifs = []
-        for n in all_notifs:
-            time_diff = now - n.created_at
-            if time_diff.days > 14 and n.seen:
-                db.session.delete(n)
-            else:
-                ago_str = ''
-                if time_diff.days > 0:
-                    ago_str = '{} days ago'.format(time_diff.days)
-                elif time_diff.seconds >= 3600:
-                    hours = time_diff.seconds // 3600
-                    ago_str = '1 hour ago' if hours == 1 else '{} hours ago'.format(hours)
-                elif time_diff.seconds >= 60:
-                    mins = time_diff.seconds // 60
-                    ago_str = '1 minute ago' if mins == 1 else '{} minutes ago'.format(mins)
+        if current_user.role_id == 1:
+            now = datetime.datetime.utcnow()
+            all_notifs = Notification.get_user_notifications(
+                student_profile_id=current_user.student_profile_id)
+            for n in all_notifs:
+                time_diff = now - n.created_at
+                if time_diff.days > 14 and n.seen:
+                    db.session.delete(n)
                 else:
-                    ago_str = '1 second ago' if timetime_diff.seconds == 1 else '{} seconds ago'.format(time_diff.seconds)
-                current_notifs += [(n, ago_str)]
-                n.seen = True
-        db.session.commit()
+                    ago_str = ''
+                    if time_diff.days > 0:
+                        ago_str = '{} days ago'.format(time_diff.days)
+                    elif time_diff.seconds >= 3600:
+                        hours = time_diff.seconds // 3600
+                        ago_str = '1 hour ago' if hours == 1 else '{} hours ago'.format(
+                            hours)
+                    elif time_diff.seconds >= 60:
+                        mins = time_diff.seconds // 60
+                        ago_str = '1 minute ago' if mins == 1 else '{} minutes ago'.format(
+                            mins)
+                    else:
+                        ago_str = '1 second ago' if time_diff.seconds == 1 else '{} seconds ago'.format(
+                            time_diff.seconds)
+                    current_notifs += [(n, ago_str)]
+                    n.seen = True
+            db.session.commit()
         if len(current_notifs) == 0:
             current_notifs = None
         ### return student dashboard checklist ###
