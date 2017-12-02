@@ -8,7 +8,7 @@ from wtforms.fields import (PasswordField, StringField, SubmitField,
                             IntegerField, FloatField, SelectField,
                             BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
-from wtforms.validators import Email, EqualTo, InputRequired, Length
+from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 from wtforms.fields.html5 import EmailField
 
 from .. import db
@@ -76,7 +76,7 @@ class AddChecklistItemForm(Form):
         'Checklist Item', validators=[InputRequired(),
                                       Length(1, 64)])
     date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
+        'Deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add checklist item')
 
 
@@ -85,7 +85,7 @@ class EditChecklistItemForm(Form):
         'New text', validators=[InputRequired(),
                                 Length(1, 64)])
     date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
+        'Deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Update checklist item')
 
 

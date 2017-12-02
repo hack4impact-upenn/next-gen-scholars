@@ -5,7 +5,7 @@
     <table class="ui basic table">
     	{% for item in checklist %}
             <tr>
-            	<td>{{ '%s' % (item.text) }}</td> 
+            	<td>{{ '%s' % (item.text) }}</td>
             	<td class = "right aligned">
 
                     <a class="ui small basic icon button" href="{{ url_for('student.complete_checklist_item', item_id=item.id) }}">
@@ -17,7 +17,7 @@
                         <a class="ui small basic icon button" href="{{ url_for('student.update_checklist_item', item_id=item.id) }}">
                             <i class="write icon"></i>
                         </a>
-                    
+
                         <a class="ui small basic icon button" href="{{ url_for('student.delete_checklist_item', item_id=item.id) }}">
                             <i class="remove icon"></i>
                         </a>
@@ -32,7 +32,7 @@
     <table class="ui basic table">
         {% for item in completed %}
             <tr>
-                <td>{{ '%s' % (item.text) }}</td> 
+                <td>{{ '%s' % (item.text) }}</td>
                 <td class = "right aligned">
                     {% if item.is_deletable %}
                         <a class="ui small basic icon button" href="{{ url_for('student.delete_checklist_item', item_id=item.id) }}">
@@ -74,8 +74,8 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-    $('#add-checklist-item').click(function() { 
-        $('#add-checklist-item-modal').modal('show');  
+    $('#add-checklist-item').click(function() {
+        $('#add-checklist-item-modal').modal('show');
     });
 });
 
