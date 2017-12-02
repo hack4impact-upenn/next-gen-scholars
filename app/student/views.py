@@ -61,10 +61,11 @@ def calendar():
             'client_secret': current_user.student_profile.cal_client_secret,
             'scopes': current_user.student_profile.cal_scopes
     }
-    API_SERVICE_NAME = 'drive'
-    API_VERSION = 'v2'
 
     credentials = google.oauth2.credentials.Credentials(credentials_json)
+    drive = googleapiclient.discovery.build(
+      API_SERVICE_NAME, API_VERSION, credentials=credentials)
+    files = drive.files().list().execute()
 
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
