@@ -66,8 +66,7 @@ class EditSupplementalEssayForm(Form):
     status = SelectField(
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
-                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done',
-                                                                  'Done')],
+                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done', 'Done')],
         validators=[InputRequired()])
     submit = SubmitField('Update essay')
 
@@ -141,8 +140,8 @@ class AddSupplementalEssayForm(Form):
     link = StringField('Link', validators=[InputRequired(), Length(1, 100)])
     status = SelectField(
         'Status',
-        choices=[('Incomplete', 'Incomplete'), ('Submitted', 'Submitted'),
-                 ('Pending', 'Pending')],
+        choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
+                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done', 'Done')],
         validators=[InputRequired()])
     submit = SubmitField('Add Supplemental Essay')
 
