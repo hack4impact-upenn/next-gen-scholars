@@ -140,10 +140,8 @@ def edit_test_score(item_id):
 @student.route('/profile/add_recommendation_letter', methods=['GET', 'POST'])
 @login_required
 def add_recommendation_letter():
-    # display list of default checklist items and option to add a new one
     form = AddRecommendationLetterForm()
     if form.validate_on_submit():
-        # create new test score from form data
         new_item = RecommendationLetter(
             student_profile_id=current_user.student_profile_id,
             name=form.name.data,
@@ -223,6 +221,13 @@ def add_college():
     return render_template(
         'student/add_academic_info.html', form=form, header="Add College")
 
+@student.route('/colleges')
+@login_required
+def colleges():
+    """View all colleges."""
+    colleges = College.query.all()
+    return render_template(
+        'student/colleges.html', colleges=colleges)
 
 @student.route('/profile/college/delete/<int:item_id>', methods=['POST'])
 @login_required
@@ -403,6 +408,16 @@ def delete_major(item_id):
 
 # checklist methods
 
+
+@student.route('/checklist')
+@login_required
+def checklist_default():
+    # get the logged-in user's profile id
+    if current_user.student_profile_id:
+        return redirect(url_for('student.checklist',
+                    student_profile_id=current_user.student_profile_id))
+    else:
+        return redirect(url_for('main.index'))
 
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required

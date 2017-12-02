@@ -86,6 +86,14 @@ def registered_users():
     return render_template(
         'counselor/registered_users.html', users=users, roles=roles)
 
+@counselor.route('/colleges')
+@login_required
+@counselor_required
+def colleges():
+    """View all colleges."""
+    colleges = College.query.all()
+    return render_template(
+        'counselor/colleges.html', colleges=colleges)
 
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
@@ -98,7 +106,6 @@ def user_info(user_id):
         abort(404)
     return render_template('counselor/manage_user.html', user=user)
 
-
 @counselor.route('/user/<int:user_id>/profile')
 @login_required
 @counselor_required
@@ -106,6 +113,8 @@ def view_user_profile(user_id):
     """ See a student's profile - containing all info from DB """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
+        abort(404)
+    if not user.is_student():
         abort(404)
     return render_template('student/student_profile.html', user=user)
 
