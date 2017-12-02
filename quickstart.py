@@ -51,7 +51,7 @@ def get_credentials():
         credentials = tools.run(flow, store)
     print('Storing credentials to ' + credential_path)
     j_credentials = credentials.to_json()
-    print (j_credentials)
+    print(j_credentials)
     #flask.session['credentials'] = j_credentials
     return credentials
 
