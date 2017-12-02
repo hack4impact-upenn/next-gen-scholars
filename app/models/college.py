@@ -4,6 +4,10 @@ from .. import db
 class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
+    description = db.Column(db.String, index=True)
+    regular_deadline = db.Column(db.Date, index=True)
+    early_deadline = db.Column(db.Date, index=True)
+
 
     @staticmethod
     def get_college_by_name(name):
