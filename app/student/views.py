@@ -48,24 +48,38 @@ def view_user_profile():
 @student.route('/calendar')
 @login_required
 def calendar():
-    if not current_user.student_profile.cal_token:
-        print("no token need to do something")
-        #show user button to integrate
+    # if not current_user.student_profile.cal_token:
+    #     print("no token!")
+    #     return render_template('student/calendar.html', authenticated=False)
+    # else:
+    #     collect_info()
+    #     return render_template('student/calendar.html', authenticated=True)
+    return render_template('student/calendar.html', authenticated=False)
 
-    # Load credentials from the session.
+
+@student.route('/collect_info')
+@login_required
+def collect_info():
+    #Load credentials from the session.
+    token= current_user.student_profile.cal_token
+    refresh_token= current_user.student_profile.cal_refresh_token
+    token_uri= current_user.student_profile.cal_token_uri
+    client_id= current_user.student_profile.cal_client_id
+    client_secret= current_user.student_profile.cal_client_secret
+    scopes= current_user.student_profile.cal_scopes
     credentials_json = {
-            'token': current_user.student_profile.cal_token,
-            'refresh_token': current_user.student_profile.cal_refresh_token,
-            'token_uri': current_user.student_profile.cal_token_uri,
-            'client_id': current_user.student_profile.cal_client_id,
-            'client_secret': current_user.student_profile.cal_client_secret,
-            'scopes': current_user.student_profile.cal_scopes
+            'token': token,
+            'refresh_token': refresh_token,
+            'token_uri': token_uri,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'scopes': scopes
     }
 
-    credentials = google.oauth2.credentials.Credentials(credentials_json)
-    drive = googleapiclient.discovery.build(
-      API_SERVICE_NAME, API_VERSION, credentials=credentials)
-    files = drive.files().list().execute()
+    credentials = google.oauth2.credentials.Credentials(**credentials_json)
+    # drive = googleapiclient.discovery.build(
+    #   'calendar', 'v3', credentials=credentials)
+    # files = drive.files().list().execute()
 
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
@@ -76,36 +90,36 @@ def calendar():
     # files = drive.files().list().execute()
     print (calendar['summary'])
 
-    event = {
-      'summary': 'Google I/O 2015',
-      'location': '800 Howard St., San Francisco, CA 94103',
-      'description': 'A chance to hear more about Google\'s developer products.',
-      'start': {
-        'dateTime': '2017-12-10T09:00:00-07:00',
-        'timeZone': 'America/Los_Angeles',
-      },
-      'end': {
-        'dateTime': '2017-12-10T17:00:00-08:00',
-        'timeZone': 'America/Los_Angeles',
-      },
-      'recurrence': [
-        'RRULE:FREQ=DAILY;COUNT=2'
-      ],
-      'attendees': [
-        {'email': 'lpage@example.com'},
-        {'email': 'sbrin@example.com'},
-      ],
-      'reminders': {
-        'useDefault': False,
-        'overrides': [
-          {'method': 'email', 'minutes': 24 * 60},
-          {'method': 'popup', 'minutes': 10},
-        ],
-      },
-    }
+    # event = {
+    #   'summary': 'Google I/O 2015',
+    #   'location': '800 Howard St., San Francisco, CA 94103',
+    #   'description': 'A chance to hear more about Google\'s developer products.',
+    #   'start': {
+    #     'dateTime': '2017-12-10T09:00:00-07:00',
+    #     'timeZone': 'America/Los_Angeles',
+    #   },
+    #   'end': {
+    #     'dateTime': '2017-12-10T17:00:00-08:00',
+    #     'timeZone': 'America/Los_Angeles',
+    #   },
+    #   'recurrence': [
+    #     'RRULE:FREQ=DAILY;COUNT=2'
+    #   ],
+    #   'attendees': [
+    #     {'email': 'lpage@example.com'},
+    #     {'email': 'sbrin@example.com'},
+    #   ],
+    #   'reminders': {
+    #     'useDefault': False,
+    #     'overrides': [
+    #       {'method': 'email', 'minutes': 24 * 60},
+    #       {'method': 'popup', 'minutes': 10},
+    #     ],
+    #   },
+    # }
 
-    event = service.events().insert(calendarId='primary', body=event).execute()
-    print('Event created: %s' % (event.get('htmlLink')))
+    # event = service.events().insert(calendarId='primary', body=event).execute()
+    # print('Event created: %s' % (event.get('htmlLink')))
 
     # Save credentials back to session in case access token was refreshed.
     # ACTION ITEM: In a production app, you likely want to save these
@@ -118,8 +132,6 @@ def calendar():
     current_user.student_profile.cal_scopes = credentials.scopes
     db.session.add(current_user)
     db.session.commit()
-
-    return render_template('student/calendar.html')
 
 
 @student.route('/authorize_calendar')

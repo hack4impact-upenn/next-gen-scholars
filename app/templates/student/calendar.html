@@ -1,16 +1,51 @@
 {% extends 'layouts/base.html' %}
 {% import 'macros/form_macros.html' as f %}
-
 {% block content %}
+<head>
+    <link rel='stylesheet' href='../static/styles/fullcalendar.css' />
+    <script src='../static/scripts/moment.min.js'></script>
+    <script src='../static/scripts/fullcalendar.js'></script>
+    <script type="text/javascript">
+$(document).ready(function() {
+
+    // page is now ready, initialize the calendar...
+
+    $('#calendar').fullCalendar({
+        // put your options and callbacks here
+        // events: [
+        // {
+        //     title  : 'event1',
+        //     start  : '2010-01-01'
+        // },
+        // {
+        //     title  : 'event2',
+        //     start  : '2010-01-05',
+        //     end    : '2010-01-07'
+        // },
+        // {
+        //     title  : 'event3',
+        //     start  : '2010-01-09T12:30:00',
+        //     allDay : false // will make the time show
+        // }]
+    })
+
+});
+</script>
+</head>
+
+
 <div class="ui stackable centered grid container">
     <div class="row">
         <div class="twelve wide column">
             <span style="padding-top:15px"></span>
             <h1 class="ui header">Calendar</h1>
-            <iframe src="https://calendar.google.com/calendar/embed?src=ngshack4impact%40gmail.com&ctz=America/New_York" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
-            <button class="ui small button" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration<>
+            <div id='calendar'></div>
+            {% if not authenticated %}
+            	<button class="ui small button" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration</button>
+            {% endif %}
         </div>
     </div>
 </div>
+
 
 {% endblock %}
