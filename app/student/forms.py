@@ -96,8 +96,8 @@ class AddTestScoreForm(Form):
         month_choices.append((calendar.month_name[i], calendar.month_name[i]))
     year_choices = []
     today = datetime.today()
-    for i in range(0, 8):
-        year_choices.append((str(today.year - 8 + i), str(today.year - 8 + i)))
+    for i in range(8):
+        year_choices.append((str(today.year - i), str(today.year - i)))
     test_name = QuerySelectField(
         'Test Name',
         validators=[InputRequired()],
