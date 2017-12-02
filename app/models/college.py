@@ -1,5 +1,7 @@
 from .. import db
 
+from datetime import datetime
+
 
 class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -32,7 +34,8 @@ class College(db.Model):
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
-                college = College(name=c)
+                college = College(name=c, description="Blank description",
+                    regular_deadline=datetime.today())
             db.session.add(college)
         db.session.commit()
 
