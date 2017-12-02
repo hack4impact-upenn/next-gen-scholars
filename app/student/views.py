@@ -56,10 +56,10 @@ def calendar():
     #     return render_template('student/calendar.html', authenticated=True)
     return render_template('student/calendar.html', authenticated=False)
 
-
-@student.route('/collect_info')
+@student.route('/calendar_data', methods=['GET', 'POST'])
 @login_required
-def collect_info():
+@csrf.exempt
+def calendar_data():
     #Load credentials from the session.
     token= current_user.student_profile.cal_token
     refresh_token= current_user.student_profile.cal_refresh_token
@@ -77,18 +77,27 @@ def collect_info():
     }
 
     credentials = google.oauth2.credentials.Credentials(**credentials_json)
+    service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
     # drive = googleapiclient.discovery.build(
     #   'calendar', 'v3', credentials=credentials)
     # files = drive.files().list().execute()
-
-    service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
+    event_data = []
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
-    calendar = service.calendars().get(calendarId='primary').execute()
-    # drive = googleapiclient.discovery.build(
-    #   API_SERVICE_NAME, API_VERSION, credentials=credentials)
-    # files = drive.files().list().execute()
-    print (calendar['summary'])
+    page_token = None
+    while True:
+      events = service.events().list(calendarId='primary', pageToken=page_token, timeMin=now).execute()
+      for event in events['items']:
+        event_data.append({'title':event['summary'], 'start':event['start']['dateTime'], 'end':event['end']['dateTime']})
+        #print (event)
+      page_token = events.get('nextPageToken')
+      if not page_token:
+        break
+
+    # service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
+    # now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    # print('Getting the upcoming 10 events')
+    # calendar = service.calendars().get(calendarId='primary').execute()
+    # print (calendar['summary'])
 
     # event = {
     #   'summary': 'Google I/O 2015',
@@ -132,6 +141,7 @@ def collect_info():
     current_user.student_profile.cal_scopes = credentials.scopes
     db.session.add(current_user)
     db.session.commit()
+    return jsonify(data=event_data)
 
 
 @student.route('/authorize_calendar')
