@@ -17,7 +17,22 @@ from ..models import (User, College, Essay, TestScore, ChecklistItem,
 @student.route('/profile')
 @login_required
 def view_user_profile():
-    return render_template('student/student_profile.html', user=current_user)
+    sat = '––'
+    act = '––'
+    student_profile = current_user.student_profile
+    if student_profile is not None:
+        test_scores = student_profile.test_scores
+        for t in test_scores:
+            print (t.name)
+            if t.name == 'SAT':
+                sat = max(sat, t.score) if sat != '––' else t.score
+            if t.name == 'ACT':
+                act = max(act, t.score) if act != '––' else t.score
+        return render_template(
+            'student/student_profile.html',
+            user=current_user,
+            sat=sat,
+            act=act)
 
 
 @student.route('/profile/edit', methods=['GET', 'POST'])
@@ -67,7 +82,7 @@ def add_test_score():
         # create new test score from form data
         new_item = TestScore(
             student_profile_id=current_user.student_profile_id,
-            name=form.test_name.data,
+            name=form.test_name.data.name,
             month=form.month.data,
             year=form.year.data,
             score=form.score.data)
@@ -98,12 +113,12 @@ def edit_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
         form = EditTestScoreForm(
-            test_name=test_score.name,
+            test_name= TestName.query.filter_by(name=test_score.name).first(),
             month=test_score.month,
             year=test_score.year,
             score=test_score.score)
         if form.validate_on_submit():
-            test_score.name = form.test_name.data
+            test_score.name = form.test_name.data.name
             test_score.month = form.month.data
             test_score.year = form.year.data
             test_score.score = form.score.data
@@ -490,21 +505,12 @@ def update_checklist_item(item_id):
             student_profile_id=item.assignee_id)
     flash('Item could not be updated', 'error')
     return redirect(url_for('main.index'))
-    sat = '––'
-    act = '––'
-    student_profile = current_user.student_profile
-    if student_profile is not None:
-        test_scores = student_profile.test_scores
-        for t in test_scores:
-            if t.name == 'SAT':
-                sat = max(sat, t.score) if sat != '––' else t.score
-            if t.name == 'ACT':
-                act = max(act, t.score) if act != '––' else t.score
-        return render_template(
-            'student/student_profile.html',
-            user=current_user,
-            sat=sat,
-            act=act)
+
+@student.route('/college_profile/<int:college_id>')
+@login_required
+def view_college_profile(college_id):
+    current_college = College.query.filter_by(id=college_id).first()
+    return render_template('main/college_profile.html', college = current_college)
 
 @student.route('/profile/add_college_status', methods=['GET', 'POST'])
 @login_required
