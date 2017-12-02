@@ -139,10 +139,8 @@ def edit_test_score(item_id):
 @student.route('/profile/add_recommendation_letter', methods=['GET', 'POST'])
 @login_required
 def add_recommendation_letter():
-    # display list of default checklist items and option to add a new one
     form = AddRecommendationLetterForm()
     if form.validate_on_submit():
-        # create new test score from form data
         new_item = RecommendationLetter(
             student_profile_id=current_user.student_profile_id,
             name=form.name.data,

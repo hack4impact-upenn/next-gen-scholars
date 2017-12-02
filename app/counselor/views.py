@@ -114,6 +114,8 @@ def view_user_profile(user_id):
     user = User.query.filter_by(id=user_id).first()
     if user is None:
         abort(404)
+    if user.is_counselor:
+        abort(404)
     return render_template('student/student_profile.html', user=user)
 
 
