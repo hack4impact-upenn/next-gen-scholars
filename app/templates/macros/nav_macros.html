@@ -28,26 +28,25 @@
     {% set calendar = [] %}
     {% set resources = [] %}
     {% set scattergram = [] %}
+    {% set colleges = [] %}
     {% if current_user.is_authenticated %}
       {% set user = ([(current_user.role.index + '.index', current_user.role.name + ' Dashboard', 'user')]) %}
       {% set calendar = ([('main.calendar', 'Calendar', 'info')]) %}
       {% set scattergram = ([('main.scattergram', 'Scattegram', 'info')]) %}
       {% set resources = ([('main.resources', 'Resources', 'info')]) %}
+      {% if current_user.is_admin() or current_user.is_counselor() %}
+        {% set calendar = ([('counselor.calendar', 'Calendar', 'info')]) %}
+        {% set colleges = ([('counselor.colleges', 'Colleges', 'info')]) %}
+      {% endif %}
     {% endif %}
-    {{ render_menu_items( endpoints +  user + calendar + resources + scattergram) }}
+    {{ render_menu_items( endpoints +  user + calendar + resources + scattergram + colleges) }}
 {% endmacro %}
 
 {# This renders the right hand side of the navigation bar. If the user is logged in, it links to
    manage their account and logout (account routes). Otherwise, it links to register and login.
 #}
 {% macro account_items(current_user) %}
-    {% if current_user.is_authenticated %}
-      {% set endpoints = [
-        ('account.manage', 'Your Account', 'settings'),
-        ('account.logout', 'Log out', 'sign out')
-      ] %}
-      {{ render_menu_items(endpoints) }}
-    {% else %}
+    {% if not current_user.is_authenticated %}
       {% set endpoints = [
         ('account.register', 'Register', 'list layout'),
         ('account.login', 'Log In', 'sign in')
@@ -92,9 +91,9 @@
         <div class="ui fixed inverted black main menu">
             <div class="ui container">
                 {{ header_items(current_user) }}
-                {{ create_dropdown(dropdown) }}
                 <div class="right menu">
                     {{ account_items(current_user) }}
+                    {{ create_dropdown(dropdown) }}
                 </div>
             </div>
         </div>
