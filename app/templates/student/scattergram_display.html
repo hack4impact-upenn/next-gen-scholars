@@ -1,0 +1,7 @@
+{% import 'macros/page_macros.html' as page %}
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<h2 class="ui header">Scattergram</h2>
+<iframe width="640" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{plot}}.embed?width=640&height=480" ></iframe>
+{% endblock %}
