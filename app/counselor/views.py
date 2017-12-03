@@ -12,7 +12,7 @@ from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile,
-                      EditableHTML, ChecklistItem, TestName, College)
+                      EditableHTML, ChecklistItem, TestName, College, Notification)
 
 
 @counselor.route('/')
@@ -156,14 +156,19 @@ def student_database():
     """View student database."""
     checklist_form = AddChecklistItemForm()
     if checklist_form.validate_on_submit():
+        print(checklist_form.assignee_ids.data)
         for assignee_id in checklist_form.assignee_ids.data.split(','):
             checklist_item = ChecklistItem(
                 text=checklist_form.item_text.data,
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=form.date.data)
+                deadline=checklist_form.date.data)
             db.session.add(checklist_item)
+            notif_text = '{} {} added "{}" to your checklist'.format(
+                current_user.first_name, current_user.last_name, checklist_item.text)
+            notification = Notification(text=notif_text, student_profile_id=assignee_id)
+            db.session.add(notification)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
         return redirect(url_for('counselor.student_database'))
@@ -242,7 +247,7 @@ def calendar():
 @counselor_required
 def add_test_name():
     # Allows a counselor to add a test name to the database.
-    form = AddTestNameForm();
+    form = AddTestNameForm()
     if form.validate_on_submit():
         test_name = TestName.query.filter_by(name=form.name.data).first()
         if test_name is None:
@@ -269,8 +274,7 @@ def edit_test_name():
         db.session.commit()
         flash('Test name successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_test_name.html', form=form
-                                                         , header='Edit Test Name')
+    return render_template('counselor/edit_test_name.html', form=form, header='Edit Test Name')
 
 
 @counselor.route('/delete_test', methods=['GET', 'POST'])
@@ -285,8 +289,8 @@ def delete_test_name():
         db.session.commit()
         flash('Test name successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_test_name.html', form=form
-                                                         , header='Delete Test Name')
+    return render_template('counselor/delete_test_name.html', form=form, header='Delete Test Name')
+
 
 @counselor.route('/add_college', methods=['GET', 'POST'])
 @login_required
@@ -303,14 +307,13 @@ def add_college():
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data
-                )
+            )
             db.session.add(college)
             db.session.commit()
         else:
             flash('College could not be added - already existed in database.', 'error')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/add_college.html', form=form
-                                                       , header='Add College Profile')
+    return render_template('counselor/add_college.html', form=form, header='Add College Profile')
 
 
 @counselor.route('/edit_college', methods=['GET', 'POST'])
@@ -322,8 +325,7 @@ def edit_college_step1():
     if form.validate_on_submit():
         college = College.query.filter_by(name=form.name.data.name).first()
         return redirect(url_for('counselor.edit_college_step2', college_id=college.id))
-    return render_template('counselor/edit_college.html', form=form
-                                                         , header='Edit College Profile')
+    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])
@@ -348,8 +350,7 @@ def edit_college_step2(college_id):
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_college.html', form=form
-                                                        , header='Edit College Profile')
+    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
 
 
 @counselor.route('/delete_college', methods=['GET', 'POST'])
@@ -364,6 +365,4 @@ def delete_college():
         db.session.commit()
         flash('College profile successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_college.html', form=form
-                                                          , header='Delete College Profile')
-
+    return render_template('counselor/delete_college.html', form=form, header='Delete College Profile')

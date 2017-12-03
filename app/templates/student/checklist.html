@@ -7,17 +7,13 @@
             <tr>
             	<td>{{ '%s' % (item.text) }}</td>
             	<td class = "right aligned">
-
                     <a class="ui small basic icon button" href="{{ url_for('student.complete_checklist_item', item_id=item.id) }}">
                         <i class="checkmark box icon"></i>
                     </a>
-
                     {% if item.is_deletable %}
-
                         <a class="ui small basic icon button" href="{{ url_for('student.update_checklist_item', item_id=item.id) }}">
                             <i class="write icon"></i>
                         </a>
-
                         <a class="ui small basic icon button" href="{{ url_for('student.delete_checklist_item', item_id=item.id) }}">
                             <i class="remove icon"></i>
                         </a>
@@ -40,8 +36,8 @@
                         </a>
                     {% endif %}
                     <a class="ui small basic icon button" href="{{ url_for('student.undo_checklist_item', item_id=item.id) }}">
-                            <i class="undo icon"></i>
-                        </a>
+                        <i class="undo icon"></i>
+                    </a>
                 </td>
             </tr>
         {% endfor %}
@@ -49,26 +45,39 @@
 {% endmacro %}
 
 {% block content %}
-    <div class="ui stackable centered grid container">
+    <div class="ui stackable centered grid container" >
         <div class="twelve wide column">
-            <h2 class="ui header">
-                Checklist
-            </h2>
-        </div>
-        <div class="stretched divided very relaxed row">
-            <div class="eight wide column">
+            <br />
+            <h2 class="ui header">Student Dashboard</h2>
+            {% if notifications %}
+            <div class="stretched divided very relaxed row">
+                <div class="ui info message">
+                    <i class="close icon"></i>
+                    <div class="header">
+                        Notifications
+                    </div>
+                    <ul class="list">
+                        {% for n in notifications %}
+                        <li>{{ n[0].text }} {{ n[1] }}.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            <h4 class="ui header">Checklist</h4>
+            <div class="stretched divided very relaxed row">
             	{{ render_checklist(checklist) }}
                 <button class="ui button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
                 {{ completed_list(completed) }}
             </div>
         </div>
-    </div>
-
-    <div id="add-checklist-item-modal" class="ui tiny modal">
-        <div class="ui segment">
-            {{ f.render_form(form, extra_classes='fluid') }}
+        <div id="add-checklist-item-modal" class="ui tiny modal">
+            <div class="ui segment">
+                {{ f.render_form(form, extra_classes='fluid') }}
+            </div>
         </div>
     </div>
+
 
 
 <script type="text/javascript">
