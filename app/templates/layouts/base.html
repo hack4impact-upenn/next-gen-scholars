@@ -8,29 +8,35 @@
         {% block custom_head_tags %}{% endblock %}
     </head>
     <body>
-      {# Example dropdown menu setup. Uncomment lines to view
-        {% set dropdown = 
-          [
-            ('account stuff',
-              [
-                ('account.login', 'login', 'sign in'),
-                ('account.logout', 'logout', 'sign out'),
-                ('2nd drop', [
-                  ('account.login', 'login 2', ''),
-                  ('3rd drop', [
-                    ('main.index', 'home 2', '')
-                  ])
-                ])
-              ]
-            ),
-            ('main.index', 'home 1', 'home')
-          ]
-        %}
-      #}
+        {% set dropdown = [] %}
+        {% if current_user.is_admin() or current_user.is_counselor() %}
+          {% set dropdown = 
+            [
+              ('Welcome ' + current_user.first_name + '!',
+                [
+                  ('account.manage', 'Your Account', 'settings'),
+                  ('counselor.index', 'Manage Users', 'user'),
+                  ('account.logout', 'Log out', 'sign out'),
+                ]
+              ),
+            ]
+          %}
+        {% elif current_user.is_authenticated %}
+          {% set dropdown = 
+            [
+              ('Welcome ' + current_user.first_name + '!',
+                [
+                  ('account.manage', 'Your Account', 'settings'),
+                  ('account.logout', 'Log out', 'sign out'),
+                ]
+              ),
+            ]
+          %}
+        {% endif %}
 
         {% block nav %}
           {# add dropdown variable here to the render_nav method to render dropdowns #}
-          {{ nav.render_nav(current_user) }}
+          {{ nav.render_nav(current_user, dropdown) }}
         {% endblock %}
 
         {% include 'partials/_flashes.html' %}

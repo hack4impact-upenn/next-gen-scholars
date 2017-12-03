@@ -91,7 +91,7 @@
             <span style="padding:0.2em"></span>
             <div class="ui three cards">
                 {% for test in user.student_profile.test_scores|sort(attribute='name') %}
-                <div class="orange card test-card">
+                <div class="blue card test-card">
                     <div class="center aligned content">
                         <div class="header">{{ test.name }}</div>
                         <div class="meta">{{ test.month }} {{ test.year }}</div>
@@ -103,18 +103,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ui bottom attached orange basic button test-button" data-id="{{ test.id }}">
+                    <div class="ui bottom attached blue basic button test-button" data-id="{{ test.id }}">
                         <i class="edit icon"></i>Edit
                     </div>
                 </div>
                 {% endfor %}
 
                 <!-- DISPLAY BUTTON FOR ADDING TEST SCORE -->
-                <a class="green card" href="{{ url_for('student.add_test_score') }}">
+                <a class="blue card" href="{{ url_for('student.add_test_score') }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
-                            <br /><i class="big green plus icon"></i><br />
-                            <span style="color:#21ba45">Add Test Score</span>
+                            <br /><i class="big blue plus icon"></i><br />
+                            <span style="color:#2987CD">Add Test Score</span>
                         </div>
                     </div>
                 </a>
@@ -140,7 +140,7 @@
             </div>
         </div>
         <div class="two wide column">
-            <a class="ui right floated green basic button" onclick="window.location.href='{{ url_for('student.add_major') }}';">Add Major</a>
+            <a class="ui right floated blue basic button" onclick="window.location.href='{{ url_for('student.add_major') }}';">Add Major</a>
         </div>
     </div>
 
@@ -163,11 +163,11 @@
                     </div>
                 </div>
                 {% endfor %}
-                <div class="ui green link card" onclick="window.location.href='{{ url_for('student.add_college') }}';">
+                <div class="ui blue link card" onclick="window.location.href='{{ url_for('student.add_college') }}';">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
-                            <i class="big green plus icon"></i><br />
-                            <span style="color:#21ba45">Add College</span>
+                            <i class="big blue plus icon"></i><br />
+                            <span style="color:#2987CD">Add College</span>
                         </div>
                     </div>
                 </div>
@@ -188,7 +188,7 @@
             <div class="ui four cards">
                 <!-- DISPLAY COMMON APP ESSAY IF STUDENT HAS ADDED IT-->
                 {% if user.student_profile.common_app_essay|length > 1 %}
-                    <div class="purple card common-essay-card">
+                    <div class="blue card common-essay-card">
                         <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="center aligned content" >
                             <div class="description">
                                 <h4 class="ui header">Common App Essay</h4>
@@ -208,25 +208,25 @@
                                 <strong>{{ user.student_profile.common_app_essay_status }}</strong></span>
                             </div>
                         </a>
-                        <div class="ui bottom attached purple basic button common-essay-button">
+                        <div class="ui bottom attached blue basic button common-essay-button">
                             <i class="edit icon"></i>Edit
                         </div>
                     </div>
                 {% else %}
                     <!-- DISPLAY ADD OPTION OTHERWISE-->
-                    <a class="green card" href="{{ url_for('student.add_common_app_essay') }}">
+                    <a class="blue card" href="{{ url_for('student.add_common_app_essay') }}">
                         <div class="content" style="text-align:center">
                             <div class="description" style="margin:0 auto">
-                                <h3></h3><i class="big green plus icon"></i><br />
-                            <span style="color:#21ba45">Add Common App Essay</span>
+                                <h3></h3><i class="big blue plus icon"></i><br />
+                            <span style="color:#2987CD">Add Common App Essay</span>
                             </div>
                         </div>
                     </a>
                 {% endif %}
-                
+
                 <!-- DISPLAY SUPPLEMENTAL ESSAYS -->
                 {% for essay in user.student_profile.essays|sort(attribute='name') %}
-                <div class="purple card sup-essay-card">
+                <div class="blue card sup-essay-card">
                     <a href="{{ essay.link }}" target="_blank" class="center aligned content" >
                         <div class="description">
                             <h4 class="ui header">{{ essay.name }}</h4>
@@ -246,16 +246,16 @@
                             <strong>{{ essay.status }}</strong></span>
                         </div>
                     </a>
-                    <div class="ui bottom attached purple basic button sup-essay-button" data-id="{{ essay.id }}">
+                    <div class="ui bottom attached blue basic button sup-essay-button" data-id="{{ essay.id }}">
                         <i class="edit icon"></i>Edit
                     </div>
                 </div>
                 {% endfor %}
-                <a class="green card" href="{{ url_for('student.add_supplemental_essay') }}">
+                <a class="blue card" href="{{ url_for('student.add_supplemental_essay') }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
-                            <h3></h3><i class="big green plus icon"></i><br />
-                        <span style="color:#21ba45">Add Supplemental Essay</span>
+                            <h3></h3><i class="big blue plus icon"></i><br />
+                        <span style="color:#2987CD">Add Supplemental Essay</span>
                         </div>
                     </div>
                 </a>
@@ -270,7 +270,7 @@
 
             <div class="ui three cards letter-card">
                 {% for letter in user.student_profile.recommendation_letters|sort(attribute='name') %}
-                <div class="black card">
+                <div class="blue card">
                     <div class="center aligned content">
                         <div class="header">
                             {{ letter.name }}
@@ -291,16 +291,16 @@
                             <strong>{{ letter.status }}</strong></span>
                         </div>
                     </div>
-                    <div class="ui bottom attached black basic button letter-button" data-id="{{ letter.id }}">
+                    <div class="ui bottom attached blue basic button letter-button" data-id="{{ letter.id }}">
                         <i class="edit icon"></i>Edit
                     </div>
                 </div>
                 {% endfor %}
-                <a class="green card" href="{{ url_for('student.add_recommendation_letter') }}">
+                <a class="blue card" href="{{ url_for('student.add_recommendation_letter') }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
-                            <br /><i class="big green plus icon"></i><br />
-                            <span style="color:#21ba45">Add Letter</span>
+                            <br /><i class="big blue plus icon"></i><br />
+                            <span style="color:#2987CD">Add Letter</span>
                         </div>
                     </div>
                 </a>
@@ -323,17 +323,17 @@ $(document).ready(function () {
         deletingMajors = !deletingMajors;
         if (deletingMajors) {
             $('#edit-majors').removeClass('blue edit');
-            $('#edit-majors').addClass('green check');
+            $('#edit-majors').addClass('blue check');
             $('#majors-list').removeClass('bulleted');
         } else {
-            $('#edit-majors').removeClass('green check');
+            $('#edit-majors').removeClass('blue check');
             $('#edit-majors').addClass('blue edit');
             $('#majors-list').addClass('bulleted');
         }
         $('.major-delete-button').toggle()
     });
 
-    // when user deletes a major, send ajax request 
+    // when user deletes a major, send ajax request
     $('.major-delete-button').click(function() {
         if (deletingMajors) {
             var url = '/student/profile/major/delete/' + $(this).data('id');
@@ -349,9 +349,9 @@ $(document).ready(function () {
                         } else {
                             alert("Sorry there was an error, please try again.");
                         }
-                        
+
                     }
-                    
+
                 }
             })
         }
@@ -359,17 +359,17 @@ $(document).ready(function () {
 
     // toggle between displaying edit option and delete option to user for colleges
     $('#edit-colleges').click(function () {
-        deletingColleges = !deletingColleges;  
+        deletingColleges = !deletingColleges;
         if (deletingColleges) {
             $('#edit-colleges').removeClass('blue edit');
-            $('#edit-colleges').addClass('green check');
+            $('#edit-colleges').addClass('blue check');
             $('.college-button').removeClass('blue');
             $('.college-button').addClass('red');
             $('.college-card').removeClass('blue');
             $('.college-card').addClass('red');
             $('.college-button').html('<i class="remove icon"></i>Remove');
         } else {
-            $('#edit-colleges').removeClass('green check');
+            $('#edit-colleges').removeClass('blue check');
             $('#edit-colleges').addClass('blue edit');
             $('.college-button').removeClass('red');
             $('.college-button').addClass('blue');
@@ -394,9 +394,9 @@ $(document).ready(function () {
                         } else {
                             alert("Sorry there was an error, please try again.");
                         }
-                        
+
                     }
-                    
+
                 }
             })
         } else {
@@ -406,17 +406,17 @@ $(document).ready(function () {
 
     // toggle between displaying edit option and delete option to user for test scores
     $('#edit-test-scores').click(function () {
-        deletingTestScores = !deletingTestScores;  
+        deletingTestScores = !deletingTestScores;
         if (deletingTestScores) {
             $('#edit-test-scores').removeClass('blue edit');
-            $('#edit-test-scores').addClass('green check');
+            $('#edit-test-scores').addClass('blue check');
             $('.test-button').removeClass('blue');
             $('.test-button').addClass('red');
             $('.test-card').removeClass('blue');
             $('.test-card').addClass('red');
             $('.test-button').html('<i class="remove icon"></i>Remove');
         } else {
-            $('#edit-test-scores').removeClass('green check');
+            $('#edit-test-scores').removeClass('blue check');
             $('#edit-test-scores').addClass('blue edit');
             $('.test-button').removeClass('red');
             $('.test-button').addClass('blue');
@@ -441,24 +441,24 @@ $(document).ready(function () {
                         } else {
                             alert("Sorry there was an error, please try again.");
                         }
-                        
+
                     }
-                    
+
                 }
             })
         } else {
             var url = '/student/profile/test_score/edit/' + $(this).data('id');
-            location.href = url; 
+            location.href = url;
         }
     });
 
 
     // toggle between displaying edit option and delete option to user for essays
     $('#edit-essays').click(function () {
-        deletingEssays = !deletingEssays;  
+        deletingEssays = !deletingEssays;
         if (deletingEssays) {
             $('#edit-essays').removeClass('blue edit');
-            $('#edit-essays').addClass('green check');
+            $('#edit-essays').addClass('blue check');
             $('.sup-essay-button').removeClass('blue');
             $('.sup-essay-button').addClass('red');
             $('.sup-essay-card').removeClass('blue');
@@ -470,7 +470,7 @@ $(document).ready(function () {
             $('.common-essay-card').addClass('red');
             $('.common-essay-button').html('<i class="remove icon"></i>Remove');
         } else {
-            $('#edit-essays').removeClass('green check');
+            $('#edit-essays').removeClass('blue check');
             $('#edit-essays').addClass('blue edit');
             $('.sup-essay-button').removeClass('red');
             $('.sup-essay-button').addClass('blue');
@@ -489,10 +489,10 @@ $(document).ready(function () {
     $('.common-essay-button').click(function() {
         if (deletingEssays) {
             var url = '/student/profile/common_app_essay/delete';
-            location.href = url; 
+            location.href = url;
         } else {
             var url = '/student/profile/common_app_essay/edit';
-            location.href = url; 
+            location.href = url;
         }
     });
 
@@ -511,30 +511,30 @@ $(document).ready(function () {
                         } else {
                             alert("Sorry there was an error, please try again.");
                         }
-                        
+
                     }
-                    
+
                 }
             })
         } else {
             var url = '/student/profile/supplemental_essay/edit/' + $(this).data('id');
-            location.href = url; 
+            location.href = url;
         }
     });
 
     // toggle between displaying edit and delete option to user for rec. letters
     $('#edit-letters').click(function () {
-        deletingLetters = !deletingLetters;  
+        deletingLetters = !deletingLetters;
         if (deletingLetters) {
             $('#edit-letters').removeClass('blue edit');
-            $('#edit-letters').addClass('green check');
+            $('#edit-letters').addClass('blue check');
             $('.letter-button').removeClass('blue');
             $('.letter-button').addClass('red');
             $('.letter-card').removeClass('blue');
             $('.letter-card').addClass('red');
             $('.letter-button').html('<i class="remove icon"></i>Remove');
         } else {
-            $('#edit-letters').removeClass('green check');
+            $('#edit-letters').removeClass('blue check');
             $('#edit-letters').addClass('blue edit');
             $('.letter-button').removeClass('red');
             $('.letter-button').addClass('blue');
@@ -559,14 +559,14 @@ $(document).ready(function () {
                         } else {
                             alert("Sorry there was an error, please try again.");
                         }
-                        
+
                     }
-                    
+
                 }
             })
         } else {
             var url = '/student/profile/recommendation_letter/edit/' + $(this).data('id');
-            location.href = url; 
+            location.href = url;
         }
     });
 
