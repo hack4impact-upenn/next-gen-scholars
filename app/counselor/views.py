@@ -153,7 +153,8 @@ def student_database():
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=form.date.data)
+                deadline=checklist_form.date.data)
+            add_to_cal(assignee_id, checklist_item.text, checklist_item.deadline)
             db.session.add(checklist_item)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
@@ -168,6 +169,45 @@ def student_database():
         checklist_form=checklist_form,
         colleges=colleges,
         essay_statuses=essay_statuses)
+
+
+def add_to_cal(student_profile_id, text, deadline):
+    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    credentials_json = {
+            'token': student_profile.cal_token,
+            'refresh_token': student_profile.cal_refresh_token,
+            'token_uri': student_profile.cal_token_uri,
+            'client_id': student_profile.cal_client_id,
+            'client_secret': student_profile.cal_client_secret,
+            'scopes': student_profile.cal_scopes
+    }
+
+    credentials = google.oauth2.credentials.Credentials(**credentials_json)
+    service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
+    y = deadline.year
+    m = deadline.month
+    d = deadline.day
+    event = {
+        'summary': text,
+        'start': {
+            'dateTime': datetime.datetime(y, m, d).isoformat('T'),
+            'timeZone': 'America/Los_Angeles',
+        },
+        'end': {
+            'dateTime': datetime.datetime(y, m, d).isoformat('T'),
+            'timeZone': 'America/Los_Angeles',
+        },
+    }
+
+    event = service.events().insert(calendarId='primary', body=event).execute()
+    student_profile.cal_token = credentials.token
+    student_profile.cal_refresh_token = credentials.refresh_token
+    student_profile.cal_token_uri = credentials.token_uri
+    student_profile.cal_client_id = credentials.client_id
+    student_profile.cal_client_secret = credentials.client_secret
+    student_profile.cal_scopes = credentials.scopes
+    db.session.add(student_profile)
+    db.session.commit()
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])

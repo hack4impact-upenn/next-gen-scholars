@@ -7,14 +7,19 @@
     <script src='../static/scripts/fullcalendar.js'></script>
     <script type="text/javascript">
 $(document).ready(function() {
+    //show empty calendar
+    $('#calendar').fullCalendar({});
+
     $.ajax({
         url: '/student/calendar_data',
         type: 'POST',
         success: function(data) {
-            $('#calendar').fullCalendar({
-                    // put your options and callbacks here
-                events: data.data
-            });
+            if (data.data.length > 0) {
+                $('#calendar').fullCalendar( 'renderEvents', data.data, true);
+                $('#integrate').hide();
+            } else {
+                $('#integrate').show();
+            }
         }
     });
 
@@ -29,9 +34,8 @@ $(document).ready(function() {
             <span style="padding-top:15px"></span>
             <h1 class="ui header">Calendar</h1>
             <div id='calendar'></div>
-            {% if not authenticated %}
-            	<button class="ui small button" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration</button>
-            {% endif %}
+            	<button class="ui small button" style="display:none;" id="integrate" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration</button>
+            <div class="ui text container" id="integrate"></div>
         </div>
     </div>
 </div>

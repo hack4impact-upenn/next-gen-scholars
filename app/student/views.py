@@ -1,7 +1,7 @@
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Essay, College, Major
+from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -48,91 +48,36 @@ def view_user_profile():
 @student.route('/calendar')
 @login_required
 def calendar():
-    # if not current_user.student_profile.cal_token:
-    #     print("no token!")
-    #     return render_template('student/calendar.html', authenticated=False)
-    # else:
-    #     collect_info()
-    #     return render_template('student/calendar.html', authenticated=True)
-    return render_template('student/calendar.html', authenticated=False)
+    return render_template('student/calendar.html')
+
 
 @student.route('/calendar_data', methods=['GET', 'POST'])
 @login_required
 @csrf.exempt
 def calendar_data():
     #Load credentials from the session.
-    token= current_user.student_profile.cal_token
-    refresh_token= current_user.student_profile.cal_refresh_token
-    token_uri= current_user.student_profile.cal_token_uri
-    client_id= current_user.student_profile.cal_client_id
-    client_secret= current_user.student_profile.cal_client_secret
-    scopes= current_user.student_profile.cal_scopes
     credentials_json = {
-            'token': token,
-            'refresh_token': refresh_token,
-            'token_uri': token_uri,
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'scopes': scopes
+            'token': current_user.student_profile.cal_token,
+            'refresh_token': current_user.student_profile.cal_refresh_token,
+            'token_uri': current_user.student_profile.cal_token_uri,
+            'client_id': current_user.student_profile.cal_client_id,
+            'client_secret': current_user.student_profile.cal_client_secret,
+            'scopes': current_user.student_profile.cal_scopes
     }
-
     credentials = google.oauth2.credentials.Credentials(**credentials_json)
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
-    # drive = googleapiclient.discovery.build(
-    #   'calendar', 'v3', credentials=credentials)
-    # files = drive.files().list().execute()
-    event_data = []
+
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    event_data = []
     page_token = None
     while True:
       events = service.events().list(calendarId='primary', pageToken=page_token, timeMin=now).execute()
       for event in events['items']:
         event_data.append({'title':event['summary'], 'start':event['start']['dateTime'], 'end':event['end']['dateTime']})
-        #print (event)
       page_token = events.get('nextPageToken')
       if not page_token:
         break
 
-    # service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
-    # now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    # print('Getting the upcoming 10 events')
-    # calendar = service.calendars().get(calendarId='primary').execute()
-    # print (calendar['summary'])
-
-    # event = {
-    #   'summary': 'Google I/O 2015',
-    #   'location': '800 Howard St., San Francisco, CA 94103',
-    #   'description': 'A chance to hear more about Google\'s developer products.',
-    #   'start': {
-    #     'dateTime': '2017-12-10T09:00:00-07:00',
-    #     'timeZone': 'America/Los_Angeles',
-    #   },
-    #   'end': {
-    #     'dateTime': '2017-12-10T17:00:00-08:00',
-    #     'timeZone': 'America/Los_Angeles',
-    #   },
-    #   'recurrence': [
-    #     'RRULE:FREQ=DAILY;COUNT=2'
-    #   ],
-    #   'attendees': [
-    #     {'email': 'lpage@example.com'},
-    #     {'email': 'sbrin@example.com'},
-    #   ],
-    #   'reminders': {
-    #     'useDefault': False,
-    #     'overrides': [
-    #       {'method': 'email', 'minutes': 24 * 60},
-    #       {'method': 'popup', 'minutes': 10},
-    #     ],
-    #   },
-    # }
-
-    # event = service.events().insert(calendarId='primary', body=event).execute()
-    # print('Event created: %s' % (event.get('htmlLink')))
-
-    # Save credentials back to session in case access token was refreshed.
-    # ACTION ITEM: In a production app, you likely want to save these
-    #              credentials in a persistent database instead.
     current_user.student_profile.cal_token = credentials.token
     current_user.student_profile.cal_refresh_token = credentials.refresh_token
     current_user.student_profile.cal_token_uri = credentials.token_uri
@@ -155,6 +100,7 @@ def authorize_calendar():
         # Enable offline access so that you can refresh an access token without
         # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
+        prompt='consent',
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
 
@@ -182,8 +128,6 @@ def oauth2callback():
 
   # Store credentials in database
   credentials = flow.credentials
-  print("find meeeee!!")
-  print(credentials)
   current_user.student_profile.cal_token = credentials.token
   current_user.student_profile.cal_refresh_token = credentials.refresh_token
   current_user.student_profile.cal_token_uri = credentials.token_uri
@@ -587,6 +531,8 @@ def checklist(student_profile_id):
                 deadline=form.date.data)
             db.session.add(checklist_item)
             db.session.commit()
+            if checklist_item.deadline is not None:
+                add_to_cal(student_profile_id, checklist_item.text, checklist_item.deadline)
             return redirect(
                 url_for(
                     'student.checklist',
@@ -599,6 +545,51 @@ def checklist(student_profile_id):
             student_profile_id=student_profile_id)
     flash('You do not have access to this page', 'error')
     return redirect(url_for('main.index'))
+
+
+def add_to_cal(student_profile_id, text, deadline):
+    token= current_user.student_profile.cal_token
+    refresh_token= current_user.student_profile.cal_refresh_token
+    token_uri= current_user.student_profile.cal_token_uri
+    client_id= current_user.student_profile.cal_client_id
+    client_secret= current_user.student_profile.cal_client_secret
+    scopes= current_user.student_profile.cal_scopes
+    credentials_json = {
+            'token': token,
+            'refresh_token': refresh_token,
+            'token_uri': token_uri,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'scopes': scopes
+    }
+
+    credentials = google.oauth2.credentials.Credentials(**credentials_json)
+    service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
+    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    y = deadline.year
+    m = deadline.month
+    d = deadline.day
+    event = {
+        'summary': text,
+        'start': {
+            'dateTime': datetime.datetime(y, m, d).isoformat('T'),
+            'timeZone': 'America/Los_Angeles',
+        },
+        'end': {
+            'dateTime': datetime.datetime(y, m, d).isoformat('T'),
+            'timeZone': 'America/Los_Angeles',
+        },
+    }
+
+    event = service.events().insert(calendarId='primary', body=event).execute()
+    current_user.student_profile.cal_token = credentials.token
+    current_user.student_profile.cal_refresh_token = credentials.refresh_token
+    current_user.student_profile.cal_token_uri = credentials.token_uri
+    current_user.student_profile.cal_client_id = credentials.client_id
+    current_user.student_profile.cal_client_secret = credentials.client_secret
+    current_user.student_profile.cal_scopes = credentials.scopes
+    db.session.add(current_user)
+    db.session.commit()
 
 
 @student.route('/checklist/delete/<int:item_id>', methods=['GET', 'POST'])
