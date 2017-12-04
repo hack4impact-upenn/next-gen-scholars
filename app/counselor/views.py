@@ -1,3 +1,4 @@
+import datetime
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from flask_rq import get_queue
@@ -5,13 +6,13 @@ from flask_rq import get_queue
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
                     DeleteTestNameForm, AddCollegeProfileForm, EditCollegeProfileStep1Form,
-                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm)
+                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm, NewSMSAlertForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile,
+from ..models import (Role, User, College, StudentProfile, SMSAlert,
                       EditableHTML, ChecklistItem, TestName, College)
 
 
@@ -86,6 +87,7 @@ def registered_users():
     return render_template(
         'counselor/registered_users.html', users=users, roles=roles)
 
+
 @counselor.route('/colleges')
 @login_required
 @counselor_required
@@ -94,6 +96,7 @@ def colleges():
     colleges = College.query.all()
     return render_template(
         'counselor/colleges.html', colleges=colleges)
+
 
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
@@ -105,6 +108,7 @@ def user_info(user_id):
     if user is None:
         abort(404)
     return render_template('counselor/manage_user.html', user=user)
+
 
 @counselor.route('/user/<int:user_id>/profile')
 @login_required
@@ -242,7 +246,7 @@ def calendar():
 @counselor_required
 def add_test_name():
     # Allows a counselor to add a test name to the database.
-    form = AddTestNameForm();
+    form = AddTestNameForm()
     if form.validate_on_submit():
         test_name = TestName.query.filter_by(name=form.name.data).first()
         if test_name is None:
@@ -269,8 +273,7 @@ def edit_test_name():
         db.session.commit()
         flash('Test name successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_test_name.html', form=form
-                                                         , header='Edit Test Name')
+    return render_template('counselor/edit_test_name.html', form=form, header='Edit Test Name')
 
 
 @counselor.route('/delete_test', methods=['GET', 'POST'])
@@ -285,8 +288,8 @@ def delete_test_name():
         db.session.commit()
         flash('Test name successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_test_name.html', form=form
-                                                         , header='Delete Test Name')
+    return render_template('counselor/delete_test_name.html', form=form, header='Delete Test Name')
+
 
 @counselor.route('/add_college', methods=['GET', 'POST'])
 @login_required
@@ -303,14 +306,13 @@ def add_college():
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data
-                )
+            )
             db.session.add(college)
             db.session.commit()
         else:
             flash('College could not be added - already existed in database.', 'error')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/add_college.html', form=form
-                                                       , header='Add College Profile')
+    return render_template('counselor/add_college.html', form=form, header='Add College Profile')
 
 
 @counselor.route('/edit_college', methods=['GET', 'POST'])
@@ -322,8 +324,7 @@ def edit_college_step1():
     if form.validate_on_submit():
         college = College.query.filter_by(name=form.name.data.name).first()
         return redirect(url_for('counselor.edit_college_step2', college_id=college.id))
-    return render_template('counselor/edit_college.html', form=form
-                                                         , header='Edit College Profile')
+    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])
@@ -348,15 +349,14 @@ def edit_college_step2(college_id):
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_college.html', form=form
-                                                        , header='Edit College Profile')
+    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
 
 
 @counselor.route('/delete_college', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def delete_college():
-    # Allows a counselor to delete a college profile.
+    """Allows a counselor to delete a college profile."""
     form = DeleteCollegeProfileForm()
     if form.validate_on_submit():
         college = form.name.data
@@ -364,6 +364,43 @@ def delete_college():
         db.session.commit()
         flash('College profile successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_college.html', form=form
-                                                          , header='Delete College Profile')
+    return render_template('counselor/delete_college.html', form=form, header='Delete College Profile')
 
+
+@counselor.route('/alerts', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def alerts_dashboard():
+    """Dashboard to view and add SMS alerts."""
+    return render_template('counselor/alerts/alerts_dashboard.html')
+
+
+@counselor.route('/alerts/manage', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def manage_alerts():
+    """Database of text notifications to send."""
+    return render_template('counselor/alerts/manage_alerts.html')
+
+
+@counselor.route('/alerts/add', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def add_alert():
+    """View add alert form."""
+    form = NewSMSAlertForm()
+    if form.validate_on_submit():
+        hour, minute = form.time.data.split(':')
+        am_pm = form.am_pm.data
+        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        alert = SMSAlert(
+            title=form.title.data,
+            content=form.content.data,
+            date=form.date.data,
+            time=datetime.time(hour, int(minute))
+        )
+        db.session.add(alert)
+        db.session.commit()
+        flash('Successfully created alert "{}"!'.format(alert.title), 'form-success')
+        return redirect(url_for('counselor.add_alert'))
+    return render_template('counselor/alerts/add_alert.html', form=form)

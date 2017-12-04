@@ -3,25 +3,22 @@
 {% block content %}
     <div class="ui stackable grid container">
         <div class="sixteen wide tablet twelve wide computer centered column">
-            <a class="ui basic compact button" href="{{ url_for('counselor.index') }}">
+            <a class="ui basic compact button" href="{{ url_for('counselor.alerts_dashboard') }}">
                 <i class="caret left icon"></i>
                 Back to dashboard
             </a>
             <h2 class="ui header">
-                Colleges
+                Manage SMS Notifications
                 <div class="sub header">
-                    View and edit colleges and their deadlines.
+                    View and modify SMS alerts about deadlines and events for students.
                 </div>
             </h2>
 
-            <div class="ui menu">
-                <div class="ui search item">
-                    <div class="ui transparent icon input">
-                        <input id="search-colleges" type="text" placeholder="Search colleges...">
-                        <i class="search icon"></i>
-                    </div>
-                </div>
+            <div class="ui fluid icon input">
+                <input id="search-texts" type="text" placeholder="Search...">
+                <i class="search icon"></i>
             </div>
+            <br />
 
             {# Use overflow-x: scroll so that mobile views don't freak out
              # when the table is too wide #}
@@ -29,22 +26,12 @@
                 <table class="ui searchable sortable unstackable selectable celled table">
                     <thead>
                         <tr>
-                            <th class="sorted ascending">Name</th>
-                            <th>Description</th>
-                            <th>Regular Deadline</th>
-                            <th>Early Deadline</th>
+                            <th class="sorted ascending">Title</th>
+                            <th>Content</th>
+                            <th>Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for c in colleges | sort(attribute='name') %}
-                        <tr onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">
-
-                            <td>{{ c.name }}</td>
-                            <td>{{ c.description }}</td>
-                            <td>{{ c.regular_deadline }}</td>
-                            <td>{{ c.early_deadline }} </td>
-                        </tr>
-                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -53,7 +40,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#search-colleges').keyup(function () {
+            $('#search-texts').keyup(function () {
                 var searchText = $(this).val();
                 if (searchText.length > 0) {
                     $('tbody td:icontains(' + searchText + ')').addClass('positive');
