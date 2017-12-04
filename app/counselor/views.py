@@ -14,7 +14,7 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, EditableHTML, SMSAlert
+from ..models import (Role, User, College, StudentProfile, EditableHTML, SMSAlert,
                       ChecklistItem, TestName, College, Notification, ScattergramData)
 
 
