@@ -9,7 +9,7 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditTestNameForm, DeleteTestNameForm,
                     AddCollegeProfileForm, EditCollegeProfileStep1Form,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
-                    NewSMSAlertForm, EditSMSAlertForm))
+                    NewSMSAlertForm, EditSMSAlertForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
