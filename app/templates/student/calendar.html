@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+{% block content %}
+<head>
+    <link rel='stylesheet' href='../static/styles/fullcalendar.css' />
+    <script src='../static/scripts/moment.min.js'></script>
+    <script src='../static/scripts/fullcalendar.js'></script>
+    <script type="text/javascript">
+$(document).ready(function() {
+    //show empty calendar
+    $('#calendar').fullCalendar({});
+
+    $.ajax({
+        url: '/student/calendar_data',
+        type: 'POST',
+        success: function(data) {
+            if (data.data.length > 0) {
+                $('#calendar').fullCalendar('renderEvents', data.data, true);
+            }
+        }
+    });
+
+});
+</script>
+</head>
+
+
+<div class="ui stackable centered grid container">
+    <div class="row">
+        <div class="twelve wide column">
+            <span style="padding-top:15px"></span>
+            <h1 class="ui header">Calendar</h1>
+            <div id='calendar'></div>
+                {% if not authenticated %}
+                	<button class="ui small button" id="integrate" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration</button>
+                {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -66,7 +66,8 @@ class EditSupplementalEssayForm(Form):
     status = SelectField(
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
-                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done', 'Done')],
+                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done',
+                                                                  'Done')],
         validators=[InputRequired()])
     submit = SubmitField('Update essay')
 
@@ -75,8 +76,7 @@ class AddChecklistItemForm(Form):
     item_text = StringField(
         'Checklist Item', validators=[InputRequired(),
                                       Length(1, 64)])
-    date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[Optional()])
+    date = DateField('Deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add checklist item')
 
 
@@ -84,8 +84,7 @@ class EditChecklistItemForm(Form):
     item_text = StringField(
         'New text', validators=[InputRequired(),
                                 Length(1, 64)])
-    date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[Optional()])
+    date = DateField('Deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Update checklist item')
 
 
@@ -141,7 +140,8 @@ class AddSupplementalEssayForm(Form):
     status = SelectField(
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
-                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done', 'Done')],
+                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done',
+                                                                  'Done')],
         validators=[InputRequired()])
     submit = SubmitField('Add Supplemental Essay')
 

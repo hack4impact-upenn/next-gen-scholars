@@ -50,6 +50,13 @@ class StudentProfile(db.Model):
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
     checklist = db.relationship('ChecklistItem')
+    cal_token = db.Column(db.String, index=True)
+    cal_refresh_token = db.Column(db.String, index=True)
+    cal_token_uri = db.Column(db.String, index=True)
+    cal_client_id = db.Column(db.String, index=True)
+    cal_client_secret = db.Column(db.String, index=True)
+    cal_scopes = db.Column(db.String, index=True)
+    cal_state = db.Column(db.String, index=True)
 
     @validates('common_app_essay_status')
     def validate_status(self, key, status):

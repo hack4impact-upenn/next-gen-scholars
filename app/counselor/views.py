@@ -1,21 +1,30 @@
 import datetime
 import pytz
-
-from flask import abort, flash, redirect, render_template, url_for, request
+from flask import abort, flash, redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 from flask_rq import get_queue
 from .. import csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
-                    NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
-                    DeleteTestNameForm, AddCollegeProfileForm, EditCollegeProfileStep1Form,
-                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm, NewSMSAlertForm, EditSMSAlertForm)
+                    NewUserForm, AddChecklistItemForm, AddTestNameForm,
+                    EditTestNameForm, DeleteTestNameForm,
+                    AddCollegeProfileForm, EditCollegeProfileStep1Form,
+                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
+                    NewSMSAlertForm, EditSMSAlertForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, EditableHTML, SMSAlert,
-                      ChecklistItem, TestName, College, Notification, ScattergramData)
+from ..models import (Role, User, College, StudentProfile, EditableHTML,
+                      ChecklistItem, TestName, College, Notification, 
+                      SMSAlert,ScattergramData)
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+import requests
+import os
+import datetime
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO: remove before production?
 
 
 @counselor.route('/')
@@ -96,8 +105,8 @@ def registered_users():
 def colleges():
     """View all colleges."""
     colleges = College.query.all()
-    return render_template(
-        'counselor/colleges.html', colleges=colleges)
+    return render_template('counselor/colleges.html', colleges=colleges)
+
 
 
 @counselor.route('/user/<int:user_id>')
@@ -162,17 +171,23 @@ def student_database():
     """View student database."""
     checklist_form = AddChecklistItemForm()
     if checklist_form.validate_on_submit():
-        print(checklist_form.assignee_ids.data)
         for assignee_id in checklist_form.assignee_ids.data.split(','):
+            result = add_to_cal(
+                student_profile_id=assignee_id,
+                text=checklist_form.item_text.data,
+                deadline=checklist_form.date.data)
             checklist_item = ChecklistItem(
                 text=checklist_form.item_text.data,
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=checklist_form.date.data)
+                deadline=checklist_form.date.data,
+                cal_event_id=result['event_id'],
+                event_created=result['event_created'])
             db.session.add(checklist_item)
             notif_text = '{} {} added "{}" to your checklist'.format(
-                current_user.first_name, current_user.last_name, checklist_item.text)
+                current_user.first_name, current_user.last_name,
+                checklist_item.text)
             notification = Notification(
                 text=notif_text, student_profile_id=assignee_id)
             db.session.add(notification)
@@ -189,6 +204,57 @@ def student_database():
         checklist_form=checklist_form,
         colleges=colleges,
         essay_statuses=essay_statuses)
+
+
+def add_to_cal(student_profile_id, text, deadline):
+    # only add checklist items with a deadline to students calendar
+    if deadline is None:
+        return {"event_id": "1", "event_created": False}
+    y = deadline.year
+    m = deadline.month
+    d = deadline.day
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
+    if student_profile is None:
+        return {"event_id": "1", "event_created": False}
+    #if a student has not authorized google calendar yet
+    if student_profile.cal_token is None:
+        return {"event_id": "1", "event_created": False}
+    credentials_json = {
+        'token': student_profile.cal_token,
+        'refresh_token': student_profile.cal_refresh_token,
+        'token_uri': student_profile.cal_token_uri,
+        'client_id': student_profile.cal_client_id,
+        'client_secret': student_profile.cal_client_secret,
+        'scopes': student_profile.cal_scopes
+    }
+
+    credentials = google.oauth2.credentials.Credentials(**credentials_json)
+    service = googleapiclient.discovery.build(
+        'calendar', 'v3', credentials=credentials)
+    event = {
+        'summary': text,
+        'start': {
+            'dateTime': datetime.datetime(y, m, d).isoformat('T'),
+            'timeZone': 'America/Los_Angeles',
+        },
+        'end': {
+            'dateTime': datetime.datetime(y, m, d).isoformat('T'),
+            'timeZone': 'America/Los_Angeles',
+        },
+    }
+
+    event = service.events().insert(calendarId='primary', body=event).execute()
+    #save the authentication values in case they have been refreshed
+    student_profile.cal_token = credentials.token
+    student_profile.cal_refresh_token = credentials.refresh_token
+    student_profile.cal_token_uri = credentials.token_uri
+    student_profile.cal_client_id = credentials.client_id
+    student_profile.cal_client_secret = credentials.client_secret
+    student_profile.cal_scopes = credentials.scopes
+    db.session.add(student_profile)
+    db.session.commit()
+    return {"event_id": event.get('id'), "event_created": True}
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])
@@ -263,7 +329,8 @@ def add_test_name():
             db.session.add(test)
             db.session.commit()
         else:
-            flash('Test could not be added - already existed in database.', 'error')
+            flash('Test could not be added - already existed in database.',
+                  'error')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/add_test_name.html', form=form)
 
@@ -281,7 +348,8 @@ def edit_test_name():
         db.session.commit()
         flash('Test name successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_test_name.html', form=form, header='Edit Test Name')
+    return render_template(
+        'counselor/edit_test_name.html', form=form, header='Edit Test Name')
 
 
 @counselor.route('/delete_test', methods=['GET', 'POST'])
@@ -296,7 +364,10 @@ def delete_test_name():
         db.session.commit()
         flash('Test name successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_test_name.html', form=form, header='Delete Test Name')
+    return render_template(
+        'counselor/delete_test_name.html',
+        form=form,
+        header='Delete Test Name')
 
 
 @counselor.route('/add_college', methods=['GET', 'POST'])
@@ -313,14 +384,15 @@ def add_college():
                 name=form.name.data,
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
-                regular_deadline=form.regular_deadline.data
-            )
+                regular_deadline=form.regular_deadline.data)
             db.session.add(college)
             db.session.commit()
         else:
-            flash('College could not be added - already existed in database.', 'error')
+            flash('College could not be added - already existed in database.',
+                  'error')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/add_college.html', form=form, header='Add College Profile')
+    return render_template(
+        'counselor/add_college.html', form=form, header='Add College Profile')
 
 
 @counselor.route('/edit_college', methods=['GET', 'POST'])
@@ -331,8 +403,12 @@ def edit_college_step1():
     form = EditCollegeProfileStep1Form()
     if form.validate_on_submit():
         college = College.query.filter_by(name=form.name.data.name).first()
-        return redirect(url_for('counselor.edit_college_step2', college_id=college.id))
-    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
+        return redirect(
+            url_for('counselor.edit_college_step2', college_id=college.id))
+    return render_template(
+        'counselor/edit_college.html',
+        form=form,
+        header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])
@@ -357,7 +433,10 @@ def edit_college_step2(college_id):
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
+    return render_template(
+        'counselor/edit_college.html',
+        form=form,
+        header='Edit College Profile')
 
 
 @counselor.route('/delete_college', methods=['GET', 'POST'])
@@ -372,7 +451,10 @@ def delete_college():
         db.session.commit()
         flash('College profile successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_college.html', form=form, header='Delete College Profile')
+    return render_template(
+        'counselor/delete_college.html',
+        form=form,
+        header='Delete College Profile')
 
 
 @counselor.route('/alerts', methods=['GET', 'POST'])
