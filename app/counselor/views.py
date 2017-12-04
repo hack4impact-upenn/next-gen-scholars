@@ -373,25 +373,21 @@ def delete_college():
 
 
 @csrf.exempt
-@counselor.route('/uploader', methods=['GET', 'POST'])
+@counselor.route('/upload_scattergram', methods=['GET', 'POST'])
 @login_required
 @counselor_required
-def upload_file():
+def upload_scattergram():
     if request.method == 'POST':
         f = request.files['file']
         contents = f.read()
-
         data = ","
         line_info = contents.split(data.encode("utf-8"))
-
         for i in range(1, int(len(line_info) / 6)):
-
             arguments = line_info[6 * i + 6].split()
             if len(arguments) == 1:
                 insert = None
             else:
                 insert = arguments[0].strip()
-
             scattergram_data = ScattergramData(
                 name=line_info[6 * i + 1].strip(),
                 status=line_info[6 * i + 2].strip(),
@@ -400,8 +396,7 @@ def upload_file():
                 SAT1600=line_info[6 * i + 5].strip(),
                 ACT=insert
             )
-
             db.session.add(scattergram_data)
         db.session.commit()
         return "file uploaded successfully"
-    return render_template('counselor/scattergram_upload.html')
+    return render_template('counselor/upload_scattergram.html')
