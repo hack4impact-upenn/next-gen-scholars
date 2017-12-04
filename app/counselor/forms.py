@@ -89,6 +89,27 @@ class NewSMSAlertForm(Form):
     submit = SubmitField('Add SMS Alert')
 
 
+class EditSMSAlertForm(Form):
+    title = StringField('Alert title', validators=[
+                        InputRequired(), Length(1, 64)])
+    content = TextAreaField('Content', validators=[InputRequired()])
+    date = DateField(
+        'Date', format='%Y-%m-%d', validators=[InputRequired()])
+    time_choices = itertools.product([12] + [x for x in range(1, 11)], [
+                                     '00', '15', '30', '45'], repeat=1)
+    time = SelectField(
+        'Time',
+        choices=[('{}:{}'.format(t[0], t[1]), '{}:{}'.format(t[0], t[1]))
+                 for t in time_choices],
+        validators=[InputRequired()])
+    am_pm = SelectField(
+        'AM/PM',
+        choices=[('AM', 'AM'), ('PM', 'PM')],
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Done Editing')
+
+
 class AddChecklistItemForm(Form):
     item_text = StringField(
         'Checklist Item', validators=[InputRequired(),

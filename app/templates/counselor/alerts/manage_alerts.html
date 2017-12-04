@@ -33,7 +33,7 @@
                     </thead>
                     <tbody>
                     {% for a in alerts %}
-                    <tr>
+                    <tr onclick="window.location.href = '{{ url_for('counselor.edit_alert', alert_id=a.id) }}';">
                         <td>{{ a.title }}</td>
                         <td>{{ a.content }}</td>
                         <td>{{ a.format_date() }} {{ a.format_time() }}</td>

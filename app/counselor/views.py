@@ -8,7 +8,7 @@ from flask_rq import get_queue
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
                     DeleteTestNameForm, AddCollegeProfileForm, EditCollegeProfileStep1Form,
-                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm, NewSMSAlertForm)
+                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm, NewSMSAlertForm, EditSMSAlertForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
@@ -408,3 +408,34 @@ def add_alert():
             alert.title), 'form-success')
         return redirect(url_for('counselor.add_alert'))
     return render_template('counselor/alerts/add_alert.html', form=form)
+
+
+@counselor.route('/alerts/edit/<int:alert_id>', methods=['GET','POST'])
+@login_required
+@counselor_required
+def edit_alert(alert_id):
+    """Edit alert."""
+    alert = SMSAlert.query.filter_by(id=alert_id).first()
+    if alert is None:
+        abort(404)
+    form = EditSMSAlertForm(
+        title=alert.title,
+        content=alert.content,
+        date=alert.date,
+        time=alert.time.strftime("%-I:%M"),
+        am_pm=alert.time.strftime("%p")
+    )
+    if form.validate_on_submit():
+        hour, minute = form.time.data.split(':')
+        am_pm = form.am_pm.data
+        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        alert.title = form.title.data
+        alert.content = form.content.data
+        alert.date = form.date.data
+        alert.time = datetime.time(hour, int(minute))
+        db.session.add(alert)
+        db.session.commit()
+        flash('Successfully edit alert "{}"!'.format(
+            alert.title), 'form-success')
+        return redirect(url_for('counselor.edit_alert', alert_id=alert.id))
+    return render_template('counselor/alerts/edit_alert.html', form=form)
