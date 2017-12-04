@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, url_for, request
+from flask import abort, flash, redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
 from flask_rq import get_queue
 
@@ -169,8 +169,7 @@ def student_database():
     if checklist_form.validate_on_submit():        
         print(checklist_form.assignee_ids.data)
         for assignee_id in checklist_form.assignee_ids.data.split(','):
-            if checklist_form.deadline is not None:
-                add_to_cal(student_profile_id=assignee_id, 
+            result = add_to_cal(student_profile_id=assignee_id, 
                     text=checklist_form.item_text.data, 
                     deadline=checklist_form.date.data)
             checklist_item = ChecklistItem(
@@ -178,7 +177,9 @@ def student_database():
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=checklist_form.date.data)
+                deadline=checklist_form.date.data,
+                cal_event_id=result['event_id'],
+                event_created=result['event_created'])
             db.session.add(checklist_item)
             notif_text = '{} {} added "{}" to your checklist'.format(
                 current_user.first_name, current_user.last_name, checklist_item.text)
@@ -200,10 +201,16 @@ def student_database():
 
 
 def add_to_cal(student_profile_id, text, deadline):
+    if deadline is None:
+        return {"event_id": "1", "event_created": False}
     y = deadline.year
     m = deadline.month
     d = deadline.day
     student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    if student_profile is None:
+        return {"event_id": "1", "event_created": False}
+    if student_profile.cal_token is None:
+        return {"event_id": "1", "event_created": False}
     credentials_json = {
             'token': student_profile.cal_token,
             'refresh_token': student_profile.cal_refresh_token,
@@ -236,6 +243,7 @@ def add_to_cal(student_profile_id, text, deadline):
     student_profile.cal_scopes = credentials.scopes
     db.session.add(student_profile)
     db.session.commit()
+    return {"event_id": event.get('id'), "event_created": True}
 
 
 @counselor.route('/_update_editor_contents', methods=['POST'])

@@ -144,9 +144,18 @@ def oauth2callback():
   current_user.student_profile.cal_state = state
   db.session.add(current_user)
   db.session.commit()
-
+  add_pending_events()
   return flask.redirect(flask.url_for('student.calendar'))
 
+
+def add_pending_events():
+    #if a student had checklist items created before they authorized gcal
+    checklist_items = ChecklistItem.query.filter_by(assignee_id=current_user.student_profile_id)
+    for item in checklist_items:
+        if not item.event_created:
+            #add these items to their calendar
+            add_to_cal(current_user.student_profile_id, 
+                item.text, item.deadline)
 
 
 @student.route('/profile/edit', methods=['GET', 'POST'])
@@ -532,6 +541,7 @@ def checklist_default():
     else:
         return redirect(url_for('main.index'))
 
+
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def checklist(student_profile_id):
@@ -546,14 +556,15 @@ def checklist(student_profile_id):
         #### form to add checklist item ###
         form = AddChecklistItemForm()
         if form.validate_on_submit():
-            event_id = add_to_cal(student_profile_id, form.item_text.data, form.date.data)
+            result = add_to_cal(student_profile_id, form.item_text.data, form.date.data)
             # add new checklist item to user's account
             checklist_item = ChecklistItem(
                 assignee_id=student_profile_id,
                 text=form.item_text.data,
                 is_deletable=True,
                 deadline=form.date.data,
-                cal_event_id=event_id)
+                cal_event_id=result['event_id'],
+                event_created=result['event_created'])
             ### if counselor is adding checklist item, send a notification
             if current_user.role_id != 1:
                 notif_text = '{} {} added "{}" to your checklist'.format(
@@ -610,25 +621,22 @@ def checklist(student_profile_id):
 
 def add_to_cal(student_profile_id, text, deadline):
     if deadline is None:
-        return ''
-    token= current_user.student_profile.cal_token
-    refresh_token= current_user.student_profile.cal_refresh_token
-    token_uri= current_user.student_profile.cal_token_uri
-    client_id= current_user.student_profile.cal_client_id
-    client_secret= current_user.student_profile.cal_client_secret
-    scopes= current_user.student_profile.cal_scopes
+        return {"event_id": "1", "event_created": False}
+
+    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    if student_profile.cal_token is None:
+        return {"event_id": "1", "event_created": False}
     credentials_json = {
-            'token': token,
-            'refresh_token': refresh_token,
-            'token_uri': token_uri,
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'scopes': scopes
+        'token': student_profile.cal_token,
+        'refresh_token': student_profile.cal_refresh_token,
+        'token_uri': student_profile.cal_token_uri,
+        'client_id': student_profile.cal_client_id,
+        'client_secret': student_profile.cal_client_secret,
+        'scopes': student_profile.cal_scopes
     }
 
     credentials = google.oauth2.credentials.Credentials(**credentials_json)
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
     y = deadline.year
     m = deadline.month
     d = deadline.day
@@ -645,15 +653,15 @@ def add_to_cal(student_profile_id, text, deadline):
     }
 
     event = service.events().insert(calendarId='primary', body=event_body).execute()
-    current_user.student_profile.cal_token = credentials.token
-    current_user.student_profile.cal_refresh_token = credentials.refresh_token
-    current_user.student_profile.cal_token_uri = credentials.token_uri
-    current_user.student_profile.cal_client_id = credentials.client_id
-    current_user.student_profile.cal_client_secret = credentials.client_secret
-    current_user.student_profile.cal_scopes = credentials.scopes
-    db.session.add(current_user)
+    student_profile.cal_token = credentials.token
+    student_profile.cal_refresh_token = credentials.refresh_token
+    student_profile.cal_token_uri = credentials.token_uri
+    student_profile.cal_client_id = credentials.client_id
+    student_profile.cal_client_secret = credentials.client_secret
+    student_profile.cal_scopes = credentials.scopes
+    db.session.add(student_profile)
     db.session.commit()
-    return event.get('id')
+    return {"event_id": event.get('id'), "event_created": True}
 
 
 @student.route('/checklist/delete/<int:item_id>', methods=['GET', 'POST'])
