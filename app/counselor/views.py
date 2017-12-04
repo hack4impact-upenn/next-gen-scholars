@@ -13,6 +13,17 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile,
                       EditableHTML, ChecklistItem, TestName, College, Notification)
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+SCOPES = 'https://www.googleapis.com/auth/calendar'
+CLIENT_SECRETS_FILE = 'client_secret.json'
+import flask
+import requests
+import os 
+import httplib2
+import datetime
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 @counselor.route('/')
@@ -155,17 +166,19 @@ def processor():
 def student_database():
     """View student database."""
     checklist_form = AddChecklistItemForm()
-    if checklist_form.validate_on_submit():
+    if checklist_form.validate_on_submit():        
         print(checklist_form.assignee_ids.data)
         for assignee_id in checklist_form.assignee_ids.data.split(','):
-            print("This is an assignee_id: " + assignee_id)
+            if checklist_form.deadline is not None:
+                add_to_cal(student_profile_id=assignee_id, 
+                    text=checklist_form.item_text.data, 
+                    deadline=checklist_form.date.data)
             checklist_item = ChecklistItem(
                 text=checklist_form.item_text.data,
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
                 deadline=checklist_form.date.data)
-            #add_to_cal(assignee_id, checklist_item.text, checklist_item.deadline)
             db.session.add(checklist_item)
             notif_text = '{} {} added "{}" to your checklist'.format(
                 current_user.first_name, current_user.last_name, checklist_item.text)
@@ -187,6 +200,9 @@ def student_database():
 
 
 def add_to_cal(student_profile_id, text, deadline):
+    y = deadline.year
+    m = deadline.month
+    d = deadline.day
     student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
     credentials_json = {
             'token': student_profile.cal_token,
@@ -199,9 +215,6 @@ def add_to_cal(student_profile_id, text, deadline):
 
     credentials = google.oauth2.credentials.Credentials(**credentials_json)
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
-    y = deadline.year
-    m = deadline.month
-    d = deadline.day
     event = {
         'summary': text,
         'start': {

@@ -15,10 +15,7 @@ $(document).ready(function() {
         type: 'POST',
         success: function(data) {
             if (data.data.length > 0) {
-                $('#calendar').fullCalendar( 'renderEvents', data.data, true);
-                $('#integrate').hide();
-            } else {
-                $('#integrate').show();
+                $('#calendar').fullCalendar('renderEvents', data.data, true);
             }
         }
     });
@@ -34,8 +31,9 @@ $(document).ready(function() {
             <span style="padding-top:15px"></span>
             <h1 class="ui header">Calendar</h1>
             <div id='calendar'></div>
-            	<button class="ui small button" style="display:none;" id="integrate" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration</button>
-            <div class="ui text container" id="integrate"></div>
+                {% if not authenticated %}
+                	<button class="ui small button" id="integrate" onclick="window.location.href='{{ url_for('student.authorize_calendar') }}';">Enable Google Calendar Integration</button>
+                {% endif %}
         </div>
     </div>
 </div>

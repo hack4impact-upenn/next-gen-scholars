@@ -15,7 +15,7 @@ class ChecklistItem(db.Model):
     is_checked = db.Column(db.Boolean, index=True, default=False)
     is_deletable = db.Column(db.Boolean, index=True, default=False)
     creator_role_id = db.Column(db.Integer, index=True, default=1)
-    # creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    cal_event_id = db.Column(db.Text, index=True)
 
     @staticmethod
     def generate_fake(count=2):
