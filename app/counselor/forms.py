@@ -2,8 +2,8 @@ from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import (PasswordField, StringField, SubmitField, HiddenField,
-                            BooleanField)
+from wtforms.fields import (PasswordField, StringField, SubmitField,
+                            HiddenField, BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
@@ -76,11 +76,13 @@ class AddChecklistItemForm(Form):
     assignee_ids = HiddenField('Assignee Ids')
     submit = SubmitField('Add checklist item')
 
+
 class AddTestNameForm(Form):
     name = StringField(
         'Test Name', validators=[InputRequired(),
                                  Length(1, 150)])
     submit = SubmitField('Add Test Name')
+
 
 class EditTestNameForm(Form):
     old_test = QuerySelectField(
@@ -93,6 +95,7 @@ class EditTestNameForm(Form):
                                      Length(1, 150)])
     submit = SubmitField('Edit Test Name')
 
+
 class DeleteTestNameForm(Form):
     old_test = QuerySelectField(
         'Select test you wish to delete',
@@ -104,15 +107,21 @@ class DeleteTestNameForm(Form):
         validators=[InputRequired()])
     submit = SubmitField('Delete Test Name')
 
+
 class AddCollegeProfileForm(Form):
-    name = StringField('College/University Name',
+    name = StringField(
+        'College/University Name',
         validators=[InputRequired(), Length(1, 200)])
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
-    early_deadline = DateField('Early Deadline (yyyy-mm-dd)',
-        format='%Y-%m-%d', validators=[Optional()])
-    regular_deadline = DateField('Regular Deadline (yyyy-mm-dd)',
-        format='%Y-%m-%d', validators=[Optional()])
+    early_deadline = DateField(
+        'Early Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    regular_deadline = DateField(
+        'Regular Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
     submit = SubmitField('Add College Profile')
 
 
@@ -126,15 +135,21 @@ class EditCollegeProfileStep1Form(Form):
 
 
 class EditCollegeProfileStep2Form(Form):
-    name = StringField('College/University Name',
+    name = StringField(
+        'College/University Name',
         validators=[InputRequired(), Length(1, 200)])
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
-    early_deadline = DateField('Early Deadline (yyyy-mm-dd)',
-        format='%Y-%m-%d', validators=[Optional()])
-    regular_deadline = DateField('Regular Deadline (yyyy-mm-dd)',
-        format='%Y-%m-%d', validators=[Optional()])
+    early_deadline = DateField(
+        'Early Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    regular_deadline = DateField(
+        'Regular Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
     submit = SubmitField('Save College Profile')
+
 
 class DeleteCollegeProfileForm(Form):
     name = QuerySelectField(
@@ -146,10 +161,3 @@ class DeleteCollegeProfileForm(Form):
         'Are you sure you want to delete this college?',
         validators=[InputRequired()])
     submit = SubmitField('Delete College Profile')
-
-
-
-
-
-
-
