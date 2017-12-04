@@ -1,0 +1,37 @@
+{% extends 'layouts/base.html' %}
+
+{% macro dashboard_option(title, endpoint, description=None, icon=None) %}
+    <a class="column" href="{{ url_for(endpoint) }}">
+        <div class="ui padded segment">
+            <h3 class="ui header">
+                {% if icon is not none %}
+                    <i class="{{ icon }}"></i>
+                {% endif %}
+                <div class="content">
+                    {{ title }}
+                    {% if description is not none %}
+                        <div class="sub header">
+                            {{ description }}
+                        </div>
+                    {% endif %}
+                </div>
+            </h3>
+        </div>
+    </a>
+{% endmacro %}
+
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            <div class="row">
+                <h2 class="ui header">SMS Alerts Dashboard</h2>
+                <div class="ui two column stackable grid">
+                    {{ dashboard_option('Manage SMS Alerts', 'counselor.manage_alerts',
+                    description='View and manage SMS alerts', icon='phone icon') }}
+                    {{ dashboard_option('Add SMS Alert', 'counselor.add_alert',
+                    description='Add new SMS alerts', icon='plus icon') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

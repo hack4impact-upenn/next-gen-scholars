@@ -13,4 +13,6 @@ from .test_name import *
 from .test_score import *
 from .student_profile import *
 from .user import *
+from .scattergram_data import *
 from .notification import *
+from .sms_alert import *

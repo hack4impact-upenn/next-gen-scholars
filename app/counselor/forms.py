@@ -1,9 +1,10 @@
+import itertools
 from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
-                            HiddenField, BooleanField)
+                            HiddenField, BooleanField, TextAreaField, SelectField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
@@ -65,6 +66,48 @@ class NewUserForm(InviteUserForm):
     password2 = PasswordField('Confirm password', validators=[InputRequired()])
 
     submit = SubmitField('Create')
+
+
+class NewSMSAlertForm(Form):
+    title = StringField('Alert title', validators=[
+                        InputRequired(), Length(1, 64)])
+    content = TextAreaField('Content', validators=[InputRequired()])
+    date = DateField(
+        'Date', format='%Y-%m-%d', validators=[InputRequired()])
+    time_choices = itertools.product([12] + [x for x in range(1, 11)], [
+                                     '00', '15', '30', '45'], repeat=1)
+    time = SelectField(
+        'Time',
+        choices=[('{}:{}'.format(t[0], t[1]), '{}:{}'.format(t[0], t[1]))
+                 for t in time_choices],
+        validators=[InputRequired()])
+    am_pm = SelectField(
+        'AM/PM',
+        choices=[('AM', 'AM'), ('PM', 'PM')],
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Add SMS Alert')
+
+
+class EditSMSAlertForm(Form):
+    title = StringField('Alert title', validators=[
+                        InputRequired(), Length(1, 64)])
+    content = TextAreaField('Content', validators=[InputRequired()])
+    date = DateField(
+        'Date', format='%Y-%m-%d', validators=[InputRequired()])
+    time_choices = itertools.product([12] + [x for x in range(1, 11)], [
+                                     '00', '15', '30', '45'], repeat=1)
+    time = SelectField(
+        'Time',
+        choices=[('{}:{}'.format(t[0], t[1]), '{}:{}'.format(t[0], t[1]))
+                 for t in time_choices],
+        validators=[InputRequired()])
+    am_pm = SelectField(
+        'AM/PM',
+        choices=[('AM', 'AM'), ('PM', 'PM')],
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Done Editing')
 
 
 class AddChecklistItemForm(Form):
