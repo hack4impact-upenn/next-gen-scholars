@@ -9,7 +9,7 @@ from redis import Redis
 from rq import Connection, Queue, Worker
 
 from app import create_app, db
-from app.models import (Role, User, College, Major,
+from app.models import (Role, User, College, Major, SMSAlert,
                         StudentProfile, ChecklistItem, TestName)
 
 
@@ -58,6 +58,7 @@ def add_fake_data(number_users):
     Adds fake data to the database.
     """
     User.generate_fake()
+    SMSAlert.generate_fake()
 
 
 @manager.command

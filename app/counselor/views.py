@@ -1,3 +1,6 @@
+import datetime
+import pytz
+
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from flask_rq import get_queue
@@ -5,13 +8,13 @@ from .. import csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
                     DeleteTestNameForm, AddCollegeProfileForm, EditCollegeProfileStep1Form,
-                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm)
+                    EditCollegeProfileStep2Form, DeleteCollegeProfileForm, NewSMSAlertForm, EditSMSAlertForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, EditableHTML,
+from ..models import (Role, User, College, StudentProfile, EditableHTML, SMSAlert,
                       ChecklistItem, TestName, College, Notification, ScattergramData)
 
 
@@ -361,7 +364,7 @@ def edit_college_step2(college_id):
 @login_required
 @counselor_required
 def delete_college():
-    # Allows a counselor to delete a college profile.
+    """Allows a counselor to delete a college profile."""
     form = DeleteCollegeProfileForm()
     if form.validate_on_submit():
         college = form.name.data
@@ -372,31 +375,73 @@ def delete_college():
     return render_template('counselor/delete_college.html', form=form, header='Delete College Profile')
 
 
-@csrf.exempt
-@counselor.route('/upload_scattergram', methods=['GET', 'POST'])
+@counselor.route('/alerts', methods=['GET', 'POST'])
 @login_required
 @counselor_required
-def upload_scattergram():
-    if request.method == 'POST':
-        f = request.files['file']
-        contents = f.read()
-        data = ","
-        line_info = contents.split(data.encode("utf-8"))
-        for i in range(1, int(len(line_info) / 6)):
-            arguments = line_info[6 * i + 6].split()
-            if len(arguments) == 1:
-                insert = None
-            else:
-                insert = arguments[0].strip()
-            scattergram_data = ScattergramData(
-                name=line_info[6 * i + 1].strip(),
-                status=line_info[6 * i + 2].strip(),
-                GPA=line_info[6 * i + 3].strip(),
-                SAT2400=line_info[6 * i + 4].strip(),
-                SAT1600=line_info[6 * i + 5].strip(),
-                ACT=insert
-            )
-            db.session.add(scattergram_data)
+def alerts_dashboard():
+    """Dashboard to view and add SMS alerts."""
+    return render_template('counselor/alerts/alerts_dashboard.html')
+
+
+@counselor.route('/alerts/manage', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def manage_alerts():
+    """Database of text notifications to send."""
+    alerts = SMSAlert.query.order_by(SMSAlert.date).all()
+    return render_template('counselor/alerts/manage_alerts.html', alerts=alerts)
+
+
+@counselor.route('/alerts/add', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def add_alert():
+    """View add alert form."""
+    form = NewSMSAlertForm()
+    if form.validate_on_submit():
+        hour, minute = form.time.data.split(':')
+        am_pm = form.am_pm.data
+        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        alert = SMSAlert(
+            title=form.title.data,
+            content=form.content.data,
+            date=form.date.data,
+            time=datetime.time(hour, int(minute))
+        )
+        db.session.add(alert)
         db.session.commit()
-        return "file uploaded successfully"
-    return render_template('counselor/upload_scattergram.html')
+        flash('Successfully created alert "{}"!'.format(
+            alert.title), 'form-success')
+        return redirect(url_for('counselor.add_alert'))
+    return render_template('counselor/alerts/add_alert.html', form=form)
+
+
+@counselor.route('/alerts/edit/<int:alert_id>', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def edit_alert(alert_id):
+    """Edit alert."""
+    alert = SMSAlert.query.filter_by(id=alert_id).first()
+    if alert is None:
+        abort(404)
+    form = EditSMSAlertForm(
+        title=alert.title,
+        content=alert.content,
+        date=alert.date,
+        time=alert.time.strftime("%-I:%M"),
+        am_pm=alert.time.strftime("%p")
+    )
+    if form.validate_on_submit():
+        hour, minute = form.time.data.split(':')
+        am_pm = form.am_pm.data
+        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        alert.title = form.title.data
+        alert.content = form.content.data
+        alert.date = form.date.data
+        alert.time = datetime.time(hour, int(minute))
+        db.session.add(alert)
+        db.session.commit()
+        flash('Successfully edit alert "{}"!'.format(
+            alert.title), 'form-success')
+        return redirect(url_for('counselor.edit_alert', alert_id=alert.id))
+    return render_template('counselor/alerts/edit_alert.html', form=form)
