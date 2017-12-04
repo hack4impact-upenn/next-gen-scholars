@@ -1,4 +1,6 @@
 import datetime
+import pytz
+
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from flask_rq import get_queue
@@ -380,7 +382,8 @@ def alerts_dashboard():
 @counselor_required
 def manage_alerts():
     """Database of text notifications to send."""
-    return render_template('counselor/alerts/manage_alerts.html')
+    alerts = SMSAlert.query.order_by(SMSAlert.date).all()
+    return render_template('counselor/alerts/manage_alerts.html', alerts=alerts)
 
 
 @counselor.route('/alerts/add', methods=['GET', 'POST'])
@@ -401,6 +404,7 @@ def add_alert():
         )
         db.session.add(alert)
         db.session.commit()
-        flash('Successfully created alert "{}"!'.format(alert.title), 'form-success')
+        flash('Successfully created alert "{}"!'.format(
+            alert.title), 'form-success')
         return redirect(url_for('counselor.add_alert'))
     return render_template('counselor/alerts/add_alert.html', form=form)

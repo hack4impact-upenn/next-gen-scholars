@@ -15,7 +15,7 @@
             </h2>
 
             <div class="ui fluid icon input">
-                <input id="search-texts" type="text" placeholder="Search...">
+                <input id="search-alerts" type="text" placeholder="Search...">
                 <i class="search icon"></i>
             </div>
             <br />
@@ -23,15 +23,22 @@
             {# Use overflow-x: scroll so that mobile views don't freak out
              # when the table is too wide #}
             <div style="overflow-x: scroll;">
-                <table class="ui searchable sortable unstackable selectable celled table">
+                <table class="ui searchable unstackable selectable celled table">
                     <thead>
                         <tr>
-                            <th class="sorted ascending">Title</th>
+                            <th>Title</th>
                             <th>Content</th>
-                            <th>Date</th>
+                            <th>Date/Time</th>
                         </tr>
                     </thead>
                     <tbody>
+                    {% for a in alerts %}
+                    <tr>
+                        <td>{{ a.title }}</td>
+                        <td>{{ a.content }}</td>
+                        <td>{{ a.format_date() }} {{ a.format_time() }}</td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -40,7 +47,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#search-texts').keyup(function () {
+            $('#search-alerts').keyup(function () {
                 var searchText = $(this).val();
                 if (searchText.length > 0) {
                     $('tbody td:icontains(' + searchText + ')').addClass('positive');
