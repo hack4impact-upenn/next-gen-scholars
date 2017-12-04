@@ -5,7 +5,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField, HiddenField,
                             BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
-from wtforms.validators import Email, EqualTo, InputRequired, Length
+from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
 from .. import db
 from ..models import Role, User, TestName, College
@@ -109,10 +109,10 @@ class AddCollegeProfileForm(Form):
         validators=[InputRequired(), Length(1, 200)])
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
-    early_deadline = DateField('Early Deadline (mm-dd-yyyy)',
-        format='%m-%d-%Y')
-    regular_deadline = DateField('Regular Deadline (mm-dd-yyyy)',
-        format='%m-%d-%Y')
+    early_deadline = DateField('Early Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d', validators=[Optional()])
+    regular_deadline = DateField('Regular Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add College Profile')
 
 
@@ -130,11 +130,11 @@ class EditCollegeProfileStep2Form(Form):
         validators=[InputRequired(), Length(1, 200)])
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
-    early_deadline = DateField('Early Deadline (mm-dd-yyyy)',
-        format='%m-%d-%Y')
-    regular_deadline = DateField('Regular Deadline (mm-dd-yyyy)',
-        format='%m-%d-%Y')
-    submit = SubmitField('Edit College Profile')
+    early_deadline = DateField('Early Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d', validators=[Optional()])
+    regular_deadline = DateField('Regular Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d', validators=[Optional()])
+    submit = SubmitField('Save College Profile')
 
 class DeleteCollegeProfileForm(Form):
     name = QuerySelectField(

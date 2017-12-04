@@ -8,7 +8,7 @@ from wtforms.fields import (PasswordField, StringField, SubmitField,
                             IntegerField, FloatField, SelectField,
                             BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
-from wtforms.validators import Email, EqualTo, InputRequired, Length
+from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 from wtforms.fields.html5 import EmailField
 
 from .. import db
@@ -66,8 +66,7 @@ class EditSupplementalEssayForm(Form):
     status = SelectField(
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
-                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done',
-                                                                  'Done')],
+                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done', 'Done')],
         validators=[InputRequired()])
     submit = SubmitField('Update essay')
 
@@ -77,7 +76,7 @@ class AddChecklistItemForm(Form):
         'Checklist Item', validators=[InputRequired(),
                                       Length(1, 64)])
     date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
+        'Deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add checklist item')
 
 
@@ -86,7 +85,7 @@ class EditChecklistItemForm(Form):
         'New text', validators=[InputRequired(),
                                 Length(1, 64)])
     date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
+        'Deadline', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Update checklist item')
 
 
@@ -96,8 +95,8 @@ class AddTestScoreForm(Form):
         month_choices.append((calendar.month_name[i], calendar.month_name[i]))
     year_choices = []
     today = datetime.today()
-    for i in range(0, 8):
-        year_choices.append((str(today.year - 8 + i), str(today.year - 8 + i)))
+    for i in range(8):
+        year_choices.append((str(today.year - i), str(today.year - i)))
     test_name = QuerySelectField(
         'Test Name',
         validators=[InputRequired()],
@@ -141,8 +140,8 @@ class AddSupplementalEssayForm(Form):
     link = StringField('Link', validators=[InputRequired(), Length(1, 100)])
     status = SelectField(
         'Status',
-        choices=[('Incomplete', 'Incomplete'), ('Submitted', 'Submitted'),
-                 ('Pending', 'Pending')],
+        choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
+                 ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done', 'Done')],
         validators=[InputRequired()])
     submit = SubmitField('Add Supplemental Essay')
 

@@ -11,8 +11,8 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile,
-                      EditableHTML, ChecklistItem, TestName, College, ScattergramData)
+from ..models import (Role, User, College, StudentProfile, EditableHTML,
+                      ChecklistItem, TestName, College, Notification, ScattergramData)
 
 
 @counselor.route('/')
@@ -87,6 +87,16 @@ def registered_users():
         'counselor/registered_users.html', users=users, roles=roles)
 
 
+@counselor.route('/colleges')
+@login_required
+@counselor_required
+def colleges():
+    """View all colleges."""
+    colleges = College.query.all()
+    return render_template(
+        'counselor/colleges.html', colleges=colleges)
+
+
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
 @login_required
@@ -106,6 +116,8 @@ def view_user_profile(user_id):
     """ See a student's profile - containing all info from DB """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
+        abort(404)
+    if not user.is_student():
         abort(404)
     return render_template('student/student_profile.html', user=user)
 
@@ -147,14 +159,20 @@ def student_database():
     """View student database."""
     checklist_form = AddChecklistItemForm()
     if checklist_form.validate_on_submit():
+        print(checklist_form.assignee_ids.data)
         for assignee_id in checklist_form.assignee_ids.data.split(','):
             checklist_item = ChecklistItem(
                 text=checklist_form.item_text.data,
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=form.date.data)
+                deadline=checklist_form.date.data)
             db.session.add(checklist_item)
+            notif_text = '{} {} added "{}" to your checklist'.format(
+                current_user.first_name, current_user.last_name, checklist_item.text)
+            notification = Notification(
+                text=notif_text, student_profile_id=assignee_id)
+            db.session.add(notification)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
         return redirect(url_for('counselor.student_database'))
@@ -233,7 +251,7 @@ def calendar():
 @counselor_required
 def add_test_name():
     # Allows a counselor to add a test name to the database.
-    form = AddTestNameForm();
+    form = AddTestNameForm()
     if form.validate_on_submit():
         test_name = TestName.query.filter_by(name=form.name.data).first()
         if test_name is None:
@@ -260,8 +278,7 @@ def edit_test_name():
         db.session.commit()
         flash('Test name successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_test_name.html', form=form
-                                                         , header='Edit Test Name')
+    return render_template('counselor/edit_test_name.html', form=form, header='Edit Test Name')
 
 
 @counselor.route('/delete_test', methods=['GET', 'POST'])
@@ -276,8 +293,8 @@ def delete_test_name():
         db.session.commit()
         flash('Test name successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_test_name.html', form=form
-                                                         , header='Delete Test Name')
+    return render_template('counselor/delete_test_name.html', form=form, header='Delete Test Name')
+
 
 @counselor.route('/add_college', methods=['GET', 'POST'])
 @login_required
@@ -294,14 +311,13 @@ def add_college():
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data
-                )
+            )
             db.session.add(college)
             db.session.commit()
         else:
             flash('College could not be added - already existed in database.', 'error')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/add_college.html', form=form
-                                                       , header='Add College Profile')
+    return render_template('counselor/add_college.html', form=form, header='Add College Profile')
 
 
 @counselor.route('/edit_college', methods=['GET', 'POST'])
@@ -313,8 +329,7 @@ def edit_college_step1():
     if form.validate_on_submit():
         college = College.query.filter_by(name=form.name.data.name).first()
         return redirect(url_for('counselor.edit_college_step2', college_id=college.id))
-    return render_template('counselor/edit_college.html', form=form
-                                                         , header='Edit College Profile')
+    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
 
 
 @counselor.route('/edit_college/<int:college_id>', methods=['GET', 'POST'])
@@ -339,8 +354,7 @@ def edit_college_step2(college_id):
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/edit_college.html', form=form
-                                                        , header='Edit College Profile')
+    return render_template('counselor/edit_college.html', form=form, header='Edit College Profile')
 
 
 @counselor.route('/delete_college', methods=['GET', 'POST'])
@@ -355,11 +369,11 @@ def delete_college():
         db.session.commit()
         flash('College profile successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
-    return render_template('counselor/delete_college.html', form=form
-                                                          , header='Delete College Profile')
+    return render_template('counselor/delete_college.html', form=form, header='Delete College Profile')
 
-@csrf.exempt    
-@counselor.route('/uploader', methods = ['GET', 'POST'])
+
+@csrf.exempt
+@counselor.route('/uploader', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def upload_file():
@@ -370,28 +384,24 @@ def upload_file():
         data = ","
         line_info = contents.split(data.encode("utf-8"))
 
-        for i in range(1, int(len(line_info)/6)):
+        for i in range(1, int(len(line_info) / 6)):
 
-            arguments = line_info[6*i + 6].split()
+            arguments = line_info[6 * i + 6].split()
             if len(arguments) == 1:
                 insert = None
             else:
                 insert = arguments[0].strip()
 
             scattergram_data = ScattergramData(
-                    name = line_info[6*i + 1].strip(),
-                    status = line_info[6*i + 2].strip(),
-                    GPA = line_info[6*i + 3].strip(),
-                    SAT2400 = line_info[6*i + 4].strip(),
-                    SAT1600 = line_info[6*i + 5].strip(),
-                    ACT = insert
-                    )
+                name=line_info[6 * i + 1].strip(),
+                status=line_info[6 * i + 2].strip(),
+                GPA=line_info[6 * i + 3].strip(),
+                SAT2400=line_info[6 * i + 4].strip(),
+                SAT1600=line_info[6 * i + 5].strip(),
+                ACT=insert
+            )
 
             db.session.add(scattergram_data)
         db.session.commit()
         return "file uploaded successfully"
     return render_template('counselor/scattergram_upload.html')
-
-
-
-

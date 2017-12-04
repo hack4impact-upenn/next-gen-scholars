@@ -105,7 +105,7 @@
                     </thead>
                     <tbody>
                     {% for s in student_profiles %}
-                        <tr class="student-row">
+                        <tr class="student-row" data-profile-id={{ s.id }}>
                             <td class="searchable-td">{{ s.user[0].first_name }}</td>
                             <td class="searchable-td">{{ s.user[0].last_name }}</td>
                             <td class="searchable-td">{{ s.grade|string }}th</td>
@@ -240,7 +240,9 @@
                     selectedProfileIds.add(studentProfileId);
                     $(this).addClass('active');
                 }
+                console.log(selectedProfileIds);
                 $('#assignee_ids').val(Array.from(selectedProfileIds));
+                console.log($('#assignee_ids'));
             });
 
             // Search through students (with the filter applied)

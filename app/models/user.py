@@ -26,15 +26,15 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (Permission.GENERAL, 'main', True),
+            'User': (Permission.GENERAL, 'student.checklist_default', True),
             'Administrator': (
                 Permission.ADMINISTER,
-                'admin',
+                'admin.index',
                 False  # grants all permissions
             ),
             'Counselor': (
                 Permission.COUNSELOR,
-                'counselor',
+                'counselor.student_database',
                 False  # grants all permissions
             )
         }
@@ -91,6 +91,9 @@ class User(UserMixin, db.Model):
 
     def is_counselor(self):
         return self.can(Permission.COUNSELOR)
+
+    def is_student(self):
+        return self.can(Permission.GENERAL)
 
     @property
     def password(self):

@@ -14,3 +14,4 @@ from .test_score import *
 from .student_profile import *
 from .user import *
 from .scattergram_data import *
+from .notification import *
