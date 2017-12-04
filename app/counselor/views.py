@@ -4,7 +4,7 @@ import pytz
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from flask_rq import get_queue
-
+from .. import csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
                     DeleteTestNameForm, AddCollegeProfileForm, EditCollegeProfileStep1Form,
@@ -14,8 +14,8 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, SMSAlert,
-                      EditableHTML, ChecklistItem, TestName, College)
+from ..models import (Role, User, College, StudentProfile, EditableHTML, SMSAlert
+                      ChecklistItem, TestName, College, Notification, ScattergramData)
 
 
 @counselor.route('/')
@@ -162,14 +162,20 @@ def student_database():
     """View student database."""
     checklist_form = AddChecklistItemForm()
     if checklist_form.validate_on_submit():
+        print(checklist_form.assignee_ids.data)
         for assignee_id in checklist_form.assignee_ids.data.split(','):
             checklist_item = ChecklistItem(
                 text=checklist_form.item_text.data,
                 assignee_id=assignee_id,
                 is_deletable=False,
                 creator_role_id=3,
-                deadline=form.date.data)
+                deadline=checklist_form.date.data)
             db.session.add(checklist_item)
+            notif_text = '{} {} added "{}" to your checklist'.format(
+                current_user.first_name, current_user.last_name, checklist_item.text)
+            notification = Notification(
+                text=notif_text, student_profile_id=assignee_id)
+            db.session.add(notification)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
         return redirect(url_for('counselor.student_database'))
@@ -410,7 +416,7 @@ def add_alert():
     return render_template('counselor/alerts/add_alert.html', form=form)
 
 
-@counselor.route('/alerts/edit/<int:alert_id>', methods=['GET','POST'])
+@counselor.route('/alerts/edit/<int:alert_id>', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def edit_alert(alert_id):
