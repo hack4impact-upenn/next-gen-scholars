@@ -1,7 +1,7 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from flask_rq import get_queue
-
+from .. import csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm, EditTestNameForm,
                     DeleteTestNameForm, AddCollegeProfileForm, EditCollegeProfileStep1Form,
@@ -11,8 +11,8 @@ from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile,
-                      EditableHTML, ChecklistItem, TestName, College, Notification)
+from ..models import (Role, User, College, StudentProfile, EditableHTML,
+                      ChecklistItem, TestName, College, Notification, ScattergramData)
 
 
 @counselor.route('/')
@@ -86,6 +86,7 @@ def registered_users():
     return render_template(
         'counselor/registered_users.html', users=users, roles=roles)
 
+
 @counselor.route('/colleges')
 @login_required
 @counselor_required
@@ -94,6 +95,7 @@ def colleges():
     colleges = College.query.all()
     return render_template(
         'counselor/colleges.html', colleges=colleges)
+
 
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
@@ -105,6 +107,7 @@ def user_info(user_id):
     if user is None:
         abort(404)
     return render_template('counselor/manage_user.html', user=user)
+
 
 @counselor.route('/user/<int:user_id>/profile')
 @login_required
@@ -167,7 +170,8 @@ def student_database():
             db.session.add(checklist_item)
             notif_text = '{} {} added "{}" to your checklist'.format(
                 current_user.first_name, current_user.last_name, checklist_item.text)
-            notification = Notification(text=notif_text, student_profile_id=assignee_id)
+            notification = Notification(
+                text=notif_text, student_profile_id=assignee_id)
             db.session.add(notification)
         db.session.commit()
         flash('Checklist item added.', 'form-success')
@@ -366,3 +370,33 @@ def delete_college():
         flash('College profile successfully deleted.', 'form-success')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/delete_college.html', form=form, header='Delete College Profile')
+
+
+@csrf.exempt
+@counselor.route('/upload_scattergram', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def upload_scattergram():
+    if request.method == 'POST':
+        f = request.files['file']
+        contents = f.read()
+        data = ","
+        line_info = contents.split(data.encode("utf-8"))
+        for i in range(1, int(len(line_info) / 6)):
+            arguments = line_info[6 * i + 6].split()
+            if len(arguments) == 1:
+                insert = None
+            else:
+                insert = arguments[0].strip()
+            scattergram_data = ScattergramData(
+                name=line_info[6 * i + 1].strip(),
+                status=line_info[6 * i + 2].strip(),
+                GPA=line_info[6 * i + 3].strip(),
+                SAT2400=line_info[6 * i + 4].strip(),
+                SAT1600=line_info[6 * i + 5].strip(),
+                ACT=insert
+            )
+            db.session.add(scattergram_data)
+        db.session.commit()
+        return "file uploaded successfully"
+    return render_template('counselor/upload_scattergram.html')

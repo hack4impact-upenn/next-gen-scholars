@@ -1,0 +1,71 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+<div class="ui stackable centered grid container">
+   <div class="twelve wide column">
+      <div class="row">
+         <h2 class="ui header">
+            Upload Scattergram Data
+            <div class="sub header">
+               Upload CSV of students' college application statuses.
+            </div>
+         </h2>
+         <h4 class="ui header">Instructions for Uploading Student Data</h4>
+         <p>
+            To add more data to the college scattergrams, create an excel sheet with the following columns in order:
+            <ol>
+               <li>Student name</li>
+               <li>College</li>
+               <li>Application status</li>
+               <li>GPA</li>
+               <li>SAT Score [2400]</li>
+               <li>SAT Score [1600]</li>
+               <li>ACT Score</li>
+            </ol>
+         </p>
+         <p>
+            <img src="/static/images/app_statuses.png" width="100%" />
+         </p>
+         <p>
+            For the "Application Status" column, possible entries are:
+            <ul>
+               <li>Accepted</li>
+               <li>Denied</li>
+               <li>Waitlisted/Deferred (Withdrew App)</li>
+               <li>Waitlisted/Deferred (Accepted)</li>
+               <li>Waitlisted/Deferred (Denied)</li>
+            </ul>
+            Double check your spelling – if a student's college or application status is misspelled, their data will not be included in the scattergram.
+            When you are finished entering all the data, download your excel sheet as a CSV file, then upload it to this portal and click "Submit."
+         </p>
+         <h4 class="ui header">Upload CSV File</h4>
+         <form class="ui form" method="POST" enctype="multipart/form-data">
+            <label id="scattergram-file-label" for="scattergram-file" class="ui icon button">
+               <i class="file icon"></i>
+               Open File</label>
+            <input type="file" id="scattergram-file" accept=".csv" style="display:none">
+            <br /><br />
+            <input class="ui submit primary button" type="submit"/>
+         </form>
+      </div>
+   </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+   $('#scattergram-file').on('change', function(e) {
+      var filename;
+      var $label = $('#scattergram-file-label');
+      if (e.target.value) {
+         filename = e.target.value.split('\\').pop();
+      }
+      if (filename) {
+         $label.html('<i class="file icon"></i>&nbsp' + filename);
+      } else {
+         $label.html();
+      }
+   });
+});
+</script>
+
+{% endblock %}
