@@ -529,3 +529,38 @@ def edit_alert(alert_id):
             alert.title), 'form-success')
         return redirect(url_for('counselor.edit_alert', alert_id=alert.id))
     return render_template('counselor/alerts/edit_alert.html', form=form)
+
+
+@csrf.exempt
+@counselor.route('/upload_scattergram', methods = ['GET', 'POST'])
+@login_required
+@counselor_required
+def upload_file():
+    if request.method == 'POST':
+        f = request.files['file']
+        contents = f.read()
+
+        data = ","
+        line_info = contents.split(data.encode("utf-8"))
+
+        for i in range(1, int(len(line_info)/6)):
+
+            arguments = line_info[6*i + 6].split()
+            if len(arguments) == 1:
+                insert = None
+            else:
+                insert = arguments[0].strip()
+
+            scattergram_data = ScattergramData(
+                    name = line_info[6*i + 1].strip(),
+                    status = line_info[6*i + 2].strip(),
+                    GPA = line_info[6*i + 3].strip(),
+                    SAT2400 = line_info[6*i + 4].strip(),
+                    SAT1600 = line_info[6*i + 5].strip(),
+                    ACT = insert
+                    )
+
+            db.session.add(scattergram_data)
+        db.session.commit()
+        return "File uploaded successfully"
+    return render_template('counselor/upload_scattergram.html')
