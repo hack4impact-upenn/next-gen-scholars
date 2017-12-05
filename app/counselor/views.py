@@ -16,7 +16,7 @@ from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
-                      ChecklistItem, TestName, College, Notification, 
+                      ChecklistItem, TestName, College, Notification,
                       SMSAlert,ScattergramData)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -128,6 +128,8 @@ def view_user_profile(user_id):
     """ See a student's profile - containing all info from DB """
     user = User.query.filter_by(id=user_id).first()
     if user is None:
+        abort(404)
+    if user.is_admin():
         abort(404)
     if not user.is_student():
         abort(404)
