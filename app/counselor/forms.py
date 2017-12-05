@@ -115,7 +115,7 @@ class AddChecklistItemForm(Form):
         'Checklist Item', validators=[InputRequired(),
                                       Length(1, 64)])
     date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[InputRequired()])
+        'Deadline', format='%Y-%m-%d', validators=[Optional()])
     assignee_ids = HiddenField('Assignee Ids')
     submit = SubmitField('Add checklist item')
 
