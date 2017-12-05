@@ -479,7 +479,7 @@ def edit_supplemental_essay(item_id):
     essay = Essay.query.filter_by(id=item_id).first()
     if essay:
         form = EditSupplementalEssayForm(
-            essay_name=essay.name, link=essay.link)
+            essay_name=essay.name, link=essay.link, status=essay.status)
         if form.validate_on_submit():
             essay.name = form.essay_name.data
             essay.link = form.link.data
