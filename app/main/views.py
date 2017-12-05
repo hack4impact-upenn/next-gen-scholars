@@ -6,6 +6,9 @@ from . import main
 
 @main.route('/')
 def index():
+    editable_html_obj = EditableHTML.get_editable_html('index')
+    return render_template(
+        'main/index.html', editable_html_obj=editable_html_obj)
     return render_template('main/index.html')
 
 
@@ -17,13 +20,13 @@ def about():
 
 
 @main.route('/resources')
-@login_required
 def resources():
-    return render_template('main/resources.html')
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template(
+        'main/resources.html', editable_html_obj=editable_html_obj)
 
 
 @main.route('/calendar', methods=['GET', 'POST'])
-@login_required
 def calendar():
     return render_template('main/calendar.html')
 

@@ -2,5 +2,14 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-<h2 class="ui header">Resources</h2>
+<div class="ui stackable centered grid container" style="margin-top:12px">
+    <div class="twelve wide computer sixteen wide mobile column">
+        <div class="row">
+            <h1 class="ui dividing header">Resources</h1>
+            {{ page.render_inline_editor(editable_html_obj, current_user) }}
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 {% endblock %}

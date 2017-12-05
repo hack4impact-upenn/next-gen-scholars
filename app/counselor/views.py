@@ -17,14 +17,15 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification,
-                      SMSAlert,ScattergramData)
+                      SMSAlert, ScattergramData)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import requests
 import os
 import datetime
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #TODO: remove before production?
+# TODO: remove before production?
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 @counselor.route('/')
@@ -35,70 +36,6 @@ def index():
     return render_template('counselor/index.html')
 
 
-@counselor.route('/new-user', methods=['GET', 'POST'])
-@login_required
-@counselor_required
-def new_user():
-    """Create a new user."""
-    form = NewUserForm()
-    if form.validate_on_submit():
-        user = User(
-            role=form.role.data,
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            email=form.email.data,
-            password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('User {} successfully created'.format(user.full_name()),
-              'form-success')
-    return render_template('counselor/new_user.html', form=form)
-
-
-@counselor.route('/invite-user', methods=['GET', 'POST'])
-@login_required
-@counselor_required
-def invite_user():
-    """Invites a new user to create an account and set their own password."""
-    form = InviteUserForm()
-    if form.validate_on_submit():
-        user = User(
-            role=form.role.data,
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            email=form.email.data)
-        db.session.add(user)
-        db.session.commit()
-        token = user.generate_confirmation_token()
-        invite_link = url_for(
-            'account.join_from_invite',
-            user_id=user.id,
-            token=token,
-            _external=True)
-        get_queue().enqueue(
-            send_email,
-            recipient=user.email,
-            subject='You Are Invited To Join',
-            template='account/email/invite',
-            user=user,
-            invite_link=invite_link,
-        )
-        flash('User {} successfully invited'.format(user.full_name()),
-              'form-success')
-    return render_template('counselor/new_user.html', form=form)
-
-
-@counselor.route('/users')
-@login_required
-@counselor_required
-def registered_users():
-    """View all registered users."""
-    users = User.query.all()
-    roles = Role.query.all()
-    return render_template(
-        'counselor/registered_users.html', users=users, roles=roles)
-
-
 @counselor.route('/colleges')
 @login_required
 @counselor_required
@@ -106,7 +43,6 @@ def colleges():
     """View all colleges."""
     colleges = College.query.all()
     return render_template('counselor/colleges.html', colleges=colleges)
-
 
 
 @counselor.route('/user/<int:user_id>')
@@ -166,7 +102,7 @@ def processor():
         get_essay_statuses=get_essay_statuses, get_colleges=get_colleges)
 
 
-@counselor.route('/student-database', methods=['GET', 'POST'])
+@counselor.route('/student_database', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def student_database():
@@ -219,7 +155,7 @@ def add_to_cal(student_profile_id, text, deadline):
         id=student_profile_id).first()
     if student_profile is None:
         return {"event_id": "1", "event_created": False}
-    #if a student has not authorized google calendar yet
+    # if a student has not authorized google calendar yet
     if student_profile.cal_token is None:
         return {"event_id": "1", "event_created": False}
     credentials_json = {
@@ -247,7 +183,7 @@ def add_to_cal(student_profile_id, text, deadline):
     }
 
     event = service.events().insert(calendarId='primary', body=event).execute()
-    #save the authentication values in case they have been refreshed
+    # save the authentication values in case they have been refreshed
     student_profile.cal_token = credentials.token
     student_profile.cal_refresh_token = credentials.refresh_token
     student_profile.cal_token_uri = credentials.token_uri
@@ -307,14 +243,6 @@ def checklist():
         return redirect(url_for('counselor.checklist'))
     return render_template(
         'counselor/checklist.html', form=form, checklist=default_items)
-
-
-@counselor.route('/calendar')
-@login_required
-@counselor_required
-def calendar():
-    """ See a calendar """
-    return render_template('counselor/calendar.html')
 
 
 @counselor.route('/add_test', methods=['GET', 'POST'])
@@ -532,7 +460,7 @@ def edit_alert(alert_id):
 
 
 @csrf.exempt
-@counselor.route('/upload_scattergram', methods = ['GET', 'POST'])
+@counselor.route('/upload_scattergram', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def upload_file():
@@ -543,22 +471,22 @@ def upload_file():
         data = ","
         line_info = contents.split(data.encode("utf-8"))
 
-        for i in range(1, int(len(line_info)/6)):
+        for i in range(1, int(len(line_info) / 6)):
 
-            arguments = line_info[6*i + 6].split()
+            arguments = line_info[6 * i + 6].split()
             if len(arguments) == 1:
                 insert = None
             else:
                 insert = arguments[0].strip()
 
             scattergram_data = ScattergramData(
-                    name = line_info[6*i + 1].strip(),
-                    status = line_info[6*i + 2].strip(),
-                    GPA = line_info[6*i + 3].strip(),
-                    SAT2400 = line_info[6*i + 4].strip(),
-                    SAT1600 = line_info[6*i + 5].strip(),
-                    ACT = insert
-                    )
+                name=line_info[6 * i + 1].strip(),
+                status=line_info[6 * i + 2].strip(),
+                GPA=line_info[6 * i + 3].strip(),
+                SAT2400=line_info[6 * i + 4].strip(),
+                SAT1600=line_info[6 * i + 5].strip(),
+                ACT=insert
+            )
 
             db.session.add(scattergram_data)
         db.session.commit()

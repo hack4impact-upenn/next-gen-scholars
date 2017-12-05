@@ -45,48 +45,45 @@
 {% endmacro %}
 
 {% block content %}
-    <div class="ui stackable centered grid container" >
-        <div class="twelve wide column">
-            <br />
-            <h2 class="ui header">Student Dashboard</h2>
-            {% if notifications %}
-            <div class="stretched divided very relaxed row">
-                <div class="ui info message">
-                    <i class="close icon"></i>
-                    <div class="header">
-                        Notifications
-                    </div>
-                    <ul class="list">
-                        {% for n in notifications %}
-                        <li>{{ n[0].text }} {{ n[1] }}.</li>
-                        {% endfor %}
-                    </ul>
+<div class="ui stackable centered grid container" style="margin-top:12px">
+    <div class="twelve wide computer sixteen wide mobile column">
+        <h2 class="ui dividing header">
+            Tasks
+            <div class="sub header">Keep track of your tasks and deadlines</div>
+        </h2>
+        {% if notifications %}
+        <div class="stretched divided very relaxed row">
+            <div class="ui info message">
+                <i class="close icon"></i>
+                <div class="header">
+                    Notifications
                 </div>
-            </div>
-            {% endif %}
-            <h4 class="ui header">Checklist</h4>
-            <div class="stretched divided very relaxed row">
-            	{{ render_checklist(checklist) }}
-                <button class="ui button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
-                {{ completed_list(completed) }}
+                <ul class="list">
+                    {% for n in notifications %}
+                    <li>{{ n[0].text }} {{ n[1] }}.</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
-        <div id="add-checklist-item-modal" class="ui tiny modal">
-            <div class="ui segment">
-                {{ f.render_form(form, extra_classes='fluid') }}
-            </div>
+        {% endif %}
+        <div class="stretched divided very relaxed row">
+        	{{ render_checklist(checklist) }}
+            <button class="ui button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
+            {{ completed_list(completed) }}
         </div>
     </div>
-
-
+    <div id="add-checklist-item-modal" class="ui tiny modal">
+        <div class="ui segment">
+            {{ f.render_form(form, extra_classes='fluid') }}
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
-
 $(document).ready(function(){
     $('#add-checklist-item').click(function() {
         $('#add-checklist-item-modal').modal('show');
     });
 });
-
 </script>
 {% endblock %}

@@ -20,29 +20,30 @@
 #}
 
 {% macro header_items(current_user) %}
-    {% set endpoints = [
-      ('main.index', config.APP_NAME, 'home'),
-      ('main.about', 'About', 'info')
-    ]%}
-    {% set user = [] %}
-    {% set calendar = [] %}
-    {% set resources = [] %}
-    {% set colleges = [] %}
-    {% if current_user.is_authenticated %}
-      {% set calendar = ([('main.calendar', 'Calendar', 'info')]) %}
-      {% set colleges = ([('student.colleges', 'Colleges', 'info')]) %}
-      {% set resources = ([('main.resources', 'Resources', 'info')]) %}
-      {% if current_user.is_admin() or current_user.is_counselor() %}
-        {% set user = ([(current_user.role.index, 'Student Database', 'user')]) %}
-        {% set calendar = ([('counselor.calendar', 'Calendar', 'info')]) %}
-        {% set colleges = ([('counselor.colleges', 'Colleges', 'info')]) %}
-      {% endif %}
+    {% if not current_user.is_authenticated %}
+      {% set endpoints = [
+        ('main.index', config.APP_NAME, ''),
+      ] %}
+    {% else %}
       {% if current_user.is_student() %}
-        {% set user = ([(current_user.role.index, 'Student Checklist', 'user')]) %}
-        {% set colleges = ([('student.colleges', 'Colleges', 'info')]) %}
+        {% set endpoints = [
+          ('main.index', config.APP_NAME, ''),
+          ('student.dashboard', 'Tasks', 'tasks'),
+          ('student.view_user_profile', 'Profile', 'user'),
+          ('student.calendar', 'Calendar', 'calendar'),
+          ('student.colleges', 'Colleges', 'university'),
+          ('main.resources', 'Resources', 'file text outline')
+        ] %}
+      {% else %}
+        {% set endpoints = [
+          ('main.index', config.APP_NAME, ''),
+          ('counselor.index', 'Dashboard', 'dashboard'),
+          ('main.calendar', 'Calendar', 'calendar'),
+          ('main.resources', 'Resources', 'file text outline')
+        ] %}
       {% endif %}
     {% endif %}
-    {{ render_menu_items( endpoints +  user + calendar + resources + colleges) }}
+    {{ render_menu_items(endpoints) }}
 {% endmacro %}
 
 {# This renders the right hand side of the navigation bar. If the user is logged in, it links to
