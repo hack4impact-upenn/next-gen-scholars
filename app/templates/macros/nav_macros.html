@@ -34,11 +34,22 @@
           ('student.colleges', 'Colleges', 'university'),
           ('main.resources', 'Resources', 'file text outline')
         ] %}
-      {% else %}
+      {% elif current_user.is_counselor() %}
         {% set endpoints = [
           ('main.index', config.APP_NAME, ''),
           ('counselor.index', 'Dashboard', 'dashboard'),
+          ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
+          ('counselor.colleges', 'Colleges', 'university'),
+          ('main.resources', 'Resources', 'file text outline')
+        ] %}
+      {% else %}
+        {% set endpoints = [
+          ('main.index', config.APP_NAME, ''),
+          ('admin.index', 'Dashboard', 'dashboard'),
+          ('counselor.student_database', 'Students', 'student'),
+          ('main.calendar', 'Calendar', 'calendar'),
+          ('counselor.colleges', 'Colleges', 'university'),
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% endif %}
