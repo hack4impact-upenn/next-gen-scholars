@@ -2,11 +2,10 @@
 {% import 'macros/form_macros.html' as f %}
 
 {% block content %}
-<div class="ui stackable centered grid container">
+<div class="ui stackable centered grid container" style="margin-top:12px">
     <!-- DISPLAY USER PROFILE INFORMATION -->
     <div class="ten wide column">
         <div style="margin:auto;text-align:left">
-            <br />
             <div class="ui items">
                 <div class="item">
                     <div class="ui small image">
@@ -110,11 +109,13 @@
                 {% endfor %}
 
                 <!-- DISPLAY BUTTON FOR ADDING TEST SCORE -->
-                <a class="blue card" href="{{ url_for('student.add_test_score') }}">
+                <a class="blue centered card" href="{{ url_for('student.add_test_score') }}">
                     <div class="content" style="text-align:center">
-                        <div class="description" style="margin:0 auto">
-                            <br /><i class="big blue plus icon"></i><br />
-                            <span style="color:#2987CD">Add Test Score</span>
+                        <div class="description">
+                            <i class="big blue plus icon"></i>
+                            <p span style="color:#2987CD">
+                                Add Test Score
+                            </p>
                         </div>
                     </div>
                 </a>

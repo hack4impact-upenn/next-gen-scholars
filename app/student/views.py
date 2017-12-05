@@ -549,10 +549,9 @@ def delete_major(item_id):
 
 # checklist methods
 
-
-@student.route('/checklist')
+@student.route('/')
 @login_required
-def checklist_default():
+def dashboard():
     # get the logged-in user's profile id
     if current_user.student_profile_id:
         return redirect(
