@@ -110,7 +110,7 @@
                 {% endfor %}
 
                 <!-- DISPLAY BUTTON FOR ADDING TEST SCORE -->
-                <a class="blue centered card" href="{{ url_for('student.add_test_score') }}">
+                <a class="blue centered card" href="{{ url_for('student.add_test_score', student_profile_id=user.student_profile.id)}}">
                     <div class="content" style="text-align:center">
                         <div class="description">
                             <i class="big blue plus icon"></i>
@@ -142,7 +142,7 @@
             </div>
         </div>
         <div class="two wide column">
-            <a class="ui right floated blue basic button" onclick="window.location.href='{{ url_for('student.add_major') }}';">Add Major</a>
+            <a class="ui right floated blue basic button" onclick="window.location.href='{{ url_for('student.add_major', student_profile_id=user.student_profile.id)}}';">Add Major</a>
         </div>
     </div>
 
@@ -165,7 +165,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <div class="ui blue link card" onclick="window.location.href='{{ url_for('student.add_college') }}';">
+                <div class="ui blue link card" onclick="window.location.href='{{ url_for('student.add_college', student_profile_id=user.student_profile.id) }}';">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
                             <i class="big blue plus icon"></i><br />
@@ -216,7 +216,7 @@
                     </div>
                 {% else %}
                     <!-- DISPLAY ADD OPTION OTHERWISE-->
-                    <a class="blue card" href="{{ url_for('student.add_common_app_essay') }}">
+                    <a class="blue card" href="{{ url_for('student.add_common_app_essay', student_profile_id=user.student_profile.id) }}">
                         <div class="content" style="text-align:center">
                             <div class="description" style="margin:0 auto">
                                 <h3></h3><i class="big blue plus icon"></i><br />
@@ -253,7 +253,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <a class="blue card" href="{{ url_for('student.add_supplemental_essay') }}">
+                <a class="blue card" href="{{ url_for('student.add_supplemental_essay', student_profile_id=user.student_profile.id) }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
                             <h3></h3><i class="big blue plus icon"></i><br />
@@ -298,7 +298,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <a class="blue card" href="{{ url_for('student.add_recommendation_letter') }}">
+                <a class="blue card" href="{{ url_for('student.add_recommendation_letter', student_profile_id=user.student_profile.id) }}">
                     <div class="content" style="text-align:center">
                         <div class="description" style="margin:0 auto">
                             <br /><i class="big blue plus icon"></i><br />
@@ -402,7 +402,7 @@ $(document).ready(function () {
                 }
             })
         } else {
-            //TODO: send user to college page
+            location.href = '/student/college_profile/' + $(this).data('id');
         }
     });
 
