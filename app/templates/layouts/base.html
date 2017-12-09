@@ -61,17 +61,18 @@
               <input type="hidden" name="csrf_token" value="{{ csrf_token()|safe }}">
             </div>
         {% endif %}
+        <div class="ui inverted vertical footer segment" style="position:absolute; bottom: -14px; width: 100%">
+            <div class="ui centered container">
+                <div class="two wide column">
+                    <div id="google_translate_element" style="display:inline; margin: 0 auto; max-width: 20px"></div>
+                </div>
+            </div>
+        </div>
     </body>
-
-    <div class="row">
-        <h4 id="hr-helper">.</h4>
-        <hr align="center">
-    </div>
-    <div class="footer row">
-      <div id="google_translate_element"></div><script type="text/javascript">
-          function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
-          }
-      </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    </div>
+    <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </html>
