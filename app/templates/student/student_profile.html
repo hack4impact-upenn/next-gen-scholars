@@ -15,7 +15,7 @@
                         <div class="header">
                             <h1 class="ui header">{{ user.full_name() }}</h1>
                         </div>
-                        <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.edit_profile') }}';">Edit Profile</button>
+                        <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.edit_profile', student_profile_id=user.student_profile.id) }}';">Edit Profile</button>
                         <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.checklist', student_profile_id=user.student_profile.id) }}';">View Checklist</button>
                         <div class="description" style="font-size:1.1em">
                             <div class="ui list">
