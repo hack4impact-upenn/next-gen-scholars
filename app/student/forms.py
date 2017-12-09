@@ -12,7 +12,7 @@ from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 from wtforms.fields.html5 import EmailField
 
 from .. import db
-from ..models import TestName
+from ..models import TestName, College
 
 
 class EditCommonAppEssayForm(Form):
@@ -182,9 +182,11 @@ class EditStudentProfile(Form):
 
 
 class AddCollegeForm(Form):
-    name = StringField(
-        'College Name', validators=[InputRequired(),
-                                    Length(1, 100)])
+    name = QuerySelectField(
+        'College Name',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
     submit = SubmitField('Add College')
 
 

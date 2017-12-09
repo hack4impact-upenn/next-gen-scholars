@@ -281,7 +281,7 @@ def edit_test_score(item_id):
 def get_redirect_url(student_profile_id):
     if (current_user.is_student() and current_user.student_profile_id == student_profile_id):
         return url_for('student.view_user_profile')
-    else: 
+    else:
         if (current_user.is_counselor() or current_user.is_admin()):
             student = User.query.filter_by(student_profile_id=student_profile_id).first()
             if student is not None:
@@ -361,18 +361,11 @@ def add_college(student_profile_id):
     form = AddCollegeForm()
     student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
     if form.validate_on_submit():
-        if form.name.data not in student_profile.colleges:
-            # Only check to add college if not already in their list.
-            college_name = College.query.filter_by(name=form.name.data).first()
-            if college_name is not None:
-                # College already exists in database.
-                student_profile.colleges.append(college_name)
-            else:
-                student_profile.colleges.append(College(name=form.name.data))
-            db.session.add(student_profile)
-            db.session.commit()
-            url = get_redirect_url(student_profile_id)
-            return redirect(url)
+        student_profile.colleges.append(form.name.data)
+        db.session.add(student_profile)
+        db.session.commit()
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
     return render_template(
         'student/add_academic_info.html', form=form, header="Add College")
 
