@@ -412,7 +412,7 @@ def edit_college_step2(college_id):
         db.session.add(college)
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
-        return redirect(url_for('counselor.index'))
+        return redirect(url_for('counselor.colleges'))
     return render_template(
         'counselor/edit_college.html',
         form=form,
