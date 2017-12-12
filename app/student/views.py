@@ -29,22 +29,23 @@ from plotly.graph_objs import *
 @student.route('/profile')
 @login_required
 def view_user_profile():
-    sat = '––'
-    act = '––'
+    sat = 'N/A'
+    act = 'N/A'
     student_profile = current_user.student_profile
     if student_profile is not None:
         test_scores = student_profile.test_scores
         for t in test_scores:
-            print(t.name)
             if t.name == 'SAT':
-                sat = max(sat, t.score) if sat != '––' else t.score
+                sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
-                act = max(act, t.score) if act != '––' else t.score
+                act = max(act, t.score) if act != 'N/A' else t.score
         return render_template(
             'student/student_profile.html',
             user=current_user,
             sat=sat,
             act=act)
+    else:
+        abort(404)
 
 
 @student.route('/calendar')

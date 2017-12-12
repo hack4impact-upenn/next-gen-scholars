@@ -54,7 +54,7 @@ def colleges():
 def upload_college_file():
     if request.method == 'POST':
         f = request.files['file']
-        
+
         stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
         csv_input = csv.reader(stream)
         header_row = True
@@ -102,7 +102,24 @@ def view_user_profile(user_id):
         abort(404)
     if not user.is_student():
         abort(404)
-    return render_template('student/student_profile.html', user=user)
+    sat = 'N/A'
+    act = 'N/A'
+    student_profile = user.student_profile
+    if student_profile is not None:
+        test_scores = student_profile.test_scores
+        for t in test_scores:
+            print("here")
+            if t.name == 'SAT':
+                sat = max(sat, t.score) if sat != 'N/A' else t.score
+            if t.name == 'ACT':
+                act = max(act, t.score) if act != 'N/A' else t.score
+        return render_template(
+            'student/student_profile.html',
+            user=user,
+            sat=sat,
+            act=act)
+    else:
+        abort(404)
 
 
 @counselor.route('/user/<int:user_id>/change-email', methods=['GET', 'POST'])
