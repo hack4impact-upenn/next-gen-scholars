@@ -62,16 +62,18 @@ def upload_college_file():
             if header_row:
                 header_row = False
                 continue
-            if all(row):
+            if len(row) >= 4 and any(row):
+                # check that there are at least for columns
+                # and the row is not completely blank
                 college_data = College(
                     name=row[0],
                     description=row[1],
                     regular_deadline=datetime.datetime.strptime(
-                        row[2], "%Y-%m-%d"),
+                        row[2], "%Y-%m-%d") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
-                        row[3], "%Y-%m-%d"),
+                        row[3], "%Y-%m-%d") if row[3] else None,
                 )
-                db.session.add(college_data)
+            db.session.add(college_data)
         db.session.commit()
         return redirect(url_for('counselor.colleges'))
     return render_template('counselor/upload_colleges.html')
