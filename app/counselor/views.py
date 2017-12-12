@@ -24,6 +24,8 @@ import googleapiclient.discovery
 import requests
 import os
 import datetime
+import csv
+import io
 # TODO: remove before production?
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -44,6 +46,37 @@ def colleges():
     colleges = College.query.all()
     return render_template('counselor/colleges.html', colleges=colleges)
 
+
+@csrf.exempt
+@counselor.route('/upload_colleges', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def upload_college_file():
+    if request.method == 'POST':
+        f = request.files['file']
+        
+        stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
+        csv_input = csv.reader(stream)
+        header_row = True
+        for row in csv_input:
+            if header_row:
+                header_row = False
+                continue
+            if len(row) >= 4 and any(row):
+                # check that there are at least for columns
+                # and the row is not completely blank
+                college_data = College(
+                    name=row[0],
+                    description=row[1],
+                    regular_deadline=datetime.datetime.strptime(
+                        row[2], "%Y-%m-%d") if row[2] else None,
+                    early_deadline=datetime.datetime.strptime(
+                        row[3], "%Y-%m-%d") if row[3] else None,
+                )
+            db.session.add(college_data)
+        db.session.commit()
+        return redirect(url_for('counselor.colleges'))
+    return render_template('counselor/upload_colleges.html')
 
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
