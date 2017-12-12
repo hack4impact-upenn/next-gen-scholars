@@ -22,6 +22,8 @@ import os
 import datetime
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  #TODO: remove before production?
+import plotly.plotly as py
+from plotly.graph_objs import *
 
 
 @student.route('/profile')
@@ -851,33 +853,6 @@ def view_college_profile(college_id):
     current_college = College.query.filter_by(id=college_id).first()
     return render_template(
         'main/college_profile.html', college=current_college)
-
-
-"""@student.route('/scattergram_display')
-@login_required
-def scattergram_display():
-    import plotly.plotly as py
-    import plotly.graph_objs as go
-
-    # Create random data with numpy
-    import numpy as np
-
-    N = 1000
-    random_x = np.random.randn(N)
-    random_y = np.random.randn(N)
-
-    # Create a trace
-    trace = go.Scatter(
-        x = random_x,
-        y = random_y,
-        mode = 'markers'
-    )
-
-    data = [trace]
-
-    # Plot and embed in ipython notebook!
-    plot = py.iplot(data)
-    return render_template('/student/scattergram_display.html', plot)"""
 
 
 def string_to_bool(str):
