@@ -513,7 +513,7 @@ def edit_alert(alert_id):
 @counselor.route('/upload_scattergram', methods=['GET', 'POST'])
 @login_required
 @counselor_required
-def upload_file():
+def upload_scattergram():
     if request.method == 'POST':
         f = request.files['file']
         contents = f.read()

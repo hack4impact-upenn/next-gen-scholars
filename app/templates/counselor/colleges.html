@@ -17,8 +17,12 @@
                         <i class="search icon"></i>
                     </div>
                 </div>
-
-                <a class="ui black basic button" href="{{ url_for('counselor.upload_college_file') }}">Upload CSV</a>
+                <div class="ui item">
+                    <a class="ui black basic button" href="{{ url_for('counselor.upload_college_file') }}">Upload College Info</a>
+                </div>
+                <div class="ui item">
+                    <a class="ui black basic button" href="{{ url_for('counselor.upload_scattergram') }}">Upload Scattergram Data</a>
+                </div>
             </div>
 
             {# Use overflow-x: scroll so that mobile views don't freak out
