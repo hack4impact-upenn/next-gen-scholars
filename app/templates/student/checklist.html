@@ -2,7 +2,12 @@
 {% import 'macros/form_macros.html' as f %}
 
 {% macro render_checklist(checklist) %}
-    <table class="ui basic table">
+    <table class="ui table">
+        <thead>
+            <tr><th colspan="2">
+              Upcoming
+            </th>
+        </tr></thead>
     	{% for item in checklist %}
             <tr>
             	<td>{{ '%s' % (item.text) }}</td>
@@ -25,7 +30,13 @@
 {% endmacro %}
 
 {% macro completed_list(completed) %}
-    <table class="ui basic table">
+    {% if completed|length > 0 %}
+    <table class="ui table">
+        <thead>
+            <tr><th colspan="2">
+              Completed
+            </th>
+        </tr></thead>
         {% for item in completed %}
             <tr>
                 <td>{{ '%s' % (item.text) }}</td>
@@ -42,10 +53,11 @@
             </tr>
         {% endfor %}
     </table>
+    {% endif %}
 {% endmacro %}
 
 {% block content %}
-<div class="ui stackable centered grid container" style="margin-top:12px">
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile column">
         <h2 class="ui dividing header">
             Tasks

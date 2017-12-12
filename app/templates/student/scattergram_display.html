@@ -2,6 +2,10 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-<h2 class="ui header">Scattergram</h2>
-<iframe width="640" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{plot}}.embed?width=640&height=480" ></iframe>
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide computer sixteen wide mobile centered column">
+        <h2 class="ui dividing header">Scattergram</h2>
+        <iframe width="640" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{plot}}.embed?width=640&height=480" ></iframe>
+    </div>
+</div>
 {% endblock %}

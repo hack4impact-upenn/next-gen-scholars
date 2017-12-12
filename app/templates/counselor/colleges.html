@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-    <div class="ui stackable grid container" style="margin-top:12px">
+    <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
         <div class="sixteen wide tablet twelve wide computer centered column">
             <h2 class="ui dividing header">
                 Colleges
@@ -29,16 +29,17 @@
                             <th>Description</th>
                             <th>Regular Deadline</th>
                             <th>Early Deadline</th>
+                            <th>College Profile</th>
                         </tr>
                     </thead>
                     <tbody>
+                    <!--TODO: Make everything under the same onclick.-->
                     {% for c in colleges | sort(attribute='name') %}
-                        <tr onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">
-
-                            <td>{{ c.name }}</td>
-                            <td>{{ c.description }}</td>
-                            <td>{{ c.regular_deadline }}</td>
-                            <td>{{ c.early_deadline }} </td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.name }}</td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.description }}</td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.regular_deadline }}</td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.early_deadline }} </td>
+                            <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}
                     </tbody>

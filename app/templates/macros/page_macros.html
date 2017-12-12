@@ -3,7 +3,7 @@
         {{ editable_html_obj.value|safe }}
     </div>
 
-    {% if current_user.is_admin() %}
+    {% if current_user.is_admin() or current_user.is_counselor() %}
        <button class="ui button start-edit">
         Edit
        </button>
