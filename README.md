@@ -11,21 +11,21 @@
 
 #####  Clone the repo
 
-```
+```bash
 $ git clone https://github.com/hack4impact/next-gen-scholars.git
 $ cd next-gen-scholars
 ```
 
 ##### Initialize a virtualenv
 
-```
+```bash
 $ pip install virtualenv
 $ virtualenv -p /path/to/python3.x/installation env
 $ source env/bin/activate
 ```
 
 For mac users it will most likely be
-```
+```bash
 $ pip install virtualenv
 $ virtualenv -p python3 env
 $ source env/bin/activate
@@ -34,16 +34,16 @@ Note: if you are using a python2.x version, point the -p value towards your pyth
 
 ##### (If you're on a mac) Make sure xcode tools are installed
 
-```
+```bash
 $ xcode-select --install
 ```
 
-##### Add Environment Variables 
+##### Add Environment Variables
 
 Create a file called `config.env` that contains environment variables in the following syntax: `ENVIRONMENT_VARIABLE=value`. For example,
 the mailing environment variables can be set as the following. We recommend using Sendgrid for a mailing SMTP server. But anything else will work as well.
 
-```
+```python3
 MAIL_USERNAME=SendgridUsername
 MAIL_PASSWORD=SendgridPassword
 SECRET_KEY=SuperRandomStringToBeUsedForEncryption
@@ -56,14 +56,14 @@ Other Key value pairs:
 * `DATABASE_URL`: set to a postgresql database url (default is `data-dev.sqlite`)
 * `REDISTOGO_URL`: set to Redis To Go URL or any redis server url (default is `http://localhost:6379`)
 * `RAYGUN_APIKEY`: api key for raygun (default is `None`)
-* `FLASK_CONFIG`: can be `development`, `production`, `default`, `heroku`, `unix`, or `testing`. Most of the time you will use `development` or `production`. 
+* `FLASK_CONFIG`: can be `development`, `production`, `default`, `heroku`, `unix`, or `testing`. Most of the time you will use `development` or `production`.
 
 
 **Note: do not include the `config.env` file in any commits. This should remain private.**
 
 ##### Install the dependencies
 
-```
+```bash
 $ pip install -r requirements.txt
 ```
 
@@ -74,7 +74,7 @@ You need [Redis](http://redis.io/), and [Sass](http://sass-lang.com/). Chances a
 
 **Sass:**
 
-```
+```bash
 $ gem install sass
 ```
 
@@ -82,13 +82,13 @@ $ gem install sass
 
 _Mac (using [homebrew](http://brew.sh/)):_
 
-```
+```bash
 $ brew install redis
 ```
 
 _Linux:_
 
-```
+```bash
 $ sudo apt-get install redis-server
 ```
 
@@ -96,26 +96,26 @@ You will also need to install **PostgresQL**
 
 _Mac (using homebrew):_
 
-```
-brew install postgresql
+```bash
+$ brew install postgresql
 ```
 
 _Linux:_
 
-```
-sudo apt-get install libpq-dev
+```bash
+$ sudo apt-get install libpq-dev
 ```
 
 
 ##### Create the database
 
-```
+```bash
 $ python manage.py recreate_db
 ```
 
 ##### Other setup (e.g. creating roles in database)
 
-```
+```bash
 $ python manage.py setup_dev
 ```
 
@@ -123,13 +123,13 @@ Note that this will create an admin user with email and password specified by th
 
 ##### [Optional] Add fake data to the database
 
-```
+```bash
 $ python manage.py add_fake_data
 ```
 
 ## Running the app
 
-```
+```bash
 $ source env/bin/activate
 $ honcho start -f Local
 ```
