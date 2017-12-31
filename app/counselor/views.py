@@ -525,7 +525,10 @@ def upload_scattergram():
 
             arguments = line_info[6 * i + 6].split()
             if len(arguments) == 1:
-                insert = None
+                if(i == int(len(line_info) / 6) - 1):
+                    insert = arguments[0].strip()
+                else:
+                    insert = None
             else:
                 insert = arguments[0].strip()
 
@@ -540,5 +543,5 @@ def upload_scattergram():
 
             db.session.add(scattergram_data)
         db.session.commit()
-        return "File uploaded successfully"
+        return contents
     return render_template('counselor/upload_scattergram.html')
