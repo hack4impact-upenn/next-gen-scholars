@@ -49,6 +49,11 @@ def view_user_profile():
         abort(404)
 
 
+@student.route('/profile_from_id/<int:student_profile_id>')
+def get_profile_from_id(student_profile_id):
+    return redirect(get_redirect_url(student_profile_id))
+
+
 @student.route('/calendar')
 @login_required
 def calendar():
@@ -212,9 +217,10 @@ def edit_profile(student_profile_id):
             db.session.commit()
             url = get_redirect_url(student_profile.id)
             return redirect(url)
-        return render_template('student/update_profile.html', form=form)
+        return render_template('student/update_profile.html', form=form, student_profile_id=student_profile.id)
     flash('Profile could not be updated.', 'error')
-    return redirect(url_for('student.view_user_profile'))
+    url = get_redirect_url(student_profile.id)
+    return redirect(url)
 
 
 # test score methods
@@ -237,7 +243,7 @@ def add_test_score(student_profile_id):
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add Test Score")
+        'student/add_academic_info.html', form=form, header="Add Test Score", student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -276,10 +282,11 @@ def edit_test_score(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Test Score")
+            header="Edit Test Score",
+            student_profile_id=test_score.student_profile_id)
     flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
-
+    url = get_redirect_url(test_score.student_profile_id)
+    return redirect(url)
 
 
 def get_redirect_url(student_profile_id):
@@ -312,7 +319,8 @@ def add_recommendation_letter(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Recommendation Letter")
+        header="Add Recommendation Letter",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -335,9 +343,11 @@ def edit_recommendation_letter(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Recommendation Letter")
+            header="Edit Recommendation Letter", 
+            student_profile_id=letter.student_profile_id)
     flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
+    url = get_redirect_url(letter.student_profile_id)
+    return redirect(url)
 
 
 @student.route(
@@ -371,7 +381,7 @@ def add_college(student_profile_id):
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add College")
+        'student/add_academic_info.html', form=form, header="Add College", student_profile_id=student_profile_id)
 
 
 @student.route('/colleges')
@@ -394,27 +404,6 @@ def delete_college(item_id):
     return jsonify({"success": "False"})
 
 
-##TODO: i dont think we need this funtion
-@student.route('/profile/college/edit/<int:item_id>', methods=['GET', 'POST'])
-@login_required
-def edit_college(item_id):
-    college = College.query.filter_by(id=item_id).first()
-    if college:
-        form = EditCollegeForm(college_name=college.name)
-        if form.validate_on_submit():
-            college.name = form.college_name.data
-            db.session.add(college)
-            db.session.commit()
-            url = get_redirect_url(student_profile_id)
-            return redirect(url)
-        return render_template(
-            'student/edit_academic_info.html',
-            form=form,
-            header="Edit College")
-    flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
-
-
 # common app essay methods
 
 
@@ -433,7 +422,8 @@ def add_common_app_essay(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Supplemental Essay")
+        header="Add Supplemental Essay",
+        student_profile_id=student_profile_id)
 
 
 @student.route('/profile/common_app_essay/edit/<int:student_profile_id>', methods=['GET', 'POST'])
@@ -452,13 +442,14 @@ def edit_common_app_essay(student_profile_id):
     return render_template(
         'student/edit_academic_info.html',
         form=form,
-        header="Edit Common App Essay")
+        header="Edit Common App Essay",
+        student_profile_id=student_profile.id)
 
 
-@student.route('/profile/common_app_essay/delete', methods=['GET', 'POST'])
+@student.route('/profile/common_app_essay/delete/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 @csrf.exempt
-def delete_common_app_essay():
+def delete_common_app_essay(student_profile_id):
     student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
     student_profile.common_app_essay = ''
     db.session.add(student_profile)
@@ -489,7 +480,8 @@ def add_supplemental_essay(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Supplemental Essay")
+        header="Add Supplemental Essay",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -511,9 +503,11 @@ def edit_supplemental_essay(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Supplemental Essay")
+            header="Edit Supplemental Essay",
+            student_profile_id=essay.student_profile_id)
     flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
+    url = get_redirect_url(essay.student_profile_id)
+    return redirect(url)
 
 
 @student.route(
@@ -554,7 +548,7 @@ def add_major(student_profile_id):
             return redirect(url)
 
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add Major")
+        'student/add_academic_info.html', form=form, header="Add Major", student_profile_id=student_profile_id)
 
 
 @student.route('/profile/major/delete/<int:item_id>', methods=['POST'])

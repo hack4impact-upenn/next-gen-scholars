@@ -210,7 +210,7 @@
                                 <strong>{{ user.student_profile.common_app_essay_status }}</strong></span>
                             </div>
                         </a>
-                        <div class="ui bottom attached blue basic button common-essay-button">
+                        <div class="ui bottom attached blue basic button common-essay-button" data-id="{{ user.student_profile.id }}">
                             <i class="edit icon"></i>Edit
                         </div>
                     </div>
@@ -490,10 +490,10 @@ $(document).ready(function () {
     // send ajax request when user clicks in delete mode, redirect to edit page otherwise
     $('.common-essay-button').click(function() {
         if (deletingEssays) {
-            var url = '/student/profile/common_app_essay/delete';
+            var url = '/student/profile/common_app_essay/delete/' + $(this).data('id');
             location.href = url;
         } else {
-            var url = '/student/profile/common_app_essay/edit';
+            var url = '/student/profile/common_app_essay/edit/' + $(this).data('id');
             location.href = url;
         }
     });
