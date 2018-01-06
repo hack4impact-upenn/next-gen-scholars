@@ -15,6 +15,7 @@ class ChecklistItem(db.Model):
     is_checked = db.Column(db.Boolean, index=True, default=False)
     is_deletable = db.Column(db.Boolean, index=True, default=False)
     creator_role_id = db.Column(db.Integer, index=True, default=1)
+    is_default_item = db.Column(db.Boolean, index=True, default=False)
     cal_event_id = db.Column(db.Text, index=True)
     event_created = db.Column(db.Boolean, index=True)
 

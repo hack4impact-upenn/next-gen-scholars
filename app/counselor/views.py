@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 import pytz
 from flask import abort, flash, redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
@@ -266,19 +267,32 @@ def update_editor_contents():
     return 'OK', 200
 
 
-@counselor.route('/checklist', methods=['GET', 'POST'])
+# order checklist items, soonest deadline is first
+# checklists with no deadline appear at the end
+def compare_checklist_items(item):
+    if item.deadline:
+        return item.deadline
+    else:
+        return date.max
+
+
+@counselor.route('/default_checklist', methods=['GET', 'POST'])
 @login_required
 @counselor_required
-def checklist():
+def default_checklist():
     # display list of default checklist items and option to add a new one
-    default_items = ChecklistItem.query.filter_by(creator_role_id=3)
+    default_items = ChecklistItem.query.filter_by(is_default_item=True)
+    default_items = [item for item in default_items]
+    default_items.sort(key=compare_checklist_items)
     form = AddChecklistItemForm()
     if form.validate_on_submit():
         # create new checklist item from form data
         new_item = ChecklistItem(
             text=form.item_text.data,
             assignee_id=current_user.id,
-            creator_role_id=3)
+            creator_role_id=3,
+            is_default_item=True,
+            deadline=form.date.data)
         db.session.add(new_item)
 
         users = User.query.filter_by(role_id=1)
@@ -287,12 +301,13 @@ def checklist():
             checklist_item = ChecklistItem(
                 assignee_id=user.student_profile_id,
                 text=form.item_text.data,
-                is_deletable=False)
+                is_deletable=False,
+                deadline=form.date.data)
             db.session.add(checklist_item)
         db.session.commit()
-        return redirect(url_for('counselor.checklist'))
+        return redirect(url_for('counselor.default_checklist'))
     return render_template(
-        'counselor/checklist.html', form=form, checklist=default_items)
+        'counselor/default_checklist.html', form=form, checklist=default_items)
 
 
 @counselor.route('/add_test', methods=['GET', 'POST'])
