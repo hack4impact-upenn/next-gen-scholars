@@ -20,6 +20,7 @@ import flask
 import requests
 import os
 import datetime
+from datetime import date
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  #TODO: remove before production?
 import plotly.plotly as py
@@ -583,6 +584,14 @@ def dashboard():
         return redirect(url_for('main.index'))
 
 
+# order checklist items so soonest deadline is first
+# checklists with no deadline appear at the end
+def compare_checklist_items(item):
+    if item.deadline:
+        return item.deadline
+    else:
+        return date.max
+
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def checklist(student_profile_id):
@@ -591,9 +600,11 @@ def checklist(student_profile_id):
         checklist_items = ChecklistItem.query.filter_by(
             assignee_id=student_profile_id)
         completed_items = [item for item in checklist_items if item.is_checked]
+        completed_items.sort(key=compare_checklist_items)
         checklist_items = [
             item for item in checklist_items if not item.is_checked
         ]
+        checklist_items.sort(key=compare_checklist_items)
         #### form to add checklist item ###
         form = AddChecklistItemForm()
         if form.validate_on_submit():

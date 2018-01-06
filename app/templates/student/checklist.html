@@ -4,17 +4,20 @@
 {% macro render_checklist(checklist) %}
     <table class="ui table">
         <thead>
-            <tr><th colspan="2">
+            <tr><th colspan="3">
               Upcoming
             </th>
         </tr></thead>
     	{% for item in checklist %}
             <tr>
-            	<td>{{ '%s' % (item.text) }}</td>
-            	<td class = "right aligned">
-                    <a class="ui small basic icon button" href="{{ url_for('student.complete_checklist_item', item_id=item.id) }}">
-                        <i class="checkmark box icon"></i>
-                    </a>
+                <td class="two wide">
+                    {% if item.deadline %}
+                        by {{  '%s' % (item.deadline)  }}
+                    {% endif %}
+                </td>
+                <td class="five wide">{{ '%s' % (item.text) }}
+                </td>
+            	<td class = "right aligned three wide">
                     {% if item.is_deletable %}
                         <a class="ui small basic icon button" href="{{ url_for('student.update_checklist_item', item_id=item.id) }}">
                             <i class="write icon"></i>
@@ -23,6 +26,9 @@
                             <i class="remove icon"></i>
                         </a>
                     {% endif %}
+                    <a class="ui small basic icon button" href="{{ url_for('student.complete_checklist_item', item_id=item.id) }}">
+                        <i class="checkmark box icon"></i>
+                    </a>
             	</td>
             </tr>
         {% endfor %}
