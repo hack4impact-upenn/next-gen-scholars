@@ -135,7 +135,7 @@
             <div class="ui bulleted list" id="majors-list">
                 {% for major in user.student_profile.majors|sort(attribute='name') %}
                 <div class="item major-item" style="font-size:1.1em">
-                    <div style="display:none" data-id="{{ major.id }}" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
+                    <div style="display:none" data-major="{{ major.id }}" data-student="{{ user.student_profile_id }}" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
                     {{ major.name }}
                 </div>
                 {% endfor %}
@@ -160,7 +160,7 @@
                             <h4 class="ui header">{{ college.name }}</h4>
                         </div>
                     </div>
-                    <div class="ui bottom attached blue basic button college-button" data-id="{{ college.id }}">
+                    <div class="ui bottom attached blue basic button college-button" data-college="{{ college.id }}" data-student="{{ user.student_profile_id }}">
                         <i class="external icon"></i>View Profile
                     </div>
                 </div>
@@ -338,7 +338,7 @@ $(document).ready(function () {
     // when user deletes a major, send ajax request
     $('.major-delete-button').click(function() {
         if (deletingMajors) {
-            var url = '/student/profile/major/delete/' + $(this).data('id');
+            var url = '/student/profile/major/delete/' + $(this).data('major') + $(this).data('student');
             var that = this;
             console.log(url);
             $.ajax({
@@ -384,7 +384,7 @@ $(document).ready(function () {
     // send ajax request when user deletes a college
     $('.college-button').click(function() {
         if (deletingColleges) {
-            var url = '/student/profile/college/delete/' + $(this).data('id');
+            var url = '/student/profile/college/delete/' + $(this).data('college') + '/' + $(this).data('student');
             var that = this;
             $.ajax({
                 url: url,
@@ -402,7 +402,7 @@ $(document).ready(function () {
                 }
             })
         } else {
-            location.href = '/student/college_profile/' + $(this).data('id');
+            location.href = '/student/college_profile/' + $(this).data('college');
         }
     });
 
