@@ -517,31 +517,19 @@ def upload_scattergram():
     if request.method == 'POST':
         f = request.files['file']
         contents = f.read()
-
-        data = ","
-        line_info = contents.split(data.encode("utf-8"))
-
-        for i in range(1, int(len(line_info) / 6)):
-
-            arguments = line_info[6 * i + 6].split()
-            if len(arguments) == 1:
-                if(i == int(len(line_info) / 6) - 1):
-                    insert = arguments[0].strip()
-                else:
-                    insert = None
-            else:
-                insert = arguments[0].strip()
-
-            scattergram_data = ScattergramData(
-                name=line_info[6 * i + 1].strip(),
-                status=line_info[6 * i + 2].strip(),
-                GPA=line_info[6 * i + 3].strip(),
-                SAT2400=line_info[6 * i + 4].strip(),
-                SAT1600=line_info[6 * i + 5].strip(),
-                ACT=insert
+        lines = contents.split('\r'.encode('utf-8'))
+        for line in lines[1:]:
+            line = line.split(','.encode('utf-8'))
+            point = ScattergramData(
+                name=line[0].strip(),
+                college=line[1].strip(),
+                status=line[2].strip(),
+                GPA=line[3].strip(),
+                SAT2400=line[4].strip(),
+                SAT1600=line[5].strip(),
+                ACT=line[6].strip()
             )
-
-            db.session.add(scattergram_data)
+            db.session.add(point)
         db.session.commit()
         return contents
     return render_template('counselor/upload_scattergram.html')
