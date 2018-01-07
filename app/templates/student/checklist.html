@@ -8,6 +8,7 @@
               Upcoming
             </th>
         </tr></thead>
+        {% if checklist|length > 0 %}
     	{% for item in checklist %}
             <tr>
                 <td class = "three wide">
@@ -32,17 +33,24 @@
                 </td>
             </tr>
         {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="4">
+              No tasks.
+            </td>
+          </tr>
+          {% endif %}
     </table>
 {% endmacro %}
 
 {% macro completed_list(completed) %}
-    {% if completed|length > 0 %}
     <table class="ui table">
         <thead>
             <tr><th colspan="2">
               Completed
             </th>
         </tr></thead>
+        {% if completed|length > 0 %}
         {% for item in completed %}
             <tr>
                 <td class = "three wide">
@@ -59,8 +67,15 @@
                 <td>{{ '%s' % (item.text) }}</td>
             </tr>
         {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="4">
+              No completed tasks.
+            </td>
+          </tr>
+        {% endif %}
     </table>
-    {% endif %}
+
 {% endmacro %}
 
 {% block content %}

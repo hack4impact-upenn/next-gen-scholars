@@ -22,7 +22,7 @@ import os
 import datetime
 from datetime import date
 os.environ[
-    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  #TODO: remove before production?
+    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 import plotly.plotly as py
 from plotly.graph_objs import *
 
@@ -69,7 +69,7 @@ def calendar():
 def calendar_data():
     if not current_user.student_profile.cal_token:
         return jsonify(data=[])
-    #Load credentials from the session.
+    # Load credentials from the session.
     credentials_json = {
         'token': current_user.student_profile.cal_token,
         'refresh_token': current_user.student_profile.cal_refresh_token,
@@ -171,12 +171,12 @@ def oauth2callback():
 
 
 def add_pending_events():
-    #if a student had checklist items created before they authorized gcal
+    # if a student had checklist items created before they authorized gcal
     checklist_items = ChecklistItem.query.filter_by(
         assignee_id=current_user.student_profile_id)
     for item in checklist_items:
         if not item.event_created:
-            #add these items to their calendar
+            # add these items to their calendar
             result = add_to_cal(current_user.student_profile_id, item.text,
                                 item.deadline)
             item.cal_event_id = result['event_id']
@@ -304,7 +304,6 @@ def edit_test_score(item_id):
             header="Edit Test Score",
             student_profile_id=test_score.student_profile_id)
     abort(404)
-
 
 def get_redirect_url(student_profile_id):
     if (current_user.is_student()
@@ -473,8 +472,8 @@ def add_common_app_essay(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Supplemental Essay",
-        student_profile_id=student_profile_id)
+        student_profile_id=student_profile_id,
+        header="Add Common App Essay")
 
 
 @student.route(
@@ -487,7 +486,8 @@ def edit_common_app_essay(student_profile_id):
         abort(404)
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
-    form = EditCommonAppEssayForm(link=student_profile.common_app_essay)
+    form = EditCommonAppEssayForm(
+        link=student_profile.common_app_essay)
     if form.validate_on_submit():
         student_profile.common_app_essay = form.link.data
         student_profile.common_app_essay_status = form.status.data
@@ -504,7 +504,7 @@ def edit_common_app_essay(student_profile_id):
 
 @student.route(
     '/profile/common_app_essay/delete/<int:student_profile_id>',
-    methods=['GET', 'POST'])
+    methods=['POST'])
 @login_required
 @csrf.exempt
 def delete_common_app_essay(student_profile_id):
@@ -515,6 +515,7 @@ def delete_common_app_essay(student_profile_id):
         id=student_profile_id).first()
     if student_profile:
         student_profile.common_app_essay = ''
+        student_profile.common_app_essay_status = 'Incomplete'
         db.session.add(student_profile)
         db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -524,10 +525,7 @@ def delete_common_app_essay(student_profile_id):
 
 # supplemental essay methods
 
-
-@student.route(
-    '/profile/add_supplemental_essay/<int:student_profile_id>',
-    methods=['GET', 'POST'])
+@student.route('/profile/add_supplemental_essay/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_supplemental_essay(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -703,7 +701,7 @@ def checklist(student_profile_id):
                 deadline=form.date.data,
                 cal_event_id=result['event_id'],
                 event_created=result['event_created'])
-            ### if counselor is adding checklist item, send a notification
+            # if counselor is adding checklist item, send a notification
             if current_user.role_id != 1:
                 notif_text = '{} {} added "{}" to your checklist'.format(
                     current_user.first_name, current_user.last_name,

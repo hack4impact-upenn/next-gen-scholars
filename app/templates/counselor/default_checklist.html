@@ -8,6 +8,7 @@
               Default Checklist Items
             </th>
         </tr></thead>
+        {% if checklist|length > 0 %}
         {% for item in checklist %}
             <tr>
                 <td>{{ '%s' % (item.text) }}</td>
@@ -18,6 +19,13 @@
                 </td>
             </tr>
         {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="4">
+              No default items.
+            </td>
+          </tr>
+        {% endif %}
     </table>
 {% endmacro %}
 
