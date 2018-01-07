@@ -4,7 +4,8 @@ from wtforms import ValidationError
 from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
-                            HiddenField, BooleanField, TextAreaField, SelectField)
+                            HiddenField, BooleanField, TextAreaField,
+                            SelectField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
@@ -69,13 +70,13 @@ class NewUserForm(InviteUserForm):
 
 
 class NewSMSAlertForm(Form):
-    title = StringField('Alert title', validators=[
-                        InputRequired(), Length(1, 64)])
+    title = StringField(
+        'Alert title', validators=[InputRequired(),
+                                   Length(1, 64)])
     content = TextAreaField('Content', validators=[InputRequired()])
-    date = DateField(
-        'Date', format='%Y-%m-%d', validators=[InputRequired()])
-    time_choices = itertools.product([12] + [x for x in range(1, 11)], [
-                                     '00', '15', '30', '45'], repeat=1)
+    date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
+    time_choices = itertools.product(
+        [12] + [x for x in range(1, 11)], ['00', '15', '30', '45'], repeat=1)
     time = SelectField(
         'Time',
         choices=[('{}:{}'.format(t[0], t[1]), '{}:{}'.format(t[0], t[1]))
@@ -84,19 +85,18 @@ class NewSMSAlertForm(Form):
     am_pm = SelectField(
         'AM/PM',
         choices=[('AM', 'AM'), ('PM', 'PM')],
-        validators=[InputRequired()]
-    )
+        validators=[InputRequired()])
     submit = SubmitField('Add SMS Alert')
 
 
 class EditSMSAlertForm(Form):
-    title = StringField('Alert title', validators=[
-                        InputRequired(), Length(1, 64)])
+    title = StringField(
+        'Alert title', validators=[InputRequired(),
+                                   Length(1, 64)])
     content = TextAreaField('Content', validators=[InputRequired()])
-    date = DateField(
-        'Date', format='%Y-%m-%d', validators=[InputRequired()])
-    time_choices = itertools.product([12] + [x for x in range(1, 11)], [
-                                     '00', '15', '30', '45'], repeat=1)
+    date = DateField('Date', format='%Y-%m-%d', validators=[InputRequired()])
+    time_choices = itertools.product(
+        [12] + [x for x in range(1, 11)], ['00', '15', '30', '45'], repeat=1)
     time = SelectField(
         'Time',
         choices=[('{}:{}'.format(t[0], t[1]), '{}:{}'.format(t[0], t[1]))
@@ -105,8 +105,7 @@ class EditSMSAlertForm(Form):
     am_pm = SelectField(
         'AM/PM',
         choices=[('AM', 'AM'), ('PM', 'PM')],
-        validators=[InputRequired()]
-    )
+        validators=[InputRequired()])
     submit = SubmitField('Done Editing')
 
 
@@ -114,8 +113,7 @@ class AddChecklistItemForm(Form):
     item_text = StringField(
         'Checklist Item', validators=[InputRequired(),
                                       Length(1, 64)])
-    date = DateField(
-        'Deadline', format='%Y-%m-%d', validators=[Optional()])
+    date = DateField('Deadline', format='%Y-%m-%d', validators=[Optional()])
     assignee_ids = HiddenField('Assignee Ids')
     submit = SubmitField('Add checklist item')
 

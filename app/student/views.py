@@ -185,14 +185,16 @@ def add_pending_events():
     db.session.commit()
 
 
-@student.route('/profile/edit/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/edit/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def edit_profile(student_profile_id):
     # only allows the student or counselors/admins to edit a student's profile
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         abort(404)
     # Allow user to update basic profile information.
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if student_profile:
         form = EditStudentProfile(
             grade=student_profile.grade,
@@ -220,14 +222,19 @@ def edit_profile(student_profile_id):
             db.session.commit()
             url = get_redirect_url(student_profile.id)
             return redirect(url)
-        return render_template('student/update_profile.html', form=form, student_profile_id=student_profile.id)
+        return render_template(
+            'student/update_profile.html',
+            form=form,
+            student_profile_id=student_profile.id)
     abort(404)
 
 
 # test score methods
 
 
-@student.route('/profile/add_test_score/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_test_score/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_test_score(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -247,7 +254,10 @@ def add_test_score(student_profile_id):
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add Test Score", student_profile_id=student_profile_id)
+        'student/add_academic_info.html',
+        form=form,
+        header="Add Test Score",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -297,19 +307,25 @@ def edit_test_score(item_id):
 
 
 def get_redirect_url(student_profile_id):
-    if (current_user.is_student() and current_user.student_profile_id == student_profile_id):
+    if (current_user.is_student()
+            and current_user.student_profile_id == student_profile_id):
         return url_for('student.view_user_profile')
     else:
         if (current_user.is_counselor() or current_user.is_admin()):
-            student = User.query.filter_by(student_profile_id=student_profile_id).first()
+            student = User.query.filter_by(
+                student_profile_id=student_profile_id).first()
             if student is not None:
-                return url_for('counselor.view_user_profile', user_id=student.id)
+                return url_for(
+                    'counselor.view_user_profile', user_id=student.id)
     return abort(404)
+
 
 # recommendation letter methods
 
 
-@student.route('/profile/add_recommendation_letter/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_recommendation_letter/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_recommendation_letter(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -356,7 +372,7 @@ def edit_recommendation_letter(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Recommendation Letter", 
+            header="Edit Recommendation Letter",
             student_profile_id=letter.student_profile_id)
     abort(404)
 
@@ -380,7 +396,8 @@ def delete_recommendation_letter(item_id):
 # college methods
 
 
-@student.route('/profile/add_college/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_college/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_college(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -388,7 +405,8 @@ def add_college(student_profile_id):
         abort(404)
     # Add a college student is interested in.
     form = AddCollegeForm()
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if form.validate_on_submit():
         if form.name.data not in student_profile.colleges:
             student_profile.colleges.append(form.name.data)
@@ -397,7 +415,10 @@ def add_college(student_profile_id):
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add College", student_profile_id=student_profile_id)
+        'student/add_academic_info.html',
+        form=form,
+        header="Add College",
+        student_profile_id=student_profile_id)
 
 
 @student.route('/colleges')
@@ -408,14 +429,17 @@ def colleges():
     return render_template('student/colleges.html', colleges=colleges)
 
 
-@student.route('/profile/college/delete/<int:item_id>/<int:student_profile_id>', methods=['POST'])
+@student.route(
+    '/profile/college/delete/<int:item_id>/<int:student_profile_id>',
+    methods=['POST'])
 @login_required
 @csrf.exempt
 def delete_college(item_id, student_profile_id):
     # only allows the student or counselors/admins to perform action
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         return jsonify({"success": "False"})
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     college = College.query.filter_by(id=item_id).first()
     if college and student_profile:
         student_profile.colleges.remove(college)
@@ -428,7 +452,9 @@ def delete_college(item_id, student_profile_id):
 # common app essay methods
 
 
-@student.route('/profile/add_common_app_essay/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_common_app_essay/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_common_app_essay(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -436,7 +462,8 @@ def add_common_app_essay(student_profile_id):
         abort(404)
     form = AddCommonAppEssayForm()
     if form.validate_on_submit():
-        student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+        student_profile = StudentProfile.query.filter_by(
+            id=student_profile_id).first()
         student_profile.common_app_essay = form.link.data
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
@@ -450,15 +477,17 @@ def add_common_app_essay(student_profile_id):
         student_profile_id=student_profile_id)
 
 
-@student.route('/profile/common_app_essay/edit/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/common_app_essay/edit/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def edit_common_app_essay(student_profile_id):
     # only allows the student or counselors/admins to access page
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         abort(404)
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
-    form = EditCommonAppEssayForm(
-        link=student_profile.common_app_essay)
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
+    form = EditCommonAppEssayForm(link=student_profile.common_app_essay)
     if form.validate_on_submit():
         student_profile.common_app_essay = form.link.data
         student_profile.common_app_essay_status = form.status.data
@@ -473,14 +502,17 @@ def edit_common_app_essay(student_profile_id):
         student_profile_id=student_profile.id)
 
 
-@student.route('/profile/common_app_essay/delete/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/common_app_essay/delete/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 @csrf.exempt
 def delete_common_app_essay(student_profile_id):
     # only allows the student or counselors/admins to perform action
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         abort(404)
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if student_profile:
         student_profile.common_app_essay = ''
         db.session.add(student_profile)
@@ -493,7 +525,9 @@ def delete_common_app_essay(student_profile_id):
 # supplemental essay methods
 
 
-@student.route('/profile/add_supplemental_essay/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_supplemental_essay/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_supplemental_essay(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -566,7 +600,8 @@ def delete_supplemental_essay(item_id):
 # major methods
 
 
-@student.route('/profile/add_major/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_major/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_major(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -574,7 +609,8 @@ def add_major(student_profile_id):
         abort(404)
     # Add a major student is interested in.
     form = AddMajorForm()
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if form.validate_on_submit():
         if form.major.data not in student_profile.majors:
             # Only add major if not already in their list.
@@ -590,17 +626,23 @@ def add_major(student_profile_id):
             return redirect(url)
 
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add Major", student_profile_id=student_profile_id)
+        'student/add_academic_info.html',
+        form=form,
+        header="Add Major",
+        student_profile_id=student_profile_id)
 
 
-@student.route('/profile/major/delete/<int:item_id>/<int:student_profile_id>', methods=['POST'])
+@student.route(
+    '/profile/major/delete/<int:item_id>/<int:student_profile_id>',
+    methods=['POST'])
 @login_required
 @csrf.exempt
 def delete_major(item_id, student_profile_id):
     # only allows the student or counselors/admins to perform action
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         return jsonify({"success": "False"})
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     major = Major.query.filter_by(id=item_id).first()
     if major:
         student_profile.majors.remove(major)
@@ -611,6 +653,7 @@ def delete_major(item_id, student_profile_id):
 
 
 # checklist methods
+
 
 @student.route('/')
 @login_required

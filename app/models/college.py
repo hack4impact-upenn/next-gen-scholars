@@ -49,20 +49,19 @@ class College(db.Model):
             datetime(2017, 1, 14)
         ]
         descriptions = [
-            'Private research university',
-            'Ivy League university',
-            'Liberal arts college',
-            'Public research university',
+            'Private research university', 'Ivy League university',
+            'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
 
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
-                college = College(name=c, description=random.choice(descriptions),
-                                  regular_deadline=random.choice(
-                                      regular_deadlines),
-                                  early_deadline=random.choice(early_deadlines))
+                college = College(
+                    name=c,
+                    description=random.choice(descriptions),
+                    regular_deadline=random.choice(regular_deadlines),
+                    early_deadline=random.choice(early_deadlines))
             db.session.add(college)
         db.session.commit()
 
