@@ -338,7 +338,7 @@ $(document).ready(function () {
     // when user deletes a major, send ajax request
     $('.major-delete-button').click(function() {
         if (deletingMajors) {
-            var url = '/student/profile/major/delete/' + $(this).data('major') + $(this).data('student');
+            var url = '/student/profile/major/delete/' + $(this).data('major') + '/' + $(this).data('student');
             var that = this;
             console.log(url);
             $.ajax({

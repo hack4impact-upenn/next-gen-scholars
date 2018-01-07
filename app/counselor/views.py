@@ -109,7 +109,6 @@ def view_user_profile(user_id):
     if student_profile is not None:
         test_scores = student_profile.test_scores
         for t in test_scores:
-            print("here")
             if t.name == 'SAT':
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':

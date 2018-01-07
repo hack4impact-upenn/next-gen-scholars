@@ -221,9 +221,7 @@ def edit_profile(student_profile_id):
             url = get_redirect_url(student_profile.id)
             return redirect(url)
         return render_template('student/update_profile.html', form=form, student_profile_id=student_profile.id)
-    flash('Profile could not be updated.', 'error')
-    url = get_redirect_url(student_profile.id)
-    return redirect(url)
+    abort(404)
 
 
 # test score methods
@@ -260,7 +258,7 @@ def delete_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
         # only allows the student or counselors/admins to perform action
-        if test_score.student_profile_id == current_user.student_profile_id or current_user.role_id == 1:
+        if test_score.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
             db.session.delete(test_score)
             db.session.commit()
             return jsonify({"success": "True"})
@@ -295,9 +293,7 @@ def edit_test_score(item_id):
             form=form,
             header="Edit Test Score",
             student_profile_id=test_score.student_profile_id)
-    flash('Item could not be updated', 'error')
-    url = get_redirect_url(test_score.student_profile_id)
-    return redirect(url)
+    abort(404)
 
 
 def get_redirect_url(student_profile_id):
@@ -362,9 +358,7 @@ def edit_recommendation_letter(item_id):
             form=form,
             header="Edit Recommendation Letter", 
             student_profile_id=letter.student_profile_id)
-    flash('Item could not be updated', 'error')
-    url = get_redirect_url(letter.student_profile_id)
-    return redirect(url)
+    abort(404)
 
 
 @student.route(
@@ -493,9 +487,7 @@ def delete_common_app_essay(student_profile_id):
         db.session.commit()
         url = get_redirect_url(student_profile_id)
         return redirect(url)
-    flash('Item could not be deleted', 'error')
-    url = get_redirect_url(student_profile_id)
-    return redirect(url)
+    abort(404)
 
 
 # supplemental essay methods
@@ -551,9 +543,7 @@ def edit_supplemental_essay(item_id):
             form=form,
             header="Edit Supplemental Essay",
             student_profile_id=essay.student_profile_id)
-    flash('Item could not be updated', 'error')
-    url = get_redirect_url(essay.student_profile_id)
-    return redirect(url)
+    abort(404)
 
 
 @student.route(
@@ -614,7 +604,7 @@ def delete_major(item_id, student_profile_id):
     major = Major.query.filter_by(id=item_id).first()
     if major:
         student_profile.majors.remove(major)
-        db.session.delete(student_profile)
+        db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})
     return jsonify({"success": "False"})
@@ -722,8 +712,7 @@ def checklist(student_profile_id):
             notifications=current_notifs,
             completed=completed_items,
             student_profile_id=student_profile_id)
-    flash('You do not have access to this page', 'error')
-    return redirect(url_for('main.index'))
+    abort(404)
 
 
 def add_to_cal(student_profile_id, text, deadline):
@@ -782,7 +771,7 @@ def delete_checklist_item(item_id):
         # only allows the student or counselors/admins to perform action
         if checklist_item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
             abort(404)
-        if checklist_item.deadline is not None:
+        if checklist_item.deadline is not None and checklist_item.event_created:
             delete_event(checklist_item.cal_event_id)
         db.session.delete(checklist_item)
         db.session.commit()
@@ -915,7 +904,7 @@ def update_checklist_item(item_id):
     item = ChecklistItem.query.filter_by(id=item_id).first()
     if item:
         # only allows the student or counselors/admins to access page
-        if checklist_item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
+        if item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
             abort(404)
         form = EditChecklistItemForm(item_text=item.text, date=item.deadline)
         if form.validate_on_submit():

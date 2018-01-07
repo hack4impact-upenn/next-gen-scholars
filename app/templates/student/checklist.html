@@ -10,14 +10,10 @@
         </tr></thead>
     	{% for item in checklist %}
             <tr>
-                <td class="two wide">
-                    {% if item.deadline %}
-                        by {{  '%s' % (item.deadline)  }}
-                    {% endif %}
-                </td>
-                <td class="five wide">{{ '%s' % (item.text) }}
-                </td>
-            	<td class = "right aligned three wide">
+                <td class = "three wide">
+                    <a class="ui small basic icon button" href="{{ url_for('student.complete_checklist_item', item_id=item.id) }}">
+                        <i class="checkmark box icon"></i>
+                    </a>
                     {% if item.is_deletable %}
                         <a class="ui small basic icon button" href="{{ url_for('student.update_checklist_item', item_id=item.id) }}">
                             <i class="write icon"></i>
@@ -26,10 +22,14 @@
                             <i class="remove icon"></i>
                         </a>
                     {% endif %}
-                    <a class="ui small basic icon button" href="{{ url_for('student.complete_checklist_item', item_id=item.id) }}">
-                        <i class="checkmark box icon"></i>
-                    </a>
-            	</td>
+                </td>
+                <td> {{ '%s' % (item.text) }}
+                </td>
+            	<td class="two wide">
+                    {% if item.deadline %}
+                        <b> {{  '%s' % (item.deadline)  }} </b>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </table>
@@ -45,17 +45,18 @@
         </tr></thead>
         {% for item in completed %}
             <tr>
-                <td>{{ '%s' % (item.text) }}</td>
-                <td class = "right aligned">
+                <td class = "three wide">
+                    <a class="ui small basic icon button" href="{{ url_for('student.undo_checklist_item', item_id=item.id) }}">
+                        <i class="undo icon"></i>
+                    </a>
                     {% if item.is_deletable %}
                         <a class="ui small basic icon button" href="{{ url_for('student.delete_checklist_item', item_id=item.id) }}">
                             <i class="remove icon"></i>
                         </a>
                     {% endif %}
-                    <a class="ui small basic icon button" href="{{ url_for('student.undo_checklist_item', item_id=item.id) }}">
-                        <i class="undo icon"></i>
-                    </a>
+                    
                 </td>
+                <td>{{ '%s' % (item.text) }}</td>
             </tr>
         {% endfor %}
     </table>
