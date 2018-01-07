@@ -521,13 +521,13 @@ def upload_scattergram():
         for line in lines[1:]:
             line = line.split(','.encode('utf-8'))
             point = ScattergramData(
-                name=line[0].strip(),
-                college=line[1].strip(),
-                status=line[2].strip(),
-                GPA=line[3].strip(),
-                SAT2400=line[4].strip(),
-                SAT1600=line[5].strip(),
-                ACT=line[6].strip()
+                name=str(line[0], 'utf-8').strip(),
+                college=str(line[1], 'utf-8').strip(),
+                status=str(line[2], 'utf-8').strip(),
+                GPA=str(line[3], 'utf-8').strip(),
+                SAT2400=str(line[4], 'utf-8').strip(),
+                SAT1600=str(line[5], 'utf-8').strip(),
+                ACT=str(line[6], 'utf-8').strip()
             )
             db.session.add(point)
         db.session.commit()

@@ -15,5 +15,5 @@ class ScattergramData(db.Model):
     ACT = db.Column(db.Integer, index=True)
 
     def __repr__(self):
-        return '<ScattergramData {}, {}, {} {}, {}, {}>'.format(self.name, self.status, self.GPA,
+        return '<ScattergramData {}, {}, {}, {}, {}, {}>'.format(self.name, self.status, self.GPA,
                                                                 self.SAT2400, self.SAT1600, self.ACT)

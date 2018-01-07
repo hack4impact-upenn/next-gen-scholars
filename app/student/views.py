@@ -21,7 +21,7 @@ import requests
 import os
 import datetime
 os.environ[
-    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  #TODO: remove before production?
+    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 import plotly.plotly as py
 from plotly.graph_objs import *
 
@@ -63,7 +63,7 @@ def calendar():
 def calendar_data():
     if not current_user.student_profile.cal_token:
         return jsonify(data=[])
-    #Load credentials from the session.
+    # Load credentials from the session.
     credentials_json = {
         'token': current_user.student_profile.cal_token,
         'refresh_token': current_user.student_profile.cal_refresh_token,
@@ -165,12 +165,12 @@ def oauth2callback():
 
 
 def add_pending_events():
-    #if a student had checklist items created before they authorized gcal
+    # if a student had checklist items created before they authorized gcal
     checklist_items = ChecklistItem.query.filter_by(
         assignee_id=current_user.student_profile_id)
     for item in checklist_items:
         if not item.event_created:
-            #add these items to their calendar
+            # add these items to their calendar
             result = add_to_cal(current_user.student_profile_id, item.text,
                                 item.deadline)
             item.cal_event_id = result['event_id']
@@ -183,7 +183,8 @@ def add_pending_events():
 @login_required
 def edit_profile(student_profile_id):
     # Allow user to update basic profile information.
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if student_profile:
         form = EditStudentProfile(
             grade=student_profile.grade,
@@ -280,13 +281,13 @@ def edit_test_score(item_id):
     return redirect(url_for('student.view_user_profile'))
 
 
-
 def get_redirect_url(student_profile_id):
     if (current_user.is_student() and current_user.student_profile_id == student_profile_id):
         return url_for('student.view_user_profile')
     else:
         if (current_user.is_counselor() or current_user.is_admin()):
-            student = User.query.filter_by(student_profile_id=student_profile_id).first()
+            student = User.query.filter_by(
+                student_profile_id=student_profile_id).first()
             if student is not None:
                 return url_for('counselor.view_user_profile', user_id=student.id)
     return url_for('main.index')
@@ -362,7 +363,8 @@ def delete_recommendation_letter(item_id):
 def add_college(student_profile_id):
     # Add a college student is interested in.
     form = AddCollegeForm()
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if form.validate_on_submit():
         student_profile.colleges.append(form.name.data)
         db.session.add(student_profile)
@@ -393,7 +395,7 @@ def delete_college(item_id):
     return jsonify({"success": "False"})
 
 
-##TODO: i dont think we need this funtion
+# TODO: i dont think we need this funtion
 @student.route('/profile/college/edit/<int:item_id>', methods=['GET', 'POST'])
 @login_required
 def edit_college(item_id):
@@ -422,7 +424,8 @@ def edit_college(item_id):
 def add_common_app_essay(student_profile_id):
     form = AddCommonAppEssayForm()
     if form.validate_on_submit():
-        student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+        student_profile = StudentProfile.query.filter_by(
+            id=student_profile_id).first()
         student_profile.common_app_essay = form.link.data
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
@@ -438,7 +441,8 @@ def add_common_app_essay(student_profile_id):
 @student.route('/profile/common_app_essay/edit/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def edit_common_app_essay(student_profile_id):
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     form = EditCommonAppEssayForm(
         link=student_profile.common_app_essay)
     if form.validate_on_submit():
@@ -458,7 +462,8 @@ def edit_common_app_essay(student_profile_id):
 @login_required
 @csrf.exempt
 def delete_common_app_essay():
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     student_profile.common_app_essay = ''
     db.session.add(student_profile)
     db.session.commit()
@@ -537,7 +542,8 @@ def delete_supplemental_essay(item_id):
 def add_major(student_profile_id):
     # Add a major student is interested in.
     form = AddMajorForm()
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if form.validate_on_submit():
         if form.major.data not in student_profile.majors:
             # Only check to add major if not already in their list.
@@ -607,7 +613,7 @@ def checklist(student_profile_id):
                 deadline=form.date.data,
                 cal_event_id=result['event_id'],
                 event_created=result['event_created'])
-            ### if counselor is adding checklist item, send a notification
+            # if counselor is adding checklist item, send a notification
             if current_user.role_id != 1:
                 notif_text = '{} {} added "{}" to your checklist'.format(
                     current_user.first_name, current_user.last_name,
@@ -870,8 +876,9 @@ def update_checklist_item(item_id):
 @login_required
 def view_college_profile(college_id):
     current_college = College.query.filter_by(id=college_id).first()
-    wanted_data = ScattergramData.query.filter_by(name = (current_college.name).encode('utf-8')).all()
+    data = ScattergramData.query.filter_by(college=current_college.name).all()
 
+    # GPA vs. SAT [2400]
     SAT2400_Accepted = []
     GPA_SAT2400_Accepted = []
     SAT2400_Denied = []
@@ -883,6 +890,7 @@ def view_college_profile(college_id):
     SAT2400_Waitlisted3 = []
     GPA_SAT2400_Waitlisted3 = []
 
+    # GPA vs. SAT [1600]
     SAT1600_Accepted = []
     GPA_SAT1600_Accepted = []
     SAT1600_Denied = []
@@ -894,6 +902,7 @@ def view_college_profile(college_id):
     SAT1600_Waitlisted3 = []
     GPA_SAT1600_Waitlisted3 = []
 
+    # GPA vs. ACT
     ACT_Accepted = []
     GPA_ACT_Accepted = []
     ACT_Denied = []
@@ -905,217 +914,222 @@ def view_college_profile(college_id):
     ACT_Waitlisted3 = []
     GPA_ACT_Waitlisted3 = []
 
+    for i in range(len(data)):
+        print('SAT [2400] ' + str(data[i].SAT2400))
+        print('SAT [1600] ' + str(data[i].SAT1600))
+        print('ACT ' + str(data[i].ACT))
+        if(data[i].SAT2400):
+            if(data[i].status == 'Accepted'):
+                SAT2400_Accepted.append(int(data[i].SAT2400))
+                GPA_SAT2400_Accepted.append(data[i].GPA)
+            elif(data[i].status == 'Denied'):
+                SAT2400_Denied.append(int(data[i].SAT2400))
+                GPA_SAT2400_Denied.append(data[i].GPA)
+            elif(data[i].status == 'Waitlisted or Deferred (Accepted)'):
+                SAT2400_Waitlisted1.append(int(data[i].SAT2400))
+                GPA_SAT2400_Waitlisted1.append(data[i].GPA)
+            elif(data[i].status == 'Waitlisted or Deferred (Denied)'):
+                SAT2400_Waitlisted2.append(int(data[i].SAT2400))
+                GPA_SAT2400_Waitlisted2.append(data[i].GPA)
+            if(data[i].status == 'Waitlisted or Deferred (Withdrew App)'):
+                SAT2400_Waitlisted3.append(int(data[i].SAT2400))
+                GPA_SAT2400_Waitlisted3.append(data[i].GPA)
 
-    for i in range(len(wanted_data)):
-        if(len(wanted_data[i].SAT2400)!=0):
-            if(wanted_data[i].status == b'Accepted'):
-                SAT2400_Accepted.append(int(wanted_data[i].SAT2400))
-                GPA_SAT2400_Accepted.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Denied'):
-                SAT2400_Denied.append(int(wanted_data[i].SAT2400))
-                GPA_SAT2400_Denied.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Waitlisted or Deferred (Accepted)'):
-                SAT2400_Waitlisted1.append(int(wanted_data[i].SAT2400))
-                GPA_SAT2400_Waitlisted1.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Waitlisted or Deferred (Denied)'):
-                SAT2400_Waitlisted2.append(int(wanted_data[i].SAT2400))
-                GPA_SAT2400_Waitlisted2.append(wanted_data[i].GPA)
-            if(wanted_data[i].status == b'Waitlisted or Deferred (Withdrew App)'):
-                SAT2400_Waitlisted3.append(int(wanted_data[i].SAT2400))
-                GPA_SAT2400_Waitlisted3.append(wanted_data[i].GPA)
+        if(data[i].SAT1600):
+            if(data[i].status == 'Accepted'):
+                SAT1600_Accepted.append(int(data[i].SAT1600))
+                GPA_SAT1600_Accepted.append(data[i].GPA)
+            elif(data[i].status == 'Denied'):
+                SAT1600_Denied.append(int(data[i].SAT1600))
+                GPA_SAT1600_Denied.append(data[i].GPA)
+            elif(data[i].status == 'Waitlisted or Deferred (Accepted)'):
+                SAT1600_Waitlisted1.append(int(data[i].SAT1600))
+                GPA_SAT1600_Waitlisted1.append(data[i].GPA)
+            elif(data[i].status == 'Waitlisted or Deferred (Denied)'):
+                SAT1600_Waitlisted2.append(int(data[i].SAT1600))
+                GPA_SAT1600_Waitlisted2.append(data[i].GPA)
+            if(data[i].status == 'Waitlisted or Deferred (Withdrew App)'):
+                SAT1600_Waitlisted3.append(int(data[i].SAT1600))
+                GPA_SAT1600_Waitlisted3.append(data[i].GPA)
 
-        if(len(wanted_data[i].SAT1600)!=0):
-            if(wanted_data[i].status == b'Accepted'):
-                SAT1600_Accepted.append(int(wanted_data[i].SAT1600))
-                GPA_SAT1600_Accepted.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Denied'):
-                SAT1600_Denied.append(int(wanted_data[i].SAT1600))
-                GPA_SAT1600_Denied.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Waitlisted or Deferred (Accepted)'):
-                SAT1600_Waitlisted1.append(int(wanted_data[i].SAT1600))
-                GPA_SAT1600_Waitlisted1.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Waitlisted or Deferred (Denied)'):
-                SAT1600_Waitlisted2.append(int(wanted_data[i].SAT1600))
-                GPA_SAT1600_Waitlisted2.append(wanted_data[i].GPA)
-            if(wanted_data[i].status == b'Waitlisted or Deferred (Withdrew App)'):
-                SAT1600_Waitlisted3.append(int(wanted_data[i].SAT1600))
-                GPA_SAT1600_Waitlisted3.append(wanted_data[i].GPA)
-
-        if(wanted_data[i].ACT!= None):
-            if(wanted_data[i].status == b'Accepted'):
-                ACT_Accepted.append(int(wanted_data[i].ACT))
-                GPA_ACT_Accepted.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Denied'):
-                ACT_Denied.append(int(wanted_data[i].ACT))
-                GPA_ACT_Denied.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Waitlisted or Deferred (Accepted)'):
-                ACT_Waitlisted1.append(int(wanted_data[i].ACT))
-                GPA_ACT_Waitlisted1.append(wanted_data[i].GPA)
-            elif(wanted_data[i].status == b'Waitlisted or Deferred (Denied)'):
-                ACT_Waitlisted2.append(int(wanted_data[i].ACT))
-                GPA_ACT_Waitlisted2.append(wanted_data[i].GPA)
-            if(wanted_data[i].status == b'Waitlisted or Deferred (Withdrew App)'):
-                ACT_Waitlisted3.append(int(wanted_data[i].ACT))
-                GPA_ACT_Waitlisted3.append(wanted_data[i].GPA)
-
+        if(data[i].ACT):
+            if(data[i].status == 'Accepted'):
+                ACT_Accepted.append(int(data[i].ACT))
+                GPA_ACT_Accepted.append(data[i].GPA)
+            elif(data[i].status == 'Denied'):
+                ACT_Denied.append(int(data[i].ACT))
+                GPA_ACT_Denied.append(data[i].GPA)
+            elif(data[i].status == 'Waitlisted or Deferred (Accepted)'):
+                ACT_Waitlisted1.append(int(data[i].ACT))
+                GPA_ACT_Waitlisted1.append(data[i].GPA)
+            elif(data[i].status == 'Waitlisted or Deferred (Denied)'):
+                ACT_Waitlisted2.append(int(data[i].ACT))
+                GPA_ACT_Waitlisted2.append(data[i].GPA)
+            if(data[i].status == 'Waitlisted or Deferred (Withdrew App)'):
+                ACT_Waitlisted3.append(int(data[i].ACT))
+                GPA_ACT_Waitlisted3.append(data[i].GPA)
 
     import plotly.tools as tools
     import plotly.plotly as py
     import plotly.graph_objs as go
 
-    tools.set_credentials_file(username='katiejiang', api_key='KAnDQP63N0oQIZwA8izV')
-
+    # CHANGE THIS LMAO
+    tools.set_credentials_file(
+        username='ktjx', api_key='xO7VaxjEmJnimiYnhKfS')
 
     # Create a trace
     trace0 = go.Scatter(
-        x = SAT2400_Accepted,
-        y = GPA_SAT2400_Accepted,
-        mode = 'markers',
-        name = "Accepted"
-        )
+        x=SAT2400_Accepted,
+        y=GPA_SAT2400_Accepted,
+        mode='markers',
+        name="Accepted"
+    )
 
     trace1 = go.Scatter(
-        x = SAT2400_Denied,
-        y = GPA_SAT2400_Denied,
-        mode = 'markers',
-        name = "Denied"
-        )
+        x=SAT2400_Denied,
+        y=GPA_SAT2400_Denied,
+        mode='markers',
+        name="Denied"
+    )
 
     trace2 = go.Scatter(
-        x = SAT2400_Waitlisted1,
-        y = GPA_SAT2400_Waitlisted1,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Accepted)"
-        )
+        x=SAT2400_Waitlisted1,
+        y=GPA_SAT2400_Waitlisted1,
+        mode='markers',
+        name="Waitlisted or Deferred (Accepted)"
+    )
 
     trace3 = go.Scatter(
-        x = SAT2400_Waitlisted2,
-        y = GPA_SAT2400_Waitlisted2,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Denied)"
-        )
+        x=SAT2400_Waitlisted2,
+        y=GPA_SAT2400_Waitlisted2,
+        mode='markers',
+        name="Waitlisted or Deferred (Denied)"
+    )
 
     trace4 = go.Scatter(
-        x = SAT2400_Waitlisted3,
-        y = GPA_SAT2400_Waitlisted3,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Withdrew App)"
-        )
+        x=SAT2400_Waitlisted3,
+        y=GPA_SAT2400_Waitlisted3,
+        mode='markers',
+        name="Waitlisted or Deferred (Withdrew App)"
+    )
 
     layout1 = go.Layout(
-    title='SAT2400 vs. GPA',
-    xaxis=dict(
-        title='SAT2400'
+        title='SAT2400 vs. GPA',
+        xaxis=dict(
+            title='SAT2400'
         ),
-    yaxis=dict(
-        title='GPA',
+        yaxis=dict(
+            title='GPA',
         )
     )
 
-    fig1 = go.Figure(data= [trace0, trace1, trace2, trace3, trace4], layout=layout1)
+    fig1 = go.Figure(data=[trace0, trace1, trace2,
+                           trace3, trace4], layout=layout1)
     plot_url1 = py.plot(fig1, filename='basic-scatter1', auto_open=False)
 
     # Create a trace
     trace5 = go.Scatter(
-        x = SAT1600_Accepted,
-        y = GPA_SAT1600_Accepted,
-        mode = 'markers',
-        name = "Accepted"
-        )
+        x=SAT1600_Accepted,
+        y=GPA_SAT1600_Accepted,
+        mode='markers',
+        name="Accepted"
+    )
 
     trace6 = go.Scatter(
-        x = SAT1600_Denied,
-        y = GPA_SAT1600_Denied,
-        mode = 'markers',
-        name = "Denied"
-        )
+        x=SAT1600_Denied,
+        y=GPA_SAT1600_Denied,
+        mode='markers',
+        name="Denied"
+    )
 
     trace7 = go.Scatter(
-        x = SAT1600_Waitlisted1,
-        y = GPA_SAT1600_Waitlisted1,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Accepted)"
-        )
+        x=SAT1600_Waitlisted1,
+        y=GPA_SAT1600_Waitlisted1,
+        mode='markers',
+        name="Waitlisted or Deferred (Accepted)"
+    )
 
     trace8 = go.Scatter(
-        x = SAT1600_Waitlisted2,
-        y = GPA_SAT1600_Waitlisted2,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Denied)"
-        )
+        x=SAT1600_Waitlisted2,
+        y=GPA_SAT1600_Waitlisted2,
+        mode='markers',
+        name="Waitlisted or Deferred (Denied)"
+    )
 
     trace9 = go.Scatter(
-        x = SAT1600_Waitlisted3,
-        y = GPA_SAT1600_Waitlisted3,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Withdrew App)"
-        )
+        x=SAT1600_Waitlisted3,
+        y=GPA_SAT1600_Waitlisted3,
+        mode='markers',
+        name="Waitlisted or Deferred (Withdrew App)"
+    )
 
     layout2 = go.Layout(
-    title='SAT1600 vs. GPA',
-    xaxis=dict(
-        title='SAT1600'
+        title='SAT1600 vs. GPA',
+        xaxis=dict(
+            title='SAT1600'
         ),
-    yaxis=dict(
-        title='GPA',
+        yaxis=dict(
+            title='GPA',
         )
     )
 
-    fig2 = go.Figure(data= [trace5, trace6, trace7, trace8, trace9], layout=layout2)
+    fig2 = go.Figure(data=[trace5, trace6, trace7,
+                           trace8, trace9], layout=layout2)
     plot_url2 = py.plot(fig2, filename='basic-scatter2', auto_open=False)
 
-     # Create a trace
+    # Create a trace
     trace10 = go.Scatter(
-        x = ACT_Accepted,
-        y = GPA_ACT_Accepted,
-        mode = 'markers',
-        name = "Accepted"
-        )
+        x=ACT_Accepted,
+        y=GPA_ACT_Accepted,
+        mode='markers',
+        name="Accepted"
+    )
 
     trace11 = go.Scatter(
-        x = ACT_Denied,
-        y = GPA_ACT_Denied,
-        mode = 'markers',
-        name = "Denied"
-        )
+        x=ACT_Denied,
+        y=GPA_ACT_Denied,
+        mode='markers',
+        name="Denied"
+    )
 
     trace12 = go.Scatter(
-        x = ACT_Waitlisted1,
-        y = GPA_ACT_Waitlisted1,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Accepted)"
-        )
+        x=ACT_Waitlisted1,
+        y=GPA_ACT_Waitlisted1,
+        mode='markers',
+        name="Waitlisted or Deferred (Accepted)"
+    )
 
     trace13 = go.Scatter(
-        x = ACT_Waitlisted2,
-        y = GPA_ACT_Waitlisted2,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Denied)"
-        )
+        x=ACT_Waitlisted2,
+        y=GPA_ACT_Waitlisted2,
+        mode='markers',
+        name="Waitlisted or Deferred (Denied)"
+    )
 
     trace14 = go.Scatter(
-        x = ACT_Waitlisted3,
-        y = GPA_ACT_Waitlisted3,
-        mode = 'markers',
-        name = "Waitlisted or Deferred (Withdrew App)"
-        )
+        x=ACT_Waitlisted3,
+        y=GPA_ACT_Waitlisted3,
+        mode='markers',
+        name="Waitlisted or Deferred (Withdrew App)"
+    )
 
     layout3 = go.Layout(
-    title='ACT vs. GPA',
-    xaxis=dict(
-        title='ACT'
+        title='ACT vs. GPA',
+        xaxis=dict(
+            title='ACT'
         ),
-    yaxis=dict(
-        title='GPA',
+        yaxis=dict(
+            title='GPA',
         )
     )
 
-    fig3 = go.Figure(data= [trace10, trace11, trace12, trace13, trace14], layout=layout3)
+    fig3 = go.Figure(data=[trace10, trace11, trace12,
+                           trace13, trace14], layout=layout3)
     plot_url3 = py.plot(fig3, filename='basic-scatter3', auto_open=False)
 
     return render_template(
-        'main/college_profile.html', data = wanted_data, test = SAT2400_Accepted, college=current_college, plot_url1 = plot_url1, 
-        plot_url2 = plot_url2, plot_url3 = plot_url3)
+        'main/college_profile.html', data=data, test=SAT2400_Accepted, college=current_college, plot_url1=plot_url1,
+        plot_url2=plot_url2, plot_url3=plot_url3)
 
 
 def string_to_bool(str):
