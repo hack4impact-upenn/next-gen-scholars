@@ -108,7 +108,6 @@ def view_user_profile(user_id):
     if student_profile is not None:
         test_scores = student_profile.test_scores
         for t in test_scores:
-            print("here")
             if t.name == 'SAT':
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
@@ -515,28 +514,31 @@ def edit_alert(alert_id):
 @counselor_required
 def upload_scattergram():
     if request.method == 'POST':
-        f = request.files['file']
-        contents = f.read()
-        lines = contents.split('\r'.encode('utf-8'))
-        college_names = set()
-        for line in lines[1:]:
-            line = line.split(','.encode('utf-8'))
-            college_names.add(str(line[1], 'utf-8').strip())
-            point = ScattergramData(
-                name=str(line[0], 'utf-8').strip(),
-                college=str(line[1], 'utf-8').strip(),
-                status=str(line[2], 'utf-8').strip(),
-                GPA=str(line[3], 'utf-8').strip(),
-                SAT2400=str(line[4], 'utf-8').strip(),
-                SAT1600=str(line[5], 'utf-8').strip(),
-                ACT=str(line[6], 'utf-8').strip()
-            )
-            db.session.add(point)
-        db.session.commit()
-        for name in list(college_names):
-            print(name)
-            college = College.query.filter_by(name=name).first()
-            if college:
-                college.update_plots()
-        return contents
-    return render_template('counselor/upload_scattergram.html')
+        try:
+            f = request.files['file']
+            contents = f.read()
+            lines = contents.split('\r'.encode('utf-8'))
+            college_names = set()
+            for line in lines[1:]:
+                line = line.split(','.encode('utf-8'))
+                college_names.add(str(line[1], 'utf-8').strip())
+                point = ScattergramData(
+                    name=str(line[0], 'utf-8').strip(),
+                    college=str(line[1], 'utf-8').strip(),
+                    status=str(line[2], 'utf-8').strip(),
+                    GPA=str(line[3], 'utf-8').strip(),
+                    SAT2400=str(line[4], 'utf-8').strip(),
+                    SAT1600=str(line[5], 'utf-8').strip(),
+                    ACT=str(line[6], 'utf-8').strip()
+                )
+                db.session.add(point)
+            db.session.commit()
+            for name in list(college_names):
+                college = College.query.filter_by(name=name).first()
+                if college:
+                    college.update_plots()
+            message, message_type = 'Upload successful!', 'positive'
+        except:
+            message, message_type = 'Error with upload. Please make sure the format of the CSV file matches the description.', 'negative'
+        return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
+    return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
