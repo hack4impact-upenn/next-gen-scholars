@@ -435,7 +435,7 @@ def add_common_app_essay(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Supplemental Essay")
+        header="Add Common App Essay")
 
 
 @student.route('/profile/common_app_essay/edit/<int:student_profile_id>', methods=['GET', 'POST'])
@@ -458,13 +458,13 @@ def edit_common_app_essay(student_profile_id):
         header="Edit Common App Essay")
 
 
-@student.route('/profile/common_app_essay/delete', methods=['GET', 'POST'])
+@student.route('/profile/common_app_essay/delete/<int:student_profile_id>', methods=['POST'])
 @login_required
 @csrf.exempt
-def delete_common_app_essay():
-    student_profile = StudentProfile.query.filter_by(
-        id=student_profile_id).first()
+def delete_common_app_essay(student_profile_id):
+    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
     student_profile.common_app_essay = ''
+    student_profile.common_app_essay_status = 'Incomplete'
     db.session.add(student_profile)
     db.session.commit()
     url = get_redirect_url(student_profile_id)
@@ -472,8 +472,6 @@ def delete_common_app_essay():
 
 
 # supplemental essay methods
-
-
 @student.route('/profile/add_supplemental_essay/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_supplemental_essay(student_profile_id):
