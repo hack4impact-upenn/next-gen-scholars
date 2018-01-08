@@ -1,579 +1,438 @@
-{% extends 'layouts/base.html' %}
-{% import 'macros/form_macros.html' as f %}
-
-{% block content %}
+{% extends 'layouts/base.html' %} {% import 'macros/form_macros.html' as f %} {% block content %}
 <div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
-    <!-- DISPLAY USER PROFILE INFORMATION -->
-    <div class="ten wide column">
-        <div style="margin:auto;text-align:left">
-            <div class="ui items">
-                <div class="item">
-                    <div class="ui small image">
-                        <img src="/static/images/user-avatar.jpg"/>
-                    </div>
-                    <div class="middle aligned content">
-                        <div class="header">
-                            <h1 class="ui header">{{ user.full_name() }}</h1>
-                        </div>
-                        <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.edit_profile', student_profile_id=user.student_profile.id) }}';">Edit Profile</button>
-                        <button class="right floated ui blue basic button" onclick="window.location.href='{{ url_for('student.checklist', student_profile_id=user.student_profile.id) }}';">View Checklist</button>
-                        <div class="description" style="font-size:1.1em">
-                            <div class="ui list">
-                                <div class="item">
-                                    <i class="mail icon"></i>
-                                    <div class="content">
-                                        &nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <i class="calendar outline icon"></i>
-                                    <div class="content">
-                                        &nbsp;{{ user.student_profile.grade }}th Grade
-                                    </div>
-
-                                </div>
-                                <div class="item">
-                                    <i class="student icon"></i>
-                                    <div class="content">
-                                        {{ user.student_profile.high_school }}, {{ user.student_profile.graduation_year }}
-                                    </div>
-                                </div>
-                                <div class="item">
-                                    <i class="marker icon"></i>
-                                    <div class="content">
-                                        &nbsp; {{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- DISPLAY USER PROFILE INFORMATION -->
+  <div class="row">
+    <div class="twelve wide column">
+      <h1 class="ui dividing header">
+        {{ user.full_name() }}
+      </h1>
     </div>
-
-    <!-- DISPLAY ACADEMIC INFORMATION -->
-    <div class="row">
-        <div class="twelve wide column">
-            <div class="ui horizontal divider">
-            <h3>Academic Information</h3>
-            </div>
+  </div>
+  <div class="row">
+    <div class="seven wide column">
+      <div class="ui list">
+        <div class="item">
+          <i class="mail icon"></i>
+          <div class="content">
+            &nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+          </div>
         </div>
-    </div>
-    <div class="row" style="padding:0">
-        <div class="eight wide column">
-            <div class="ui mini three statistics">
-                <div class="statistic">
-                    <div class="label">GPA</div>
-                    <span style="padding:0.25em"></span>
-                    <div class="value">{{ user.student_profile.gpa }}</div>
-                </div>
-                <div class="statistic">
-                    <div class="label">SAT</div>
-                    <span style="padding:0.25em"></span>
-                    <div class="value">{{ sat }}</div>
-                </div>
-                <div class="statistic">
-                    <div class="label">ACT</div>
-                    <span style="padding:0.25em"></span>
-                    <div class="value">{{ act }}</div>
-                </div>
-            </div>
+        <div class="item">
+          <i class="calendar outline icon"></i>
+          <div class="content">
+            &nbsp;{{ user.student_profile.grade }}th Grade
+          </div>
         </div>
-    </div>
-
-    <!-- DISPLAY TEST SCORES -->
-    <div class="row">
-        <div class="twelve wide column">
-            <div class="ui horizontal divider">
-            Test Scores &nbsp; <i class="blue link edit icon" id="edit-test-scores"></i>
-            </div>
-            <span style="padding:0.2em"></span>
-            <div class="ui three cards">
-                {% for test in user.student_profile.test_scores|sort(attribute='name') %}
-                <div class="blue card test-card">
-                    <div class="center aligned content">
-                        <div class="header">{{ test.name }}</div>
-                        <div class="meta">{{ test.month }} {{ test.year }}</div>
-                        <div class="description">
-                            <div class="ui mini one statistics">
-                                <div class="statistic">
-                                    <div class="value">{{ test.score|string }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ui bottom attached blue basic button test-button" data-id="{{ test.id }}">
-                        <i class="edit icon"></i>Edit
-                    </div>
-                </div>
-                {% endfor %}
-
-                <!-- DISPLAY BUTTON FOR ADDING TEST SCORE -->
-                <a class="blue centered card" href="{{ url_for('student.add_test_score', student_profile_id=user.student_profile.id)}}">
-                    <div class="content" style="text-align:center">
-                        <div class="description">
-                            <i class="big blue plus icon"></i>
-                            <p span style="color:#2987CD">
-                                Add Test Score
-                            </p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+        <div class="item">
+          <i class="student icon"></i>
+          <div class="content">
+            {{ user.student_profile.high_school }}, {{ user.student_profile.graduation_year }}
+          </div>
         </div>
+        <div class="item">
+          <i class="marker icon"></i>
+          <div class="content">
+            &nbsp; {{ user.student_profile.district }}, {{ user.student_profile.city }}, {{ user.student_profile.state }}
+          </div>
+        </div>
+      </div>
     </div>
+    <div class="five wide column">
+      <button class="right floated ui button" onclick="window.location.href='{{ url_for('student.edit_profile', student_profile_id=user.student_profile.id) }}';"><i class="ui edit icon"></i>Edit Profile</button>
+      <button class="right floated ui button" onclick="window.location.href='{{ url_for('student.checklist', student_profile_id=user.student_profile.id) }}';"><i class="ui tasks icon"></i>View Tasks</button>
+    </div>
+  </div>
 
+  <!-- DISPLAY ACADEMIC INFORMATION -->
+  <div class="row">
+    <div class="twelve wide column">
+      <div class="ui horizontal divider">
+        <h3>Academic Information</h3>
+      </div>
+    </div>
+    <div class="eight wide column">
+      <div class="ui mini three statistics">
+        <div class="statistic">
+          <div class="label">GPA</div>
+          <span style="padding:0.25em"></span>
+          <div class="value">{{ user.student_profile.gpa }}</div>
+        </div>
+        <div class="statistic">
+          <div class="label">SAT</div>
+          <span style="padding:0.25em"></span>
+          <div class="value">{{ sat }}</div>
+        </div>
+        <div class="statistic">
+          <div class="label">ACT</div>
+          <span style="padding:0.25em"></span>
+          <div class="value">{{ act }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPLAY TEST SCORES -->
+  <div class="row">
+    <div class="twelve wide column">
+      <div class="ui horizontal divider">
+        Test Scores
+      </div>
+      <table class="ui compact table">
+        <thead class="full-width">
+          <th>Test Name</th>
+          <th>Date</th>
+          <th>Score</th>
+          {% if user.student_profile.test_scores|length > 0 %}
+          <th></th>
+          {% endif %}
+        </thead>
+        <tbody>
+          {% if user.student_profile.test_scores|length > 0 %} {% for test in user.student_profile.test_scores|sort(attribute='name') %}
+          <tr>
+            <td>{{ test.name }}</td>
+            <td>{{ test.month }} {{ test.year }}</td>
+            <td>{{ test.score|string }}</td>
+            <td class="collapsing">
+              <div class="ui tiny icon buttons">
+                <a class="ui blue basic icon button" href="/student/profile/test_score/edit/{{ test.id }}"><i class="ui edit icon"></i></a>
+                <div class="ui red basic icon button delete-test-button" data-id="{{ test.id }}"><i class="ui remove icon"></i></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="4">
+              No test scores.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th colspan="4">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_test_score', student_profile_id=user.student_profile.id)}}">
+                <i class="plus icon"></i> Add Test Score
+              </a>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
     <!-- DISPLAY MAJORS -->
-    <div class="row">
-        <div class="twelve wide column">
-            <div class="ui horizontal divider">
-            Majors of Interest &nbsp; <i class="blue link edit icon" id="edit-majors"></i>
-            </div>
-        </div>
-        <div class="ten wide column">
-            <div class="ui bulleted list" id="majors-list">
-                {% for major in user.student_profile.majors|sort(attribute='name') %}
-                <div class="item major-item" style="font-size:1.1em">
-                    <div style="display:none" data-id="{{ major.id }}" class="ui basic red icon mini circular button major-delete-button"><i class="x icon"></i></div>
-                    {{ major.name }}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="two wide column">
-            <a class="ui right floated blue basic button" onclick="window.location.href='{{ url_for('student.add_major', student_profile_id=user.student_profile.id)}}';">Add Major</a>
-        </div>
+    <div class="six wide column">
+      <div class="ui horizontal divider">
+        Majors of Interest
+      </div>
+      <table class="ui compact table">
+        <thead class="full-width">
+          <th colspan="2">Major</th>
+        </thead>
+        <tbody>
+          {% if user.student_profile.majors|length > 0 %} {% for major in user.student_profile.majors|sort(attribute='name') %}
+          <tr>
+            <td>{{ major.name }}</td>
+            <td class="collapsing">
+              <div class="ui icon red basic tiny button delete-major-button" data-id="{{ major.id }}">
+                <i class="x icon"></i>
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="2">
+              No majors.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th colspan="2">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_major', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i> Add Major
+              </a>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
     </div>
-
     <!-- DISPLAY COLLEGES -->
-    <div class="row">
-        <div class="twelve wide column">
-            <div class="ui horizontal divider">
-            Colleges of Interest &nbsp; <i class="blue link edit icon" id="edit-colleges"></i>
-            </div>
-            <div class="ui four cards">
-                {% for college in user.student_profile.colleges|sort(attribute='name') %}
-                <div class="ui blue link card college-card">
-                    <div class="center aligned content">
-                        <div class="description">
-                            <h4 class="ui header">{{ college.name }}</h4>
-                        </div>
-                    </div>
-                    <div class="ui bottom attached blue basic button college-button" data-id="{{ college.id }}">
-                        <i class="external icon"></i>View Profile
-                    </div>
-                </div>
-                {% endfor %}
-                <div class="ui blue link card" onclick="window.location.href='{{ url_for('student.add_college', student_profile_id=user.student_profile.id) }}';">
-                    <div class="content" style="text-align:center">
-                        <div class="description" style="margin:0 auto">
-                            <i class="big blue plus icon"></i><br />
-                            <span style="color:#2987CD">Add College</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="six wide column">
+      <div class="ui horizontal divider">
+        Colleges of Interest
+      </div>
+      <table class="ui compact table">
+        <thead class="full-width">
+          <th colspan="2">College</th>
+        </thead>
+        <tbody>
+          {% if user.student_profile.colleges|length > 0 %} {% for college in user.student_profile.colleges|sort(attribute='name') %}
+          <tr>
+            <td>{{ college.name }}</td>
+            <td class="collapsing">
+              <a class="ui labeled icon basic tiny button" href="/student/college_profile/{{ college.id }}">
+                <i class="external icon"></i> View Profile
+              </a>
+              <div class="ui icon red basic tiny button delete-college-button" data-id="{{ college.id }}">
+                <i class="x icon"></i>
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="2">
+              No colleges.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th colspan="3">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_college', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i> Add College
+              </a>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
     </div>
+  </div>
 
-    <!-- DISPLAY ESSAYS -->
-    <div class="row">
-        <div class="twelve wide column">
-            <div class="ui horizontal divider">
-            <h3>College Application Information</h3>
-            </div>
+  <!-- DISPLAY ESSAYS -->
+  <div class="row">
+    <div class="twelve wide column">
+      <div class="ui horizontal divider">
+        <h3>College Application Information</h3>
+      </div>
+      <div class="ui horizontal divider">Essays</div>
+      <table class="ui compact table">
+        <thead class="full-width">
+          <th>Essay</th>
+          <th>Status</th>
+          <th></th>
+        </thead>
+        <tbody>
+          <!-- COMMON APP ESSAY -->
+          {% if user.student_profile.common_app_essay|length > 0 %} {% if user.student_profile.common_app_essay_status=='Incomplete' %}
+          <tr class="negative">
+          {% elif user.student_profile.common_app_essay_status=='Done' %}
+          <tr class="positive">
+          {% else %}
+          <tr class="warning">
+          {% endif %}
+            <td>Common App Essay</td>
+            <td>{{ user.student_profile.common_app_essay_status }}</td>
+            <td class="collapsing">
+              <a class="ui basic tiny labeled icon button" href="{{ user.student_profile.common_app_essay }}" target="_blank">
+                <i class="external icon"></i>
+                View Essay
+              </a>
+              <div class="ui tiny buttons">
+                <a class="ui blue basic icon button" href="/student/profile/common_app_essay/edit/{{ user.student_profile_id }}">
+                  <i class="edit icon"></i>
+                </a>
+                <div class="ui red basic icon button delete-common-button">
+                  <i class="x icon"></i>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+          <!-- SUPPLEMENTAL ESSAYS -->
+          {% if user.student_profile.essays|length > 0 %} {% for essay in user.student_profile.essays|sort(attribute='name') %} {% if essay.status=='Incomplete' %}
+          <tr class="negative">
+          {% elif essay.status=='Done' %}
+          <tr class="positive">
+          {% else %}
+          <tr class="warning">
+          {% endif %}
+            <td>{{ essay.name }}</td>
+            <td>{{ essay.status }}</td>
+            <td class="collapsing">
+              <a class="ui basic tiny labeled icon button" href="{{ essay.link }}" target="_blank">
+                <i class="external icon"></i>
+                View Essay
+              </a>
+              <div class="ui tiny buttons">
+                <a class="ui blue basic icon button" href="/student/profile/supplemental_essay/edit/{{ essay.id }}">
+                  <i class="edit icon"></i>
+                </a>
+                <div class="ui red basic icon button delete-essay-button" data-id="{{ essay.id }}">
+                  <i class="x icon"></i>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %} {% elif user.student_profile.common_app_essay|length == 0 %}
+          <tr>
+            <td colspan="3">
+              No essays.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th colspan="3">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_supplemental_essay', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i> Add Supplemental Essay
+              </a> {% if user.student_profile.common_app_essay|length == 0 %}
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_common_app_essay', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i> Add Common App Essay
+              </a> {% endif %}
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
 
-            <div class="ui horizontal divider">Essays &nbsp; <i class="blue link edit icon" id="edit-essays"></i>
-            </div>
-
-            <div class="ui four cards">
-                <!-- DISPLAY COMMON APP ESSAY IF STUDENT HAS ADDED IT-->
-                {% if user.student_profile.common_app_essay|length > 1 %}
-                    <div class="blue card common-essay-card">
-                        <a href="{{ user.student_profile.common_app_essay }}" target="_blank" class="center aligned content" >
-                            <div class="description">
-                                <h4 class="ui header">Common App Essay</h4>
-                                {% if user.student_profile.common_app_essay_status=='Incomplete' %}
-                                <span style="color:#db2828">
-                                {% elif user.student_profile.common_app_essay_status=='Waiting' %}
-                                <span style="color:#eaae00">
-                                {% elif user.student_profile.common_app_essay_status=='Reviewed' %}
-                                <span style="color:#eaae00">
-                                {% elif user.student_profile.common_app_essay_status=='Edited' %}
-                                <span style="color:#eaae00">
-                                {% elif user.student_profile.common_app_essay_status=='Done' %}
-                                <span style="color:#21ba45">
-                                {% else %}
-                                <span>
-                                {% endif %}
-                                <strong>{{ user.student_profile.common_app_essay_status }}</strong></span>
-                            </div>
-                        </a>
-                        <div class="ui bottom attached blue basic button common-essay-button">
-                            <i class="edit icon"></i>Edit
-                        </div>
-                    </div>
-                {% else %}
-                    <!-- DISPLAY ADD OPTION OTHERWISE-->
-                    <a class="blue card" href="{{ url_for('student.add_common_app_essay', student_profile_id=user.student_profile.id) }}">
-                        <div class="content" style="text-align:center">
-                            <div class="description" style="margin:0 auto">
-                                <h3></h3><i class="big blue plus icon"></i><br />
-                            <span style="color:#2987CD">Add Common App Essay</span>
-                            </div>
-                        </div>
-                    </a>
+  <!-- DISPLAY RECOMMENDATION LETTERS -->
+  <div class="row">
+    <div class="twelve wide column">
+      <div class="ui horizontal divider">Recommendation Letters</div>
+      <table class="ui compact table">
+        <thead class="full-width">
+          <th>Name</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th></th>
+        </thead>
+        <tbody>
+          {% if user.student_profile.recommendation_letters|length > 0 %} {% for letter in user.student_profile.recommendation_letters|sort(attribute='name') %} {% if letter.status=='Incomplete' %}
+          <tr class="negative">
+            {% elif letter.status=='Submitted' %}
+            <tr class="positive">
+              {% else %}
+              <tr class="warning">
                 {% endif %}
-
-                <!-- DISPLAY SUPPLEMENTAL ESSAYS -->
-                {% for essay in user.student_profile.essays|sort(attribute='name') %}
-                <div class="blue card sup-essay-card">
-                    <a href="{{ essay.link }}" target="_blank" class="center aligned content" >
-                        <div class="description">
-                            <h4 class="ui header">{{ essay.name }}</h4>
-                            {% if essay.status=='Incomplete' %}
-                            <span style="color:#db2828">
-                            {% elif essay.status=='Waiting' %}
-                            <span style="color:#eaae00">
-                            {% elif essay.status=='Reviewed' %}
-                            <span style="color:#eaae00">
-                            {% elif essay.status=='Edited' %}
-                            <span style="color:#eaae00">
-                            {% elif essay.status=='Done' %}
-                            <span style="color:#21ba45">
-                            {% else %}
-                            <span>
-                            {% endif %}
-                            <strong>{{ essay.status }}</strong></span>
-                        </div>
+                <td>{{ letter.name }}</td>
+                <td>{{ letter.category }}</td>
+                <td>{{ letter.status }}</td>
+                <td class="collapsing">
+                  <div class="ui tiny buttons">
+                    <a class="ui icon blue basic button" href="/student/profile/recommendation_letter/edit/{{ letter.id }}">
+                      <i class="edit icon"></i>
                     </a>
-                    <div class="ui bottom attached blue basic button sup-essay-button" data-id="{{ essay.id }}">
-                        <i class="edit icon"></i>Edit
+                    <div class="ui icon red basic button delete-letter-button" data-id="{{ letter.id }}">
+                      <i class="x icon"></i>
                     </div>
-                </div>
-                {% endfor %}
-                <a class="blue card" href="{{ url_for('student.add_supplemental_essay', student_profile_id=user.student_profile.id) }}">
-                    <div class="content" style="text-align:center">
-                        <div class="description" style="margin:0 auto">
-                            <h3></h3><i class="big blue plus icon"></i><br />
-                        <span style="color:#2987CD">Add Supplemental Essay</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %} {% else %}
+              <tr>
+                <td colspan="4">
+                  No recommendation letters.
+                </td>
+              </tr>
+              {% endif %}
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th colspan="4">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_recommendation_letter', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i> Add Recommendation Letter
+              </a>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
     </div>
-
-    <!-- DISPLAY RECOMMENDATION LETTERS -->
-    <div class="row">
-        <div class="twelve wide column">
-            <div class="ui horizontal divider">Recommendation Letters &nbsp; <i class="blue link edit icon" id="edit-letters"></i></div>
-
-            <div class="ui three cards letter-card">
-                {% for letter in user.student_profile.recommendation_letters|sort(attribute='name') %}
-                <div class="blue card">
-                    <div class="center aligned content">
-                        <div class="header">
-                            {{ letter.name }}
-                        </div>
-                        <div class="meta">
-                            {{ letter.category }}
-                        </div>
-                        <div class="description">
-                            {% if letter.status=='Incomplete' %}
-                            <span style="color:#db2828">
-                            {% elif letter.status=='Pending' %}
-                            <span style="color:#eaae00">
-                            {% elif letter.status=='Submitted' %}
-                            <span style="color:#21ba45">
-                            {% else %}
-                            <span>
-                            {% endif %}
-                            <strong>{{ letter.status }}</strong></span>
-                        </div>
-                    </div>
-                    <div class="ui bottom attached blue basic button letter-button" data-id="{{ letter.id }}">
-                        <i class="edit icon"></i>Edit
-                    </div>
-                </div>
-                {% endfor %}
-                <a class="blue card" href="{{ url_for('student.add_recommendation_letter', student_profile_id=user.student_profile.id) }}">
-                    <div class="content" style="text-align:center">
-                        <div class="description" style="margin:0 auto">
-                            <br /><i class="big blue plus icon"></i><br />
-                            <span style="color:#2987CD">Add Letter</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script type="text/javascript">
-
-$(document).ready(function () {
-    var deletingMajors = false;
-    var deletingColleges = false;
-    var deletingTestScores = false;
-    var deletingEssays = false;
-    var deletingLetters = false;
-
-    // toggle between displaying and not displaying delete option to user for majors
-    $('#edit-majors').click(function () {
-        deletingMajors = !deletingMajors;
-        if (deletingMajors) {
-            $('#edit-majors').removeClass('blue edit');
-            $('#edit-majors').addClass('blue check');
-            $('#majors-list').removeClass('bulleted');
-        } else {
-            $('#edit-majors').removeClass('blue check');
-            $('#edit-majors').addClass('blue edit');
-            $('#majors-list').addClass('bulleted');
+  $(document).ready(function() {
+    // Delete test score
+    $('.delete-test-button').click(function() {
+      var url = '/student/profile/test_score/delete/' + $(this).data('id');
+      $(this).parent().parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data) {
+          if (data.success !== "True") {
+            alert("Sorry there was an error, please try again.");
+          }
         }
-        $('.major-delete-button').toggle()
+      });
     });
 
-    // when user deletes a major, send ajax request
-    $('.major-delete-button').click(function() {
-        if (deletingMajors) {
-            var url = '/student/profile/major/delete/' + $(this).data('id');
-            var that = this;
-            console.log(url);
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function(data) {
-                    if (data.success) {
-                        if (data.success === "True") {
-                            $(that).parent().remove();
-                        } else {
-                            alert("Sorry there was an error, please try again.");
-                        }
-
-                    }
-
-                }
-            })
+    // Delete major
+    $('.delete-major-button').click(function() {
+      var url = '/student/profile/major/delete/' + $(this).data('id');
+      $(this).parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data) {
+          if (data.success !== "True") {
+            alert("Sorry there was an error, please try again.");
+          }
         }
+      });
     });
 
-    // toggle between displaying edit option and delete option to user for colleges
-    $('#edit-colleges').click(function () {
-        deletingColleges = !deletingColleges;
-        if (deletingColleges) {
-            $('#edit-colleges').removeClass('blue edit');
-            $('#edit-colleges').addClass('blue check');
-            $('.college-button').removeClass('blue');
-            $('.college-button').addClass('red');
-            $('.college-card').removeClass('blue');
-            $('.college-card').addClass('red');
-            $('.college-button').html('<i class="remove icon"></i>Remove');
-        } else {
-            $('#edit-colleges').removeClass('blue check');
-            $('#edit-colleges').addClass('blue edit');
-            $('.college-button').removeClass('red');
-            $('.college-button').addClass('blue');
-            $('.college-card').removeClass('red');
-            $('.college-card').addClass('blue');
-            $('.college-button').html('<i class="external icon"></i>View Profile');
+    // Delete college
+    $('.delete-college-button').click(function() {
+      var url = '/student/profile/college/delete/' + $(this).data('id');
+      $(this).parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data) {
+          if (data.success !== "True") {
+            alert("Sorry there was an error, please try again.");
+          }
         }
+      })
     });
 
-    // send ajax request when user deletes a college
-    $('.college-button').click(function() {
-        if (deletingColleges) {
-            var url = '/student/profile/college/delete/' + $(this).data('id');
-            var that = this;
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function(data) {
-                    if (data.success) {
-                        if (data.success === "True") {
-                            $(that).parent().remove();
-                        } else {
-                            alert("Sorry there was an error, please try again.");
-                        }
-
-                    }
-
-                }
-            })
-        } else {
-            location.href = '/student/college_profile/' + $(this).data('id');
-        }
+    // Delete common app essay
+    $('.delete-common-button').click(function() {
+      var url = '/student/profile/common_app_essay/delete/{{ user.student_profile_id }}';
+      $(this).parent().parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data) {}
+      });
     });
 
-    // toggle between displaying edit option and delete option to user for test scores
-    $('#edit-test-scores').click(function () {
-        deletingTestScores = !deletingTestScores;
-        if (deletingTestScores) {
-            $('#edit-test-scores').removeClass('blue edit');
-            $('#edit-test-scores').addClass('blue check');
-            $('.test-button').removeClass('blue');
-            $('.test-button').addClass('red');
-            $('.test-card').removeClass('blue');
-            $('.test-card').addClass('red');
-            $('.test-button').html('<i class="remove icon"></i>Remove');
-        } else {
-            $('#edit-test-scores').removeClass('blue check');
-            $('#edit-test-scores').addClass('blue edit');
-            $('.test-button').removeClass('red');
-            $('.test-button').addClass('blue');
-            $('.test-card').removeClass('red');
-            $('.test-card').addClass('blue');
-            $('.test-button').html('<i class="edit icon"></i>Edit');
+    // Delete supplemental essay
+    $('.delete-essay-button').click(function() {
+      var url = '/student/profile/supplemental_essay/delete/' + $(this).data('id');
+      $(this).parent().parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data) {
+          if (data.success !== 'True') {
+            alert("Sorry there was an error, please try again.");
+          }
         }
+      });
     });
 
-    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
-    $('.test-button').click(function() {
-        if (deletingTestScores) {
-            var url = '/student/profile/test_score/delete/' + $(this).data('id');
-            var that = this;
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function(data) {
-                    if (data.success) {
-                        if (data.success === "True") {
-                            $(that).parent().remove();
-                        } else {
-                            alert("Sorry there was an error, please try again.");
-                        }
-
-                    }
-
-                }
-            })
-        } else {
-            var url = '/student/profile/test_score/edit/' + $(this).data('id');
-            location.href = url;
+    // Delete recommendation letter
+    $('.delete-letter-button').click(function() {
+      var url = '/student/profile/recommendation_letter/delete/' + $(this).data('id');
+      $(this).parent().parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data) {
+          if (data.success !== "True") {
+            alert("Sorry there was an error, please try again.");
+          }
         }
+      });
     });
-
-
-    // toggle between displaying edit option and delete option to user for essays
-    $('#edit-essays').click(function () {
-        deletingEssays = !deletingEssays;
-        if (deletingEssays) {
-            $('#edit-essays').removeClass('blue edit');
-            $('#edit-essays').addClass('blue check');
-            $('.sup-essay-button').removeClass('blue');
-            $('.sup-essay-button').addClass('red');
-            $('.sup-essay-card').removeClass('blue');
-            $('.sup-essay-card').addClass('red');
-            $('.sup-essay-button').html('<i class="remove icon"></i>Remove');
-            $('.common-essay-button').removeClass('blue');
-            $('.common-essay-button').addClass('red');
-            $('.common-essay-card').removeClass('blue');
-            $('.common-essay-card').addClass('red');
-            $('.common-essay-button').html('<i class="remove icon"></i>Remove');
-        } else {
-            $('#edit-essays').removeClass('blue check');
-            $('#edit-essays').addClass('blue edit');
-            $('.sup-essay-button').removeClass('red');
-            $('.sup-essay-button').addClass('blue');
-            $('.sup-essay-card').removeClass('red');
-            $('.sup-essay-card').addClass('blue');
-            $('.sup-essay-button').html('<i class="edit icon"></i>Edit');
-            $('.common-essay-button').removeClass('red');
-            $('.common-essay-button').addClass('blue');
-            $('.common-essay-card').removeClass('red');
-            $('.common-essay-card').addClass('blue');
-            $('.common-essay-button').html('<i class="edit icon"></i>Edit');
-        }
-    });
-
-    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
-    $('.common-essay-button').click(function() {
-        if (deletingEssays) {
-            var url = '/student/profile/common_app_essay/delete';
-            location.href = url;
-        } else {
-            var url = '/student/profile/common_app_essay/edit';
-            location.href = url;
-        }
-    });
-
-    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
-    $('.sup-essay-button').click(function() {
-        if (deletingEssays) {
-            var url = '/student/profile/supplemental_essay/delete/' + $(this).data('id');
-            var that = this;
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function(data) {
-                    if (data.success) {
-                        if (data.success === "True") {
-                            $(that).parent().remove();
-                        } else {
-                            alert("Sorry there was an error, please try again.");
-                        }
-
-                    }
-
-                }
-            })
-        } else {
-            var url = '/student/profile/supplemental_essay/edit/' + $(this).data('id');
-            location.href = url;
-        }
-    });
-
-    // toggle between displaying edit and delete option to user for rec. letters
-    $('#edit-letters').click(function () {
-        deletingLetters = !deletingLetters;
-        if (deletingLetters) {
-            $('#edit-letters').removeClass('blue edit');
-            $('#edit-letters').addClass('blue check');
-            $('.letter-button').removeClass('blue');
-            $('.letter-button').addClass('red');
-            $('.letter-card').removeClass('blue');
-            $('.letter-card').addClass('red');
-            $('.letter-button').html('<i class="remove icon"></i>Remove');
-        } else {
-            $('#edit-letters').removeClass('blue check');
-            $('#edit-letters').addClass('blue edit');
-            $('.letter-button').removeClass('red');
-            $('.letter-button').addClass('blue');
-            $('.letter-card').removeClass('red');
-            $('.letter-card').addClass('blue');
-            $('.letter-button').html('<i class="edit icon"></i>Edit');
-        }
-    });
-
-    // send ajax request when user clicks in delete mode, redirect to edit page otherwise
-    $('.letter-button').click(function() {
-        if (deletingLetters) {
-            var url = '/student/profile/recommendation_letter/delete/' + $(this).data('id');
-            var that = this;
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function(data) {
-                    if (data.success) {
-                        if (data.success === "True") {
-                            $(that).parent().remove();
-                        } else {
-                            alert("Sorry there was an error, please try again.");
-                        }
-
-                    }
-
-                }
-            })
-        } else {
-            var url = '/student/profile/recommendation_letter/edit/' + $(this).data('id');
-            location.href = url;
-        }
-    });
-
-
-});
-
+  });
 </script>
 {% endblock %}
