@@ -1,7 +1,24 @@
+from . import ScattergramData
 from .. import db
 
 import random
 from datetime import datetime
+import json
+import requests
+from requests.auth import HTTPBasicAuth
+import plotly.tools as tools
+import plotly.plotly as py
+import plotly.graph_objs as go
+
+username = 'ktjx'
+api_key = 'xO7VaxjEmJnimiYnhKfS'
+
+# CHANGE THIS LMAO
+tools.set_credentials_file(username=username, api_key=api_key)
+
+# Delete plot urls if they exist already
+auth = HTTPBasicAuth(username, api_key)
+headers = {'Plotly-Client-Platform': 'python'}
 
 
 class College(db.Model):
@@ -15,7 +32,28 @@ class College(db.Model):
     plot_ACT = db.Column(db.String)
 
     def update_plots(self):
+        if (self.plot_SAT2400):
+            plot_num = self.plot_SAT2400[1 + self.plot_SAT2400.rfind('/')]
+            requests.post('https://api.plot.ly/v2/files/' +
+                          username + ':' + plot_num + '/trash', auth=auth, headers=headers)
+            requests.delete('https://api.plot.ly/v2/files/' + username + ':' + plot_num +
+                            '/permanent_delete', auth=auth, headers=headers)
+        if (self.plot_SAT1600):
+            plot_num = self.plot_SAT1600[1 + self.plot_SAT1600.rfind('/')]
+            requests.post('https://api.plot.ly/v2/files/' +
+                          username + ':' + plot_num + '/trash', auth=auth, headers=headers)
+            requests.delete('https://api.plot.ly/v2/files/' + username + ':' + plot_num +
+                            '/permanent_delete', auth=auth, headers=headers)
+        if (self.plot_ACT):
+            plot_num = self.plot_ACT[1 + self.plot_ACT.rfind('/')]
+            requests.post('https://api.plot.ly/v2/files/' +
+                          username + ':' + plot_num + '/trash', auth=auth, headers=headers)
+            requests.delete('https://api.plot.ly/v2/files/' + username + ':' + plot_num +
+                            '/permanent_delete', auth=auth, headers=headers)
+
         data = ScattergramData.query.filter_by(college=self.name).all()
+
+        college_filename = self.name.replace(' ', '-').lower()
 
         # GPA vs. SAT [2400]
         SAT2400_Accepted = []
@@ -54,9 +92,6 @@ class College(db.Model):
         GPA_ACT_Waitlisted3 = []
 
         for i in range(len(data)):
-            print('SAT [2400] ' + str(data[i].SAT2400))
-            print('SAT [1600] ' + str(data[i].SAT1600))
-            print('ACT ' + str(data[i].ACT))
             if(data[i].SAT2400):
                 if(data[i].status == 'Accepted'):
                     SAT2400_Accepted.append(int(data[i].SAT2400))
@@ -64,13 +99,13 @@ class College(db.Model):
                 elif(data[i].status == 'Denied'):
                     SAT2400_Denied.append(int(data[i].SAT2400))
                     GPA_SAT2400_Denied.append(data[i].GPA)
-                elif(data[i].status == 'Waitlisted or Deferred (Accepted)'):
+                elif(data[i].status == 'Waitlisted/Deferred (Accepted)'):
                     SAT2400_Waitlisted1.append(int(data[i].SAT2400))
                     GPA_SAT2400_Waitlisted1.append(data[i].GPA)
-                elif(data[i].status == 'Waitlisted or Deferred (Denied)'):
+                elif(data[i].status == 'Waitlisted/Deferred (Denied)'):
                     SAT2400_Waitlisted2.append(int(data[i].SAT2400))
                     GPA_SAT2400_Waitlisted2.append(data[i].GPA)
-                if(data[i].status == 'Waitlisted or Deferred (Withdrew App)'):
+                if(data[i].status == 'Waitlisted/Deferred (Withdrew App)'):
                     SAT2400_Waitlisted3.append(int(data[i].SAT2400))
                     GPA_SAT2400_Waitlisted3.append(data[i].GPA)
 
@@ -81,13 +116,13 @@ class College(db.Model):
                 elif(data[i].status == 'Denied'):
                     SAT1600_Denied.append(int(data[i].SAT1600))
                     GPA_SAT1600_Denied.append(data[i].GPA)
-                elif(data[i].status == 'Waitlisted or Deferred (Accepted)'):
+                elif(data[i].status == 'Waitlisted/Deferred (Accepted)'):
                     SAT1600_Waitlisted1.append(int(data[i].SAT1600))
                     GPA_SAT1600_Waitlisted1.append(data[i].GPA)
-                elif(data[i].status == 'Waitlisted or Deferred (Denied)'):
+                elif(data[i].status == 'Waitlisted/Deferred (Denied)'):
                     SAT1600_Waitlisted2.append(int(data[i].SAT1600))
                     GPA_SAT1600_Waitlisted2.append(data[i].GPA)
-                if(data[i].status == 'Waitlisted or Deferred (Withdrew App)'):
+                if(data[i].status == 'Waitlisted/Deferred (Withdrew App)'):
                     SAT1600_Waitlisted3.append(int(data[i].SAT1600))
                     GPA_SAT1600_Waitlisted3.append(data[i].GPA)
 
@@ -98,23 +133,15 @@ class College(db.Model):
                 elif(data[i].status == 'Denied'):
                     ACT_Denied.append(int(data[i].ACT))
                     GPA_ACT_Denied.append(data[i].GPA)
-                elif(data[i].status == 'Waitlisted or Deferred (Accepted)'):
+                elif(data[i].status == 'Waitlisted/Deferred (Accepted)'):
                     ACT_Waitlisted1.append(int(data[i].ACT))
                     GPA_ACT_Waitlisted1.append(data[i].GPA)
-                elif(data[i].status == 'Waitlisted or Deferred (Denied)'):
+                elif(data[i].status == 'Waitlisted/Deferred (Denied)'):
                     ACT_Waitlisted2.append(int(data[i].ACT))
                     GPA_ACT_Waitlisted2.append(data[i].GPA)
-                if(data[i].status == 'Waitlisted or Deferred (Withdrew App)'):
+                if(data[i].status == 'Waitlisted/Deferred (Withdrew App)'):
                     ACT_Waitlisted3.append(int(data[i].ACT))
                     GPA_ACT_Waitlisted3.append(data[i].GPA)
-
-        import plotly.tools as tools
-        import plotly.plotly as py
-        import plotly.graph_objs as go
-
-        # CHANGE THIS LMAO
-        tools.set_credentials_file(
-            username='ktjx', api_key='xO7VaxjEmJnimiYnhKfS')
 
         # Create a trace
         trace0 = go.Scatter(
@@ -135,27 +162,27 @@ class College(db.Model):
             x=SAT2400_Waitlisted1,
             y=GPA_SAT2400_Waitlisted1,
             mode='markers',
-            name="Waitlisted or Deferred (Accepted)"
+            name="Waitlisted/Deferred (Accepted)"
         )
 
         trace3 = go.Scatter(
             x=SAT2400_Waitlisted2,
             y=GPA_SAT2400_Waitlisted2,
             mode='markers',
-            name="Waitlisted or Deferred (Denied)"
+            name="Waitlisted/Deferred (Denied)"
         )
 
         trace4 = go.Scatter(
             x=SAT2400_Waitlisted3,
             y=GPA_SAT2400_Waitlisted3,
             mode='markers',
-            name="Waitlisted or Deferred (Withdrew App)"
+            name="Waitlisted/Deferred (Withdrew App)"
         )
 
         layout1 = go.Layout(
-            title='SAT2400 vs. GPA',
+            title='{}: SAT [2400] vs. GPA'.format(self.name),
             xaxis=dict(
-                title='SAT2400'
+                title='SAT [2400]'
             ),
             yaxis=dict(
                 title='GPA',
@@ -165,7 +192,7 @@ class College(db.Model):
         fig1 = go.Figure(data=[trace0, trace1, trace2,
                                trace3, trace4], layout=layout1)
         self.plot_SAT2400 = py.plot(
-            fig1, filename='basic-scatter1', auto_open=False)
+            fig1, filename=college_filename+'-sat2400', auto_open=False)
 
         # Create a trace
         trace5 = go.Scatter(
@@ -186,25 +213,25 @@ class College(db.Model):
             x=SAT1600_Waitlisted1,
             y=GPA_SAT1600_Waitlisted1,
             mode='markers',
-            name="Waitlisted or Deferred (Accepted)"
+            name="Waitlisted/Deferred (Accepted)"
         )
 
         trace8 = go.Scatter(
             x=SAT1600_Waitlisted2,
             y=GPA_SAT1600_Waitlisted2,
             mode='markers',
-            name="Waitlisted or Deferred (Denied)"
+            name="Waitlisted/Deferred (Denied)"
         )
 
         trace9 = go.Scatter(
             x=SAT1600_Waitlisted3,
             y=GPA_SAT1600_Waitlisted3,
             mode='markers',
-            name="Waitlisted or Deferred (Withdrew App)"
+            name="Waitlisted/Deferred (Withdrew App)"
         )
 
         layout2 = go.Layout(
-            title='SAT1600 vs. GPA',
+            title='{}: SAT [1600] vs. GPA'.format(self.name),
             xaxis=dict(
                 title='SAT1600'
             ),
@@ -215,8 +242,8 @@ class College(db.Model):
 
         fig2 = go.Figure(data=[trace5, trace6, trace7,
                                trace8, trace9], layout=layout2)
-        plot_SAT1600 = py.plot(
-            fig2, filename='basic-scatter2', auto_open=False)
+        self.plot_SAT1600 = py.plot(
+            fig2, filename=college_filename + '-sat1600', auto_open=False)
 
         # Create a trace
         trace10 = go.Scatter(
@@ -237,25 +264,25 @@ class College(db.Model):
             x=ACT_Waitlisted1,
             y=GPA_ACT_Waitlisted1,
             mode='markers',
-            name="Waitlisted or Deferred (Accepted)"
+            name="Waitlisted/Deferred (Accepted)"
         )
 
         trace13 = go.Scatter(
             x=ACT_Waitlisted2,
             y=GPA_ACT_Waitlisted2,
             mode='markers',
-            name="Waitlisted or Deferred (Denied)"
+            name="Waitlisted/Deferred (Denied)"
         )
 
         trace14 = go.Scatter(
             x=ACT_Waitlisted3,
             y=GPA_ACT_Waitlisted3,
             mode='markers',
-            name="Waitlisted or Deferred (Withdrew App)"
+            name="Waitlisted/Deferred (Withdrew App)"
         )
 
         layout3 = go.Layout(
-            title='ACT vs. GPA',
+            title='{}: ACT vs. GPA'.format(self.name),
             xaxis=dict(
                 title='ACT'
             ),
@@ -267,7 +294,7 @@ class College(db.Model):
         fig3 = go.Figure(data=[trace10, trace11, trace12,
                                trace13, trace14], layout=layout3)
         self.plot_ACT = py.plot(
-            fig3, filename='basic-scatter3', auto_open=False)
+            fig3, filename=college_filename + '-act', auto_open=False)
 
     @staticmethod
     def get_college_by_name(name):

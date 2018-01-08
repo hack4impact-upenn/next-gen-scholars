@@ -518,8 +518,10 @@ def upload_scattergram():
         f = request.files['file']
         contents = f.read()
         lines = contents.split('\r'.encode('utf-8'))
+        college_names = set()
         for line in lines[1:]:
             line = line.split(','.encode('utf-8'))
+            college_names.add(str(line[1], 'utf-8').strip())
             point = ScattergramData(
                 name=str(line[0], 'utf-8').strip(),
                 college=str(line[1], 'utf-8').strip(),
@@ -531,5 +533,10 @@ def upload_scattergram():
             )
             db.session.add(point)
         db.session.commit()
+        for name in list(college_names):
+            print(name)
+            college = College.query.filter_by(name=name).first()
+            if college:
+                college.update_plots()
         return contents
     return render_template('counselor/upload_scattergram.html')
