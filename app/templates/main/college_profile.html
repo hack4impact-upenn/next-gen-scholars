@@ -11,10 +11,15 @@
         <p><strong>Early</strong>: {{ college.early_deadline }}</p>
         <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
 
-        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{plot_url1}}.embed?showlink=false"></iframe>
-        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{plot_url2}}.embed?showlink=false"></iframe>
-        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{plot_url3}}.embed?showlink=false"></iframe>
-
+        {% if college.plot_SAT2400 %}
+        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT2400}}.embed?showlink=false"></iframe>
+        {% endif %}
+        {% if college.plot_SAT1600 %}
+        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>
+        {% endif %}
+        {% if college.plot_ACT %}
+        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_ACT}}.embed?showlink=false"></iframe>
+        {% endif %}
     </div>
 </div>
 
