@@ -305,6 +305,7 @@ def edit_test_score(item_id):
             student_profile_id=test_score.student_profile_id)
     abort(404)
 
+    
 def get_redirect_url(student_profile_id):
     if (current_user.is_student()
             and current_user.student_profile_id == student_profile_id):
@@ -447,7 +448,7 @@ def delete_college(item_id, student_profile_id):
         return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
-
+  
 # common app essay methods
 
 
@@ -524,6 +525,7 @@ def delete_common_app_essay(student_profile_id):
 
 
 # supplemental essay methods
+
 
 @student.route('/profile/add_supplemental_essay/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
