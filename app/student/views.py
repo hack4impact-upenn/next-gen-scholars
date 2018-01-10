@@ -20,10 +20,7 @@ import flask
 import requests
 import os
 import datetime
-os.environ[
-    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
-import plotly.plotly as py
-from plotly.graph_objs import *
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 
 @student.route('/profile')
@@ -462,7 +459,8 @@ def edit_common_app_essay(student_profile_id):
 @login_required
 @csrf.exempt
 def delete_common_app_essay(student_profile_id):
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     student_profile.common_app_essay = ''
     student_profile.common_app_essay_status = 'Incomplete'
     db.session.add(student_profile)

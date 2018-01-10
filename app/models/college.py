@@ -1,6 +1,7 @@
 from . import ScattergramData
 from .. import db
 
+import os
 import random
 from datetime import datetime
 import json
@@ -10,16 +11,14 @@ import plotly.tools as tools
 import plotly.plotly as py
 import plotly.graph_objs as go
 
-username = 'ktjx'
-api_key = 'xO7VaxjEmJnimiYnhKfS'
+PLOTLY_USERNAME = os.environ.get('PLOTLY_USERNAME')
+PLOTLY_API_KEY = os.environ.get('PLOTLY_API_KEY')
 
-# CHANGE THIS LMAO
-tools.set_credentials_file(username=username, api_key=api_key)
+py.sign_in(PLOTLY_USERNAME, PLOTLY_API_KEY)
+tools.set_credentials_file(username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
 
-# Delete plot urls if they exist already
-auth = HTTPBasicAuth(username, api_key)
+auth = HTTPBasicAuth(PLOTLY_USERNAME, PLOTLY_API_KEY)
 headers = {'Plotly-Client-Platform': 'python'}
-
 
 class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,19 +34,19 @@ class College(db.Model):
         if (self.plot_SAT2400):
             plot_num = self.plot_SAT2400[1 + self.plot_SAT2400.rfind('/')]
             requests.post('https://api.plot.ly/v2/files/' +
-                          username + ':' + plot_num + '/trash', auth=auth, headers=headers)
+                          PLOTLY_USERNAME + ':' + plot_num + '/trash', auth=auth, headers=headers)
             requests.delete('https://api.plot.ly/v2/files/' + username + ':' + plot_num +
                             '/permanent_delete', auth=auth, headers=headers)
         if (self.plot_SAT1600):
             plot_num = self.plot_SAT1600[1 + self.plot_SAT1600.rfind('/')]
             requests.post('https://api.plot.ly/v2/files/' +
-                          username + ':' + plot_num + '/trash', auth=auth, headers=headers)
+                          PLOTLY_USERNAME + ':' + plot_num + '/trash', auth=auth, headers=headers)
             requests.delete('https://api.plot.ly/v2/files/' + username + ':' + plot_num +
                             '/permanent_delete', auth=auth, headers=headers)
         if (self.plot_ACT):
             plot_num = self.plot_ACT[1 + self.plot_ACT.rfind('/')]
             requests.post('https://api.plot.ly/v2/files/' +
-                          username + ':' + plot_num + '/trash', auth=auth, headers=headers)
+                          PLOTLY_USERNAME + ':' + plot_num + '/trash', auth=auth, headers=headers)
             requests.delete('https://api.plot.ly/v2/files/' + username + ':' + plot_num +
                             '/permanent_delete', auth=auth, headers=headers)
 
