@@ -5,7 +5,7 @@ from flask_rq import get_queue
 from . import account
 from .. import db
 from ..email import send_email
-from ..models import User, ChecklistItem
+from ..models import User, ChecklistItem, StudentProfile
 from .forms import (ChangeEmailForm, ChangePasswordForm, CreatePasswordForm,
                     LoginForm, RegistrationForm, RequestResetPasswordForm,
                     ResetPasswordForm)
@@ -36,7 +36,9 @@ def register():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             email=form.email.data,
-            password=form.password.data)
+            password=form.password.data,
+            student_profile=StudentProfile()
+        )
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()

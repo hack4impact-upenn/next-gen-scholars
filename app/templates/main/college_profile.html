@@ -11,8 +11,18 @@
         <p><strong>Early</strong>: {{ college.early_deadline }}</p>
         <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
 
-        <iframe width="600" height="400" frameborder="0" scrolling="no" src="//plot.ly/~aruna/441.embed"></iframe>
-
+        {% if college.plot_SAT1600 %}
+        <h4 class="ui header">GPA vs. SAT [1600] Scattergram</h4>
+        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>
+        {% endif %}
+        {% if college.plot_ACT %}
+        <h4 class="ui header">GPA vs. ACT Scattergram</h4>
+        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_ACT}}.embed?showlink=false"></iframe>
+        {% endif %}
+        {% if college.plot_SAT2400 %}
+        <h4 class="ui header">GPA vs. SAT [2400] Scattergram</h4>
+        <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT2400}}.embed?showlink=false"></iframe>
+        {% endif %}
     </div>
 </div>
 

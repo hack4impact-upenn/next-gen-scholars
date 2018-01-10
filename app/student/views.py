@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile
+from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -20,10 +20,7 @@ import flask
 import requests
 import os
 import datetime
-os.environ[
-    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
-import plotly.plotly as py
-from plotly.graph_objs import *
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 
 @student.route('/profile')
@@ -462,8 +459,8 @@ def edit_common_app_essay(student_profile_id):
 @login_required
 @csrf.exempt
 def delete_common_app_essay(student_profile_id):
-    print(student_profile_id)
-    student_profile = StudentProfile.query.filter_by(id=student_profile_id).first()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     student_profile.common_app_essay = ''
     student_profile.common_app_essay_status = 'Incomplete'
     db.session.add(student_profile)
@@ -874,9 +871,9 @@ def update_checklist_item(item_id):
 @student.route('/college_profile/<int:college_id>')
 @login_required
 def view_college_profile(college_id):
-    current_college = College.query.filter_by(id=college_id).first()
+    college = College.query.filter_by(id=college_id).first()
     return render_template(
-        'main/college_profile.html', college=current_college)
+        'main/college_profile.html', college=college)
 
 
 def string_to_bool(str):
