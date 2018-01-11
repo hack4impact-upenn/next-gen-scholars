@@ -4,6 +4,7 @@ module (as opposed to just their python files)
 """
 
 from .checklist_item import *
+from .scattergram_data import *
 from .college import *
 from .essay import *
 from .major import *
@@ -13,6 +14,5 @@ from .test_name import *
 from .test_score import *
 from .student_profile import *
 from .user import *
-from .scattergram_data import *
 from .notification import *
 from .sms_alert import *

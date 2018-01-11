@@ -526,29 +526,31 @@ def edit_alert(alert_id):
 @counselor_required
 def upload_scattergram():
     if request.method == 'POST':
-        f = request.files['file']
-        contents = f.read()
-
-        data = ","
-        line_info = contents.split(data.encode("utf-8"))
-
-        for i in range(1, int(len(line_info) / 6)):
-
-            arguments = line_info[6 * i + 6].split()
-            if len(arguments) == 1:
-                insert = None
-            else:
-                insert = arguments[0].strip()
-
-            scattergram_data = ScattergramData(
-                name=line_info[6 * i + 1].strip(),
-                status=line_info[6 * i + 2].strip(),
-                GPA=line_info[6 * i + 3].strip(),
-                SAT2400=line_info[6 * i + 4].strip(),
-                SAT1600=line_info[6 * i + 5].strip(),
-                ACT=insert)
-
-            db.session.add(scattergram_data)
-        db.session.commit()
-        return "File uploaded successfully"
-    return render_template('counselor/upload_scattergram.html')
+        try:
+            f = request.files['file']
+            contents = f.read()
+            lines = contents.split('\r'.encode('utf-8'))
+            college_names = set()
+            for line in lines[1:]:
+                line = line.split(','.encode('utf-8'))
+                college_names.add(str(line[1], 'utf-8').strip())
+                point = ScattergramData(
+                    name=str(line[0], 'utf-8').strip(),
+                    college=str(line[1], 'utf-8').strip(),
+                    status=str(line[2], 'utf-8').strip(),
+                    GPA=str(line[3], 'utf-8').strip(),
+                    SAT2400=str(line[4], 'utf-8').strip(),
+                    SAT1600=str(line[5], 'utf-8').strip(),
+                    ACT=str(line[6], 'utf-8').strip()
+                )
+                db.session.add(point)
+            db.session.commit()
+            for name in list(college_names):
+                college = College.query.filter_by(name=name).first()
+                if college:
+                    college.update_plots()
+            message, message_type = 'Upload successful!', 'positive'
+        except:
+            message, message_type = 'Error with upload. Please make sure the format of the CSV file matches the description.', 'negative'
+        return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
+    return render_template('counselor/upload_scattergram.html', message=None, message_type=None)

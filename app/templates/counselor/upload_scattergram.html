@@ -40,6 +40,14 @@
             When you are finished entering all the data, download your excel sheet as a CSV file, then upload it to this portal and click "Submit."
          </p>
          <h4 class="ui header">Upload CSV File</h4>
+         {% if message %}
+         <div class="ui {{ message_type }} message">
+            <i class="close icon"></i>
+            <div class="header">
+              {{ message }}
+            </div>
+          </div>
+         {% endif %}
          <form class="ui form" method="POST" enctype="multipart/form-data">
             <label id="scattergram-file-label" for="scattergram-file" class="ui icon button">
                <i class="file icon"></i>
@@ -53,8 +61,8 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function() {
+   var filename = '';
    $('#scattergram-file').on('change', function(e) {
-      var filename;
       var $label = $('#scattergram-file-label');
       if (e.target.value) {
          filename = e.target.value.split('\\').pop();
