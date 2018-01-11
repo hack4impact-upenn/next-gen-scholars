@@ -37,8 +37,7 @@ def register():
             last_name=form.last_name.data,
             email=form.email.data,
             password=form.password.data,
-            student_profile=StudentProfile()
-        )
+            student_profile=StudentProfile())
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()

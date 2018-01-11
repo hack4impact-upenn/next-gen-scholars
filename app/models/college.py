@@ -15,10 +15,10 @@ PLOTLY_USERNAME = os.environ.get('PLOTLY_USERNAME')
 PLOTLY_API_KEY = os.environ.get('PLOTLY_API_KEY')
 
 py.sign_in(PLOTLY_USERNAME, PLOTLY_API_KEY)
-tools.set_credentials_file(username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
 
 auth = HTTPBasicAuth(PLOTLY_USERNAME, PLOTLY_API_KEY)
 headers = {'Plotly-Client-Platform': 'python'}
+
 
 class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -191,7 +191,7 @@ class College(db.Model):
         fig1 = go.Figure(data=[trace0, trace1, trace2,
                                trace3, trace4], layout=layout1)
         self.plot_SAT2400 = py.plot(
-            fig1, filename=college_filename+'-sat2400', auto_open=False)
+            fig1, filename=college_filename + '-sat2400', auto_open=False)
 
         # Create a trace
         trace5 = go.Scatter(
@@ -333,20 +333,19 @@ class College(db.Model):
             datetime(2017, 1, 14)
         ]
         descriptions = [
-            'Private research university',
-            'Ivy League university',
-            'Liberal arts college',
-            'Public research university',
+            'Private research university', 'Ivy League university',
+            'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
 
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
-                college = College(name=c, description=random.choice(descriptions),
-                                  regular_deadline=random.choice(
-                                      regular_deadlines),
-                                  early_deadline=random.choice(early_deadlines))
+                college = College(
+                    name=c,
+                    description=random.choice(descriptions),
+                    regular_deadline=random.choice(regular_deadlines),
+                    early_deadline=random.choice(early_deadlines))
             db.session.add(college)
         db.session.commit()
 

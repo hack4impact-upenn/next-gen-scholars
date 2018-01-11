@@ -45,6 +45,11 @@ def view_user_profile():
         abort(404)
 
 
+@student.route('/profile_from_id/<int:student_profile_id>')
+def get_profile_from_id(student_profile_id):
+    return redirect(get_redirect_url(student_profile_id))
+
+
 @student.route('/calendar')
 @login_required
 def calendar():
@@ -176,9 +181,13 @@ def add_pending_events():
     db.session.commit()
 
 
-@student.route('/profile/edit/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/edit/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def edit_profile(student_profile_id):
+    # only allows the student or counselors/admins to edit a student's profile
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     # Allow user to update basic profile information.
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
@@ -209,17 +218,24 @@ def edit_profile(student_profile_id):
             db.session.commit()
             url = get_redirect_url(student_profile.id)
             return redirect(url)
-        return render_template('student/update_profile.html', form=form)
-    flash('Profile could not be updated.', 'error')
-    return redirect(url_for('student.view_user_profile'))
+        return render_template(
+            'student/update_profile.html',
+            form=form,
+            student_profile_id=student_profile.id)
+    abort(404)
 
 
 # test score methods
 
 
-@student.route('/profile/add_test_score/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_test_score/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_test_score(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     form = AddTestScoreForm()
     if form.validate_on_submit():
         # create new test score from form data
@@ -234,7 +250,10 @@ def add_test_score(student_profile_id):
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add Test Score")
+        'student/add_academic_info.html',
+        form=form,
+        header="Add Test Score",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -244,9 +263,11 @@ def add_test_score(student_profile_id):
 def delete_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
-        db.session.delete(test_score)
-        db.session.commit()
-        return jsonify({"success": "True"})
+        # only allows the student or counselors/admins to perform action
+        if test_score.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
+            db.session.delete(test_score)
+            db.session.commit()
+            return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
 
@@ -256,6 +277,9 @@ def delete_test_score(item_id):
 def edit_test_score(item_id):
     test_score = TestScore.query.filter_by(id=item_id).first()
     if test_score:
+        # only allows the student or counselors/admins to access page
+        if test_score.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
         form = EditTestScoreForm(
             test_name=TestName.query.filter_by(name=test_score.name).first(),
             month=test_score.month,
@@ -273,28 +297,36 @@ def edit_test_score(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Test Score")
-    flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
+            header="Edit Test Score",
+            student_profile_id=test_score.student_profile_id)
+    abort(404)
 
 
 def get_redirect_url(student_profile_id):
-    if (current_user.is_student() and current_user.student_profile_id == student_profile_id):
+    if (current_user.is_student()
+            and current_user.student_profile_id == student_profile_id):
         return url_for('student.view_user_profile')
     else:
         if (current_user.is_counselor() or current_user.is_admin()):
             student = User.query.filter_by(
                 student_profile_id=student_profile_id).first()
             if student is not None:
-                return url_for('counselor.view_user_profile', user_id=student.id)
-    return url_for('main.index')
+                return url_for(
+                    'counselor.view_user_profile', user_id=student.id)
+    return abort(404)
+
 
 # recommendation letter methods
 
 
-@student.route('/profile/add_recommendation_letter/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_recommendation_letter/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_recommendation_letter(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     form = AddRecommendationLetterForm()
     if form.validate_on_submit():
         new_item = RecommendationLetter(
@@ -309,7 +341,8 @@ def add_recommendation_letter(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Recommendation Letter")
+        header="Add Recommendation Letter",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -319,6 +352,9 @@ def add_recommendation_letter(student_profile_id):
 def edit_recommendation_letter(item_id):
     letter = RecommendationLetter.query.filter_by(id=item_id).first()
     if letter:
+        # only allows the student or counselors/admins to access page
+        if letter.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
         form = EditRecommendationLetterForm(
             name=letter.name, category=letter.category, status=letter.status)
         if form.validate_on_submit():
@@ -332,9 +368,9 @@ def edit_recommendation_letter(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Recommendation Letter")
-    flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
+            header="Edit Recommendation Letter",
+            student_profile_id=letter.student_profile_id)
+    abort(404)
 
 
 @student.route(
@@ -345,31 +381,40 @@ def edit_recommendation_letter(item_id):
 def delete_recommendation_letter(item_id):
     letter = RecommendationLetter.query.filter_by(id=item_id).first()
     if letter:
-        db.session.delete(letter)
-        db.session.commit()
-        db.session.commit()
-        return jsonify({"success": "True"})
+        # only allows the student or counselors/admins to perform action
+        if letter.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
+            db.session.delete(letter)
+            db.session.commit()
+            return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
 
 # college methods
 
 
-@student.route('/profile/add_college/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_college/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_college(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     # Add a college student is interested in.
     form = AddCollegeForm()
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     if form.validate_on_submit():
-        student_profile.colleges.append(form.name.data)
-        db.session.add(student_profile)
-        db.session.commit()
+        if form.name.data not in student_profile.colleges:
+            student_profile.colleges.append(form.name.data)
+            db.session.add(student_profile)
+            db.session.commit()
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add College")
+        'student/add_academic_info.html',
+        form=form,
+        header="Add College",
+        student_profile_id=student_profile_id)
 
 
 @student.route('/colleges')
@@ -380,45 +425,37 @@ def colleges():
     return render_template('student/colleges.html', colleges=colleges)
 
 
-@student.route('/profile/college/delete/<int:item_id>', methods=['POST'])
+@student.route(
+    '/profile/college/delete/<int:item_id>/<int:student_profile_id>',
+    methods=['POST'])
 @login_required
 @csrf.exempt
-def delete_college(item_id):
+def delete_college(item_id, student_profile_id):
+    # only allows the student or counselors/admins to perform action
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        return jsonify({"success": "False"})
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     college = College.query.filter_by(id=item_id).first()
-    if college:
-        db.session.delete(college)
+    if college and student_profile:
+        student_profile.colleges.remove(college)
+        db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
 
-# TODO: i dont think we need this funtion
-@student.route('/profile/college/edit/<int:item_id>', methods=['GET', 'POST'])
-@login_required
-def edit_college(item_id):
-    college = College.query.filter_by(id=item_id).first()
-    if college:
-        form = EditCollegeForm(college_name=college.name)
-        if form.validate_on_submit():
-            college.name = form.college_name.data
-            db.session.add(college)
-            db.session.commit()
-            url = get_redirect_url(student_profile_id)
-            return redirect(url)
-        return render_template(
-            'student/edit_academic_info.html',
-            form=form,
-            header="Edit College")
-    flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
-
-
 # common app essay methods
 
 
-@student.route('/profile/add_common_app_essay/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_common_app_essay/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_common_app_essay(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     form = AddCommonAppEssayForm()
     if form.validate_on_submit():
         student_profile = StudentProfile.query.filter_by(
@@ -432,12 +469,18 @@ def add_common_app_essay(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
+        student_profile_id=student_profile_id,
         header="Add Common App Essay")
 
 
-@student.route('/profile/common_app_essay/edit/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/common_app_essay/edit/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def edit_common_app_essay(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     form = EditCommonAppEssayForm(
@@ -452,27 +495,40 @@ def edit_common_app_essay(student_profile_id):
     return render_template(
         'student/edit_academic_info.html',
         form=form,
-        header="Edit Common App Essay")
+        header="Edit Common App Essay",
+        student_profile_id=student_profile.id)
 
 
-@student.route('/profile/common_app_essay/delete/<int:student_profile_id>', methods=['POST'])
+@student.route(
+    '/profile/common_app_essay/delete/<int:student_profile_id>',
+    methods=['POST'])
 @login_required
 @csrf.exempt
 def delete_common_app_essay(student_profile_id):
+    # only allows the student or counselors/admins to perform action
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
-    student_profile.common_app_essay = ''
-    student_profile.common_app_essay_status = 'Incomplete'
-    db.session.add(student_profile)
-    db.session.commit()
-    url = get_redirect_url(student_profile_id)
-    return redirect(url)
+    if student_profile:
+        student_profile.common_app_essay = ''
+        student_profile.common_app_essay_status = 'Incomplete'
+        db.session.add(student_profile)
+        db.session.commit()
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
+    abort(404)
 
 
 # supplemental essay methods
+
+
 @student.route('/profile/add_supplemental_essay/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_supplemental_essay(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     form = AddSupplementalEssayForm()
     if form.validate_on_submit():
         # create new essay from form data
@@ -489,7 +545,8 @@ def add_supplemental_essay(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Supplemental Essay")
+        header="Add Supplemental Essay",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
@@ -498,6 +555,9 @@ def add_supplemental_essay(student_profile_id):
 def edit_supplemental_essay(item_id):
     essay = Essay.query.filter_by(id=item_id).first()
     if essay:
+        # only allows the student or counselors/admins to access page
+        if essay.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
         form = EditSupplementalEssayForm(
             essay_name=essay.name, link=essay.link, status=essay.status)
         if form.validate_on_submit():
@@ -511,9 +571,9 @@ def edit_supplemental_essay(item_id):
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Supplemental Essay")
-    flash('Item could not be updated', 'error')
-    return redirect(url_for('student.view_user_profile'))
+            header="Edit Supplemental Essay",
+            student_profile_id=essay.student_profile_id)
+    abort(404)
 
 
 @student.route(
@@ -524,6 +584,9 @@ def edit_supplemental_essay(item_id):
 def delete_supplemental_essay(item_id):
     essay = Essay.query.filter_by(id=item_id).first()
     if essay:
+        # only allows the student or counselors/admins to perform action
+        if essay.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            return jsonify({"success": "False"})
         db.session.delete(essay)
         db.session.commit()
         return jsonify({"success": "True"})
@@ -533,16 +596,20 @@ def delete_supplemental_essay(item_id):
 # major methods
 
 
-@student.route('/profile/add_major/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_major/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def add_major(student_profile_id):
+    # only allows the student or counselors/admins to access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
     # Add a major student is interested in.
     form = AddMajorForm()
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     if form.validate_on_submit():
         if form.major.data not in student_profile.majors:
-            # Only check to add major if not already in their list.
+            # Only add major if not already in their list.
             major_name = Major.query.filter_by(name=form.major.data).first()
             if major_name is not None:
                 # Major already exists in database.
@@ -555,22 +622,34 @@ def add_major(student_profile_id):
             return redirect(url)
 
     return render_template(
-        'student/add_academic_info.html', form=form, header="Add Major")
+        'student/add_academic_info.html',
+        form=form,
+        header="Add Major",
+        student_profile_id=student_profile_id)
 
 
-@student.route('/profile/major/delete/<int:item_id>', methods=['POST'])
+@student.route(
+    '/profile/major/delete/<int:item_id>/<int:student_profile_id>',
+    methods=['POST'])
 @login_required
 @csrf.exempt
-def delete_major(item_id):
+def delete_major(item_id, student_profile_id):
+    # only allows the student or counselors/admins to perform action
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        return jsonify({"success": "False"})
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     major = Major.query.filter_by(id=item_id).first()
     if major:
-        db.session.delete(major)
+        student_profile.majors.remove(major)
+        db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
 
 # checklist methods
+
 
 @student.route('/')
 @login_required
@@ -585,6 +664,15 @@ def dashboard():
         return redirect(url_for('main.index'))
 
 
+# order checklist items so soonest deadline is first
+# checklists with no deadline appear at the end
+def compare_checklist_items(item):
+    if item.deadline:
+        return item.deadline
+    else:
+        return date.max
+
+
 @student.route('/checklist/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
 def checklist(student_profile_id):
@@ -593,9 +681,11 @@ def checklist(student_profile_id):
         checklist_items = ChecklistItem.query.filter_by(
             assignee_id=student_profile_id)
         completed_items = [item for item in checklist_items if item.is_checked]
+        completed_items.sort(key=compare_checklist_items)
         checklist_items = [
             item for item in checklist_items if not item.is_checked
         ]
+        checklist_items.sort(key=compare_checklist_items)
         #### form to add checklist item ###
         form = AddChecklistItemForm()
         if form.validate_on_submit():
@@ -661,8 +751,7 @@ def checklist(student_profile_id):
             notifications=current_notifs,
             completed=completed_items,
             student_profile_id=student_profile_id)
-    flash('You do not have access to this page', 'error')
-    return redirect(url_for('main.index'))
+    abort(404)
 
 
 def add_to_cal(student_profile_id, text, deadline):
@@ -718,7 +807,10 @@ def add_to_cal(student_profile_id, text, deadline):
 def delete_checklist_item(item_id):
     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
     if checklist_item:
-        if checklist_item.deadline is not None:
+        # only allows the student or counselors/admins to perform action
+        if checklist_item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        if checklist_item.deadline is not None and checklist_item.event_created:
             delete_event(checklist_item.cal_event_id)
         db.session.delete(checklist_item)
         db.session.commit()
@@ -812,6 +904,9 @@ def update_event(event_id, new_text, new_deadline):
 def complete_checklist_item(item_id):
     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
     if checklist_item:
+        # only allows the student or counselors/admins to access page
+        if checklist_item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
         checklist_item.is_checked = True
         db.session.add(checklist_item)
         db.session.commit()
@@ -828,6 +923,9 @@ def complete_checklist_item(item_id):
 def undo_checklist_item(item_id):
     checklist_item = ChecklistItem.query.filter_by(id=item_id).first()
     if checklist_item:
+        # only allows the student or counselors/admins to access page
+        if checklist_item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
         checklist_item.is_checked = False
         db.session.add(checklist_item)
         db.session.commit()
@@ -844,6 +942,9 @@ def undo_checklist_item(item_id):
 def update_checklist_item(item_id):
     item = ChecklistItem.query.filter_by(id=item_id).first()
     if item:
+        # only allows the student or counselors/admins to access page
+        if item.assignee_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
         form = EditChecklistItemForm(item_text=item.text, date=item.deadline)
         if form.validate_on_submit():
             if item.deadline is not None and form.date.data is not None:

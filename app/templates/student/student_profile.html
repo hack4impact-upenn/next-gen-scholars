@@ -365,7 +365,7 @@
 
     // Delete major
     $('.delete-major-button').click(function() {
-      var url = '/student/profile/major/delete/' + $(this).data('id');
+      var url = '/student/profile/major/delete/' + $(this).data('id') + '/{{ user.student_profile_id }}';
       $(this).parent().parent().remove();
       $.ajax({
         url: url,
@@ -380,7 +380,7 @@
 
     // Delete college
     $('.delete-college-button').click(function() {
-      var url = '/student/profile/college/delete/' + $(this).data('id');
+      var url = '/student/profile/college/delete/' + $(this).data('id') + '/{{ user.student_profile_id }}';
       $(this).parent().parent().remove();
       $.ajax({
         url: url,
