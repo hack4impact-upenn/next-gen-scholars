@@ -20,6 +20,7 @@ import flask
 import requests
 import os
 import datetime
+from datetime import date
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 

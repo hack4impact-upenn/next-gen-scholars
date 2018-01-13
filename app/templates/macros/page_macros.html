@@ -15,7 +15,7 @@
     <script>
     var editorIDName = "editor-{{ editable_html_obj.editor_name }}";
     $(document).ready(function() {
-        {% if current_user.is_admin() %}
+        {% if current_user.is_admin() or current_user.is_counselor() %}
             $(".end-edit").hide();
         {% endif %}
         $(".start-edit").click(function() {
@@ -36,7 +36,11 @@
                     editor_name: "{{ editable_html_obj.editor_name }}",
                     edit_data: CKEDITOR.instances[editorIDName].getData(),
                 };
-                $.post("{{ url_for('admin.update_editor_contents') }}", json_data);
+                {% if current_user.is_admin() %}
+                    $.post("{{ url_for('admin.update_editor_contents') }}", json_data);
+                {% else %}
+                    $.post("{{ url_for('counselor.update_editor_contents') }}", json_data);
+                {% endif %}
                 CKEDITOR.instances[editorIDName].destroy();
             }
             $(".end-edit").hide();
