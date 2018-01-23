@@ -31,8 +31,9 @@ def new_user():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             email=form.email.data,
-            password=form.password.data,
-            student_profile=StudentProfile())
+            password=form.password.data)
+        if user.role.id == 1:
+            user.student_profile=StudentProfile()
         db.session.add(user)
         db.session.commit()
         flash('User {} successfully created'.format(user.full_name()),
@@ -51,8 +52,9 @@ def invite_user():
             role=form.role.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            email=form.email.data,
-            student_profile=StudentProfile())
+            email=form.email.data)
+        if user.role.id == 1:
+            user.student_profile=StudentProfile()
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
@@ -132,6 +134,11 @@ def change_account_type(user_id):
     form = ChangeAccountTypeForm()
     if form.validate_on_submit():
         user.role = form.role.data
+        if user.role.id == 2 or user.role.id == 3:
+            if user.student_profile:
+                db.session.delete(user.student_profile)
+        else:
+            user.student_profile = StudentProfile()
         db.session.add(user)
         db.session.commit()
         flash('Role for user {} successfully changed to {}.'.format(
@@ -160,7 +167,8 @@ def delete_user(user_id):
               'administrator to do this.', 'error')
     else:
         user = User.query.filter_by(id=user_id).first()
-        db.session.delete(user.student_profile)
+        if user.student_profile:
+            db.session.delete(user.student_profile)
         db.session.delete(user)
         db.session.commit()
         flash('Successfully deleted user %s.' % user.full_name(), 'success')
