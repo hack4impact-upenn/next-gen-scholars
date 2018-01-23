@@ -8,7 +8,7 @@ from . import admin
 from .. import db
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import Role, User, EditableHTML
+from ..models import Role, User, EditableHTML, StudentProfile
 
 
 @admin.route('/')
@@ -31,7 +31,8 @@ def new_user():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             email=form.email.data,
-            password=form.password.data)
+            password=form.password.data,
+            student_profile=StudentProfile())
         db.session.add(user)
         db.session.commit()
         flash('User {} successfully created'.format(user.full_name()),
@@ -50,7 +51,8 @@ def invite_user():
             role=form.role.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            email=form.email.data)
+            email=form.email.data,
+            student_profile=StudentProfile())
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
@@ -158,6 +160,7 @@ def delete_user(user_id):
               'administrator to do this.', 'error')
     else:
         user = User.query.filter_by(id=user_id).first()
+        db.session.delete(user.student_profile)
         db.session.delete(user)
         db.session.commit()
         flash('Successfully deleted user %s.' % user.full_name(), 'success')
