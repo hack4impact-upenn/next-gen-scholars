@@ -104,8 +104,9 @@
                     <tbody>
                     {% for s in student_profiles %}
                         <tr class="student-row" data-profile-id={{ s.id }}>
-                            <td class="searchable-td">{{ s.user[0].first_name }}</td>
-                            <td class="searchable-td">{{ s.user[0].last_name }}</td>
+                            {% set user = s.user|first %}
+                            <td class="searchable-td">{{ user.first_name }}</td>
+                            <td class="searchable-td">{{ user.last_name }}</td>
                             <td class="searchable-td">{{ s.grade|string }}th</td>
                             <td class="searchable-td">{{ s.high_school }}</td>
                             <td style="text-align:center" class='td-fafsa' data-fafsa={{ s.fafsa_status }}>
