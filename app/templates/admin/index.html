@@ -23,9 +23,8 @@
 {% block content %}
     <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
         <div class="twelve wide column">
-            <h2 class="ui header">
-                Manage Users
-            </h2>
+            <h2 class="ui dividing header">Counselor Dashboard</h2>
+            <h4 class="ui dividing header">Manage Users</h4>
             <div class="ui two column stackable grid">
                 {{ dashboard_option('Registered Users', 'admin.registered_users',
                                     description='View and manage user accounts', icon='users icon') }}
@@ -33,6 +32,40 @@
                                     description='Create a new user account', icon='add user icon') }}
                 {{ dashboard_option('Invite New User', 'admin.invite_user',
                                     description='Invites a new user to create their own account', icon='add user icon') }}
+            </div>
+            <h4 class="ui dividing header">Students</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('View Students', 'counselor.student_database',
+                description='View student profiles and add tasks', icon='student icon') }}
+                {{ dashboard_option('View Default Tasks', 'counselor.default_checklist',
+                description='View and add default tasks for all students', icon='tasks icon') }}
+            </div>
+            <h4 class="ui dividing header">Colleges</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('View Colleges', 'counselor.colleges',
+                description='View and edit college descriptions', icon='university icon') }}
+                {{ dashboard_option('Add College', 'counselor.add_college',
+                description='Add a new college profile', icon='plus icon') }}
+                {{ dashboard_option('Delete College', 'counselor.add_college',
+                description='Delete an existing college profile', icon='remove icon') }}
+                {{ dashboard_option('Upload Scattergram Data', 'counselor.upload_scattergram',
+                description='Upload college acceptance data for scattergrams', icon='bar chart icon')}}
+            </div>
+            <h4 class="ui dividing header">SMS Alerts</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('Manage SMS Alerts', 'counselor.manage_alerts',
+                description='View and manage SMS alerts', icon='phone icon') }}
+                {{ dashboard_option('Add SMS Alert', 'counselor.add_alert',
+                description='Add new SMS alerts', icon='plus icon') }}
+            </div>
+            <h4 class="ui dividing header">Tests</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('Add Test', 'counselor.add_test_name',
+                description='Add a test that students can enter scores for', icon='file text icon') }}
+                {{ dashboard_option('Edit Tests', 'counselor.edit_test_name',
+                description='Edit existing test names', icon='edit icon') }}
+                {{ dashboard_option('Delete Test', 'counselor.delete_test_name',
+                description='Delete an existing test name', icon='remove icon') }}
             </div>
         </div>
     </div>
