@@ -61,7 +61,8 @@ class TestScore(db.Model):
                 # student_profile_id=student_profile.id,
                 name=test['name'],
                 score=random.randint(
-                    round((test['max_score'] * 0.75), 0), test['max_score']) // 10 * 10,
+                    round((test['max_score'] * 0.75), 0), test['max_score']) //
+                10 * 10,
                 month=fake.month_name(),
                 year=random.choice(years))
             test_scores += [test_score]

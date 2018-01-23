@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 import pytz
 from flask import abort, flash, redirect, render_template, url_for, request, jsonify
 from flask_login import current_user, login_required
@@ -16,8 +17,8 @@ from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
-                      ChecklistItem, TestName, College, Notification,
-                      SMSAlert, ScattergramData)
+                      ChecklistItem, TestName, College, Notification, SMSAlert,
+                      ScattergramData)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -78,6 +79,7 @@ def upload_college_file():
         return redirect(url_for('counselor.colleges'))
     return render_template('counselor/upload_colleges.html')
 
+
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
 @login_required
@@ -108,16 +110,12 @@ def view_user_profile(user_id):
     if student_profile is not None:
         test_scores = student_profile.test_scores
         for t in test_scores:
-            print("here")
             if t.name == 'SAT':
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
         return render_template(
-            'student/student_profile.html',
-            user=user,
-            sat=sat,
-            act=act)
+            'student/student_profile.html', user=user, sat=sat, act=act)
     else:
         abort(404)
 
@@ -266,19 +264,32 @@ def update_editor_contents():
     return 'OK', 200
 
 
-@counselor.route('/checklist', methods=['GET', 'POST'])
+# order checklist items, soonest deadline is first
+# checklists with no deadline appear at the end
+def compare_checklist_items(item):
+    if item.deadline:
+        return item.deadline
+    else:
+        return date.max
+
+
+@counselor.route('/default_checklist', methods=['GET', 'POST'])
 @login_required
 @counselor_required
-def checklist():
+def default_checklist():
     # display list of default checklist items and option to add a new one
-    default_items = ChecklistItem.query.filter_by(creator_role_id=3)
+    default_items = ChecklistItem.query.filter_by(is_default_item=True)
+    default_items = [item for item in default_items]
+    default_items.sort(key=compare_checklist_items)
     form = AddChecklistItemForm()
     if form.validate_on_submit():
         # create new checklist item from form data
         new_item = ChecklistItem(
             text=form.item_text.data,
             assignee_id=current_user.id,
-            creator_role_id=3)
+            creator_role_id=3,
+            is_default_item=True,
+            deadline=form.date.data)
         db.session.add(new_item)
 
         users = User.query.filter_by(role_id=1)
@@ -287,12 +298,13 @@ def checklist():
             checklist_item = ChecklistItem(
                 assignee_id=user.student_profile_id,
                 text=form.item_text.data,
-                is_deletable=False)
+                is_deletable=False,
+                deadline=form.date.data)
             db.session.add(checklist_item)
         db.session.commit()
-        return redirect(url_for('counselor.checklist'))
+        return redirect(url_for('counselor.default_checklist'))
     return render_template(
-        'counselor/checklist.html', form=form, checklist=default_items)
+        'counselor/default_checklist.html', form=form, checklist=default_items)
 
 
 @counselor.route('/add_test', methods=['GET', 'POST'])
@@ -451,7 +463,8 @@ def alerts_dashboard():
 def manage_alerts():
     """Database of text notifications to send."""
     alerts = SMSAlert.query.order_by(SMSAlert.date).all()
-    return render_template('counselor/alerts/manage_alerts.html', alerts=alerts)
+    return render_template(
+        'counselor/alerts/manage_alerts.html', alerts=alerts)
 
 
 @counselor.route('/alerts/add', methods=['GET', 'POST'])
@@ -468,12 +481,11 @@ def add_alert():
             title=form.title.data,
             content=form.content.data,
             date=form.date.data,
-            time=datetime.time(hour, int(minute))
-        )
+            time=datetime.time(hour, int(minute)))
         db.session.add(alert)
         db.session.commit()
-        flash('Successfully created alert "{}"!'.format(
-            alert.title), 'form-success')
+        flash('Successfully created alert "{}"!'.format(alert.title),
+              'form-success')
         return redirect(url_for('counselor.add_alert'))
     return render_template('counselor/alerts/add_alert.html', form=form)
 
@@ -491,8 +503,7 @@ def edit_alert(alert_id):
         content=alert.content,
         date=alert.date,
         time=alert.time.strftime("%-I:%M"),
-        am_pm=alert.time.strftime("%p")
-    )
+        am_pm=alert.time.strftime("%p"))
     if form.validate_on_submit():
         hour, minute = form.time.data.split(':')
         am_pm = form.am_pm.data
@@ -503,8 +514,8 @@ def edit_alert(alert_id):
         alert.time = datetime.time(hour, int(minute))
         db.session.add(alert)
         db.session.commit()
-        flash('Successfully edit alert "{}"!'.format(
-            alert.title), 'form-success')
+        flash('Successfully edit alert "{}"!'.format(alert.title),
+              'form-success')
         return redirect(url_for('counselor.edit_alert', alert_id=alert.id))
     return render_template('counselor/alerts/edit_alert.html', form=form)
 
@@ -515,30 +526,31 @@ def edit_alert(alert_id):
 @counselor_required
 def upload_scattergram():
     if request.method == 'POST':
-        f = request.files['file']
-        contents = f.read()
-
-        data = ","
-        line_info = contents.split(data.encode("utf-8"))
-
-        for i in range(1, int(len(line_info) / 6)):
-
-            arguments = line_info[6 * i + 6].split()
-            if len(arguments) == 1:
-                insert = None
-            else:
-                insert = arguments[0].strip()
-
-            scattergram_data = ScattergramData(
-                name=line_info[6 * i + 1].strip(),
-                status=line_info[6 * i + 2].strip(),
-                GPA=line_info[6 * i + 3].strip(),
-                SAT2400=line_info[6 * i + 4].strip(),
-                SAT1600=line_info[6 * i + 5].strip(),
-                ACT=insert
-            )
-
-            db.session.add(scattergram_data)
-        db.session.commit()
-        return "File uploaded successfully"
-    return render_template('counselor/upload_scattergram.html')
+        try:
+            f = request.files['file']
+            contents = f.read()
+            lines = contents.split('\r'.encode('utf-8'))
+            college_names = set()
+            for line in lines[1:]:
+                line = line.split(','.encode('utf-8'))
+                college_names.add(str(line[1], 'utf-8').strip())
+                point = ScattergramData(
+                    name=str(line[0], 'utf-8').strip(),
+                    college=str(line[1], 'utf-8').strip(),
+                    status=str(line[2], 'utf-8').strip(),
+                    GPA=str(line[3], 'utf-8').strip(),
+                    SAT2400=str(line[4], 'utf-8').strip(),
+                    SAT1600=str(line[5], 'utf-8').strip(),
+                    ACT=str(line[6], 'utf-8').strip()
+                )
+                db.session.add(point)
+            db.session.commit()
+            for name in list(college_names):
+                college = College.query.filter_by(name=name).first()
+                if college:
+                    college.update_plots()
+            message, message_type = 'Upload successful!', 'positive'
+        except:
+            message, message_type = 'Error with upload. Please make sure the format of the CSV file matches the description.', 'negative'
+        return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
+    return render_template('counselor/upload_scattergram.html', message=None, message_type=None)

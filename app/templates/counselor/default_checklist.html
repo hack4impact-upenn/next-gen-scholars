@@ -1,0 +1,49 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% macro counselor_checklist(checklist) %}
+    <table class="ui table">
+        <thead>
+            <tr><th colspan="2">
+              Default Checklist Items
+            </th>
+        </tr></thead>
+        {% if checklist|length > 0 %}
+        {% for item in checklist %}
+            <tr>
+                <td>{{ '%s' % (item.text) }}</td>
+                <td class = "right aligned">
+                    {% if item.deadline %}
+                        {{  '%s' % (item.deadline)  }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="4">
+              No default items.
+            </td>
+          </tr>
+        {% endif %}
+    </table>
+{% endmacro %}
+
+{% block content %}
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide computer sixteen wide mobile column">
+        <h2 class="ui dividing header">
+            Default Checklist
+            <div class="sub header">View all default checklist items created by any counselor</div>
+        </h2>
+        <div class="stretched divided very relaxed row">
+            {{ counselor_checklist(checklist) }}
+            <h2 class="ui dividing header">
+                Add a Default Item
+                <div class="sub header">Add a checklist item for all students</div>
+            </h2>
+            {{ f.render_form(form, extra_classes='fluid') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

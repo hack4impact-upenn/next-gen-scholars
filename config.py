@@ -38,7 +38,7 @@ class Config:
         'ADMIN_EMAIL') or 'admin@ngs.com'
     COUNSELOR_EMAIL = os.environ.get('COUNSELOR_EMAIL') or 'counselor@ngs.com'
     COUNSELOR_PASSWORD = os.environ.get('COUNSELOR_PASSWORD') or 'password'
-    USER_EMAIL = os.environ.get('USER_EMAIL') or 'user@ngs.com'
+    USER_EMAIL = os.environ.get('USER_EMAIL') or 'student@ngs.com'
     USER_PASSWORD = os.environ.get('USER_PASSWORD') or 'password'
     EMAIL_SUBJECT_PREFIX = '[{}]'.format(APP_NAME)
     EMAIL_SENDER = '{app_name} Admin <{email}>'.format(
