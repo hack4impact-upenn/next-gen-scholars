@@ -41,11 +41,13 @@ $ xcode-select --install
 ##### Add Environment Variables
 
 Create a file called `config.env` that contains environment variables in the following syntax: `ENVIRONMENT_VARIABLE=value`. For example,
-the mailing environment variables can be set as the following. We recommend using Sendgrid for a mailing SMTP server. But anything else will work as well.
+the mailing environment variables can be set as the following. We recommend using Sendgrid for a mailing SMTP server. But anything else will work as well. You must have `PLOTLY_USERNAME` and `PLOTLY_API_KEY` set in order to run the application. Make an account on [Plotly](http://plot.ly) for more details.
 
 ```python3
-MAIL_USERNAME=SendgridUsername
-MAIL_PASSWORD=SendgridPassword
+PLOTLY_USERNAME=MyPlotlyUsername
+PLOTLY_API_KEY=XXXXXXXXXXXX
+MAIL_USERNAME=MySendgridUsername
+MAIL_PASSWORD=MySendgridPassword
 SECRET_KEY=SuperRandomStringToBeUsedForEncryption
 ```
 
