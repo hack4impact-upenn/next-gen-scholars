@@ -193,3 +193,23 @@ class AddCollegeForm(Form):
 class AddMajorForm(Form):
     major = StringField('Major', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Add Major')
+    
+
+class AddCompletedApplicationForm(Form):
+    college = StringField('College', validators=[InputRequired(), Length(1,100)])
+    status = SelectField(
+        'Status',
+        choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
+        ('Denied','Denied'), ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+        validators=[InputRequired()])
+    submit = SubmitField('Add Completed Application')
+
+
+class EditCompletedApplicationForm(Form):
+    college = StringField('College', validators=[InputRequired(), Length(1,100)])
+    status = SelectField(
+        'Status',
+        choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
+        ('Denied','Denied'), ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+        validators=[InputRequired()])
+    submit = SubmitField('Update Completed Application')

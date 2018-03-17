@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData
+from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData, CompletedApplication
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -10,7 +10,8 @@ from .forms import (
     EditCollegeForm, EditSupplementalEssayForm, EditTestScoreForm,
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
-    EditRecommendationLetterForm, AddCommonAppEssayForm)
+    EditRecommendationLetterForm, AddCommonAppEssayForm, AddCompletedApplicationForm,
+    EditCompletedApplicationForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification)
 import google.oauth2.credentials
@@ -390,6 +391,75 @@ def delete_recommendation_letter(item_id):
     return jsonify({"success": "False"})
 
 
+# completed application methods
+
+
+@student.route(
+    '/profile/add_competed_application/<int:student_profile_id>',
+    methods=['GET','POST'])
+@login_required
+def add_completed_application(student_profile_id):
+    # only student or counselor/admin may access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
+    form = AddCompletedApplicationForm()
+    if form.validate_on_submit():
+        new_item = CompletedApplication(
+            student_profile_id = student_profile_id,
+            college = form.college.data,
+            status = form.status.data)
+        db.session.add(new_item)
+        db.session.commit()
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
+    return render_template(
+        'student/add_academic_info.html',
+        form=form,
+        header="Add Completed Application",
+        student_profile_id = student_profile_id)
+
+
+@student.route(
+    '/profile/completed_application/edit/<int:item_id>',
+    methods=['GET','POST'])
+@login_required
+def edit_completed_application(item_id):
+    application = CompletedApplication.query.filter_by(id=item_id).first()
+    if application:
+        # only allows student or counselors/admin to access page
+        if application.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        form = EditCompletedApplicationForm(
+            college=application.college, status=application.status)
+        if form.validate_on_submit():
+            application.college = form.college.data
+            application.status = form.status.data
+            db.session.add(application)
+            db.session.commit()
+            url = get_redirect_url(application.student_profile_id)
+            return redirect(url)
+        return render_template(
+            'student/edit_academic_info.html',
+            form=form,
+            header="Edit Completed Application",
+            student_profile_id=application.student_profile_id)
+    abort(404)
+
+@student.route(
+    'profile/completed_application/delete/<int:item_id>',
+    methods=['GET','POST'])
+@login_required
+@csrf.exempt
+def delete_completed_application(student_profile_id):
+    applicaton = CompletedApplication.query.filter_by(id=item_id).first()
+    if application:
+        # only allows student or counselors/admin to access page
+        if application.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+            db.session.delete(application)
+            db.session.commit()
+            return jsonify({"success": "True"})
+        return jsonify({"success": "False"})
 # college methods
 
 
