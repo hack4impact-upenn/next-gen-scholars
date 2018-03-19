@@ -403,10 +403,12 @@ def add_completed_application(student_profile_id):
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         abort(404)
     form = AddCompletedApplicationForm()
+    student_profile = StudentProfile.query.filter_by(
+        id=student_profile_id).first()
     if form.validate_on_submit():
         new_item = CompletedApplication(
             student_profile_id = student_profile_id,
-            college = form.college.data,
+            college = form.college.data.name,
             status = form.status.data)
         db.session.add(new_item)
         db.session.commit()
@@ -430,9 +432,10 @@ def edit_completed_application(item_id):
         if application.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
             abort(404)
         form = EditCompletedApplicationForm(
-            college=application.college, status=application.status)
+            college=CompletedApplication.query.filter_by(college=application.college).first(),
+            status=application.status)
         if form.validate_on_submit():
-            application.college = form.college.data
+            application.college = form.college.data.name
             application.status = form.status.data
             db.session.add(application)
             db.session.commit()

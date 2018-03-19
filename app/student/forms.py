@@ -196,7 +196,10 @@ class AddMajorForm(Form):
     
 
 class AddCompletedApplicationForm(Form):
-    college = StringField('College', validators=[InputRequired(), Length(1,100)])
+    college = QuerySelectField(
+        'College Name', validators=[InputRequired()], 
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
     status = SelectField(
         'Status',
         choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
@@ -206,7 +209,11 @@ class AddCompletedApplicationForm(Form):
 
 
 class EditCompletedApplicationForm(Form):
-    college = StringField('College', validators=[InputRequired(), Length(1,100)])
+    college = QuerySelectField(
+        'College Name', 
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
     status = SelectField(
         'Status',
         choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
