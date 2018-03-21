@@ -73,7 +73,9 @@ def upload_college_file():
                         row[2], "%Y-%m-%d") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
                         row[3], "%Y-%m-%d") if row[3] else None,
-                    # image = row[4]
+                    tuition = row[4],
+                    room_and_board = row[5],
+                    image = row[6]
                 )
             db.session.add(college_data)
         db.session.commit()

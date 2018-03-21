@@ -5,7 +5,7 @@ from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
                             HiddenField, BooleanField, TextAreaField,
-                            SelectField)
+                            SelectField, IntegerField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
@@ -163,6 +163,12 @@ class AddCollegeProfileForm(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    tuition = IntegerField(
+        'Tuition',
+        validators=[InputRequired()])
+    room_and_board = IntegerField(
+        'Room and Board',
+        validators=[InputRequired()])
     image = StringField(
         'URL for image of college',
         validators=[InputRequired()]
@@ -193,10 +199,15 @@ class EditCollegeProfileStep2Form(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    tuition = IntegerField(
+        'Tuition',
+        validators=[InputRequired()])
+    room_and_board = IntegerField(
+        'Room and Board',
+        validators=[InputRequired()])
     image = StringField(
         'URL to image of college',
-        validators=[InputRequired()]
-    )
+        validators=[InputRequired()])
     submit = SubmitField('Save College Profile')
 
 

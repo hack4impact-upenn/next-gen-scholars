@@ -24,9 +24,9 @@ class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
-    # TODO image addition
+    tuition = db.Column(db.Integer, index=True)
+    room_and_board = db.Column(db.Integer, index=True)
     image = db.Column(db.String, index=True)
-    # TODO cost of attendance
     regular_deadline = db.Column(db.Date, index=True)
     early_deadline = db.Column(db.Date, index=True)
     plot_SAT2400 = db.Column(db.String)
@@ -340,6 +340,12 @@ class College(db.Model):
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
+        tuitions = [
+            50000, 16000, 24000
+        ]
+        room_and_boards = [
+            10000, 15000, 8000
+        ]
         images = [
             'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
             'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
@@ -351,6 +357,8 @@ class College(db.Model):
                 college = College(
                     name=c,
                     description=random.choice(descriptions),
+                    tuition=random.choice(tuitions),
+                    room_and_board=random.choice(room_and_boards),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     image=random.choice(images))
