@@ -73,6 +73,7 @@ def upload_college_file():
                         row[2], "%Y-%m-%d") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
                         row[3], "%Y-%m-%d") if row[3] else None,
+                    # image = row[4]
                 )
             db.session.add(college_data)
         db.session.commit()
@@ -376,7 +377,8 @@ def add_college():
                 name=form.name.data,
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
-                regular_deadline=form.regular_deadline.data)
+                regular_deadline=form.regular_deadline.data,
+                image = form.image.data)
             db.session.add(college)
             db.session.commit()
         else:
@@ -414,13 +416,15 @@ def edit_college_step2(college_id):
         name=old_college.name,
         description=old_college.description,
         regular_deadline=old_college.regular_deadline,
-        early_deadline=old_college.early_deadline)
+        early_deadline=old_college.early_deadline,
+        image = old_college.image)
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
+        college.image = form.image.data
         db.session.add(college)
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')

@@ -25,6 +25,7 @@ class College(db.Model):
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
     # TODO image addition
+    image = db.Column(db.String, index=True)
     # TODO cost of attendance
     regular_deadline = db.Column(db.Date, index=True)
     early_deadline = db.Column(db.Date, index=True)
@@ -339,6 +340,10 @@ class College(db.Model):
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
+        images = [
+            'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
+            'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
+        ]
 
         for c in college_names:
             college = College.get_college_by_name(c)
@@ -347,7 +352,8 @@ class College(db.Model):
                     name=c,
                     description=random.choice(descriptions),
                     regular_deadline=random.choice(regular_deadlines),
-                    early_deadline=random.choice(early_deadlines))
+                    early_deadline=random.choice(early_deadlines),
+                    image=random.choice(images))
             db.session.add(college)
         db.session.commit()
 

@@ -163,6 +163,10 @@ class AddCollegeProfileForm(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    image = StringField(
+        'URL for image of college',
+        validators=[InputRequired()]
+    )
     submit = SubmitField('Add College Profile')
 
 
@@ -189,6 +193,10 @@ class EditCollegeProfileStep2Form(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    image = StringField(
+        'URL to image of college',
+        validators=[InputRequired()]
+    )
     submit = SubmitField('Save College Profile')
 
 
