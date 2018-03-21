@@ -722,7 +722,7 @@ def checklist(student_profile_id):
                 student_profile_id=current_user.student_profile_id)
             for n in all_notifs:
                 time_diff = now - n.created_at
-                if time_diff.days > 14 and n.seen:
+                if time_diff.days > 14 or n.seen:
                     db.session.delete(n)
                 else:
                     ago_str = ''
