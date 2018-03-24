@@ -29,6 +29,7 @@ class College(db.Model):
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
     plot_ACT = db.Column(db.String)
+    # TODO: Add college dates
 
     def update_plots(self):
         if (self.plot_SAT2400):
