@@ -9,7 +9,7 @@ class CompletedApplication(db.Model):
         db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
     # college name
     college = db.Column(db.String, index=True)
-    # statuses include 'Pending Results', 'Accepted', 'Rejected', 'Waitlisted',
+    # statuses include 'Pending Results', 'Accepted', 'Denied', 'Waitlisted',
     #    'Deferred'
     status = db.Column(db.String, index=True)
 
