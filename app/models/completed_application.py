@@ -15,7 +15,7 @@ class CompletedApplication(db.Model):
 
     @validates('status')
     def validate_status(self, key, status):
-        assert status in ['Pending Results', 'Accepted', 'Rejected', 'Waitlisted', 'Deferred']
+        assert status in ['Pending Results', 'Accepted', 'Denied', 'Waitlisted', 'Deferred']
         return status
 
     @staticmethod
@@ -27,7 +27,7 @@ class CompletedApplication(db.Model):
             'University of Florida',
             'University of Richomnd',
         ], count)
-        statuses = ['Pending Results', 'Accepted', 'Rejected', 'Waitlisted', 'Deferred']
+        statuses = ['Pending Results', 'Accepted', 'Denied', 'Waitlisted', 'Deferred']
         comp_apps = []
         for i in range(count):
             comp_apps.append(
