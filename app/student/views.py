@@ -403,16 +403,13 @@ def add_completed_application(student_profile_id):
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         abort(404)
     form = AddCompletedApplicationForm()
-    student_profile = StudentProfile.query.filter_by(
-        id=student_profile_id).first()
     if form.validate_on_submit():
-        if form.college.data not in student_profile.completed_applications:
-            new_item = CompletedApplication(
-                student_profile_id = student_profile_id,
-                college = form.college.data.name,
-                status = form.status.data)
-            db.session.add(new_item)
-            db.session.commit()
+        new_item = CompletedApplication(
+            student_profile_id = student_profile_id,
+            college = form.college.data.name,
+            status = form.status.data)
+        db.session.add(new_item)
+        db.session.commit()
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
