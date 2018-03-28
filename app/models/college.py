@@ -24,6 +24,7 @@ class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
+    cost_of_attendance = db.Column(db.Integer, index=True)
     tuition = db.Column(db.Integer, index=True)
     room_and_board = db.Column(db.Integer, index=True)
     image = db.Column(db.String, index=True)
@@ -340,6 +341,9 @@ class College(db.Model):
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
+        costs_of_attendance = [
+            60000, 50000
+        ]
         tuitions = [
             50000, 16000, 24000
         ]
@@ -357,6 +361,7 @@ class College(db.Model):
                 college = College(
                     name=c,
                     description=random.choice(descriptions),
+                    cost_of_attendance=random.choice(costs_of_attendance),
                     tuition=random.choice(tuitions),
                     room_and_board=random.choice(room_and_boards),
                     regular_deadline=random.choice(regular_deadlines),

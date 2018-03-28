@@ -163,6 +163,9 @@ class AddCollegeProfileForm(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    cost_of_attendance = IntegerField(
+        'Cost of Attendance',
+        validators=[InputRequired()])
     tuition = IntegerField(
         'Tuition',
         validators=[InputRequired()])
@@ -199,6 +202,9 @@ class EditCollegeProfileStep2Form(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    cost_of_attendance = IntegerField(
+        'Cost of Attendance',
+        validators=[InputRequired()])
     tuition = IntegerField(
         'Tuition',
         validators=[InputRequired()])
