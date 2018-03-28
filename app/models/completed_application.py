@@ -25,7 +25,7 @@ class CompletedApplication(db.Model):
             'Cornell',
             'Princeton',
             'University of Florida',
-            'University of Richomnd',
+            'University of Richmond',
         ], count)
         statuses = ['Pending Results', 'Accepted', 'Denied', 'Waitlisted', 'Deferred']
         comp_apps = []

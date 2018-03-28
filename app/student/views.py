@@ -13,7 +13,7 @@ from .forms import (
     EditRecommendationLetterForm, AddCommonAppEssayForm, AddCompletedApplicationForm,
     EditCompletedApplicationForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
-                      RecommendationLetter, TestName, Notification)
+                      RecommendationLetter, TestName, Notification, CompletedApplication)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -406,12 +406,13 @@ def add_completed_application(student_profile_id):
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     if form.validate_on_submit():
-        new_item = CompletedApplication(
-            student_profile_id = student_profile_id,
-            college = form.college.data.name,
-            status = form.status.data)
-        db.session.add(new_item)
-        db.session.commit()
+        if form.college.data not in student_profile.completed_applications:
+            new_item = CompletedApplication(
+                student_profile_id = student_profile_id,
+                college = form.college.data.name,
+                status = form.status.data)
+            db.session.add(new_item)
+            db.session.commit()
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
@@ -432,7 +433,7 @@ def edit_completed_application(item_id):
         if application.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
             abort(404)
         form = EditCompletedApplicationForm(
-            college=CompletedApplication.query.filter_by(college=application.college).first(),
+            college=application.college,
             status=application.status)
         if form.validate_on_submit():
             application.college = form.college.data.name
@@ -449,20 +450,22 @@ def edit_completed_application(item_id):
     abort(404)
 
 @student.route(
-    'profile/completed_application/delete/<int:item_id>',
+    '/profile/completed_application/delete/<int:item_id>',
     methods=['GET','POST'])
 @login_required
 @csrf.exempt
-def delete_completed_application(student_profile_id):
-    applicaton = CompletedApplication.query.filter_by(id=item_id).first()
+def delete_completed_application(item_id):
+    application = CompletedApplication.query.filter_by(id=item_id).first()
     if application:
         # only allows student or counselors/admin to access page
-        if application.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
-            abort(404)
+        if application.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
             db.session.delete(application)
             db.session.commit()
             return jsonify({"success": "True"})
-        return jsonify({"success": "False"})
+    return jsonify({"success": "False"})
+
+
+
 # college methods
 
 

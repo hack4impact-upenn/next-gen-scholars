@@ -370,7 +370,7 @@
                     href="/student/profile/completed_application/edit/{{ application.id }}">
                     <i class="edit icon"></i>
                   </a>
-                  <div class="ui icon red basic button delete-completed-application-button" data-id=
+                  <div class="ui icon red basic button delete-application-button" data-id=
                   "{{ application.id }}">
                     <i class="x icon"></i>
                   </div>
@@ -494,7 +494,7 @@
     });
 
     // Delete Completed Application
-    $('.delete-completed-application-button').click(function() {
+    $('.delete-application-button').click(function() {
       var url = '/student/profile/completed_application/delete/' + $(this).data('id');
       $(this).parent().parent().parent().remove();
       $.ajax({
