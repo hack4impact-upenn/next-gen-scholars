@@ -70,9 +70,13 @@ def upload_college_file():
                     name=row[0],
                     description=row[1],
                     regular_deadline=datetime.datetime.strptime(
-                        row[2], "%Y-%m-%d") if row[2] else None,
+                        row[2], "%m/%d/%y") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
-                        row[3], "%Y-%m-%d") if row[3] else None,
+                        row[3], "%m/%d/%y") if row[3] else None,
+                    cost_of_attendance = row[4],
+                    tuition = row[5],
+                    room_and_board = row[6],
+                    image = row[7]
                 )
             db.session.add(college_data)
         db.session.commit()
@@ -376,7 +380,11 @@ def add_college():
                 name=form.name.data,
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
-                regular_deadline=form.regular_deadline.data)
+                regular_deadline=form.regular_deadline.data,
+                cost_of_attendance=form.cost_of_attendance.data,
+                tuition=form.tuition.data,
+                room_and_board=form.room_and_board.data,
+                image = form.image.data)
             db.session.add(college)
             db.session.commit()
         else:
@@ -414,13 +422,21 @@ def edit_college_step2(college_id):
         name=old_college.name,
         description=old_college.description,
         regular_deadline=old_college.regular_deadline,
-        early_deadline=old_college.early_deadline)
+        early_deadline=old_college.early_deadline,
+        cost_of_attendance=old_college.cost_of_attendance,
+        tuition=old_college.tuition,
+        room_and_board=old_college.room_and_board,
+        image = old_college.image)
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
+        college.cost_of_attendance = form.cost_of_attendance.data
+        college.tuition = form.tuition.data
+        college.room_and_board = form.room_and_board.data
+        college.image = form.image.data
         db.session.add(college)
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')

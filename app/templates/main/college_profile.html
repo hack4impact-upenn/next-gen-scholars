@@ -4,10 +4,15 @@
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
         <h1 class="ui dividing header">{{ college.name }}'s Profile:</h1>
+        <center><img style="height:300px; width:600px; object-fit:cover; margin-top:1em; margin-bottom:2em" src="{{ college.image }}"></center>
         <p>
             {{ college.description }}
         </p>
-        <h4 class="ui header">Deadlines</h4>
+        <h3 class="ui header">Costs</h3>
+        <p><strong>Overall Cost of Attendance</strong>: ${{ college.cost_of_attendance }}</p>
+        <p><strong>Tuition</strong>: ${{ college.tuition }}</p>
+        <p><strong>Room and Board</strong>: ${{ college.room_and_board }}</p>
+        <h3 class="ui header">Deadlines</h3>
         <p><strong>Early</strong>: {{ college.early_deadline }}</p>
         <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
 
