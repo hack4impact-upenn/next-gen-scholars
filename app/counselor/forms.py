@@ -163,6 +163,10 @@ class AddCollegeProfileForm(Form):
         'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    scholarship_deadline = DateField(
+        'Scholarship Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
     fafsa_deadline = DateField(
         'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
@@ -173,12 +177,6 @@ class AddCollegeProfileForm(Form):
         validators=[Optional()])
     cost_of_attendance = IntegerField(
         'Cost of Attendance',
-        validators=[InputRequired()])
-    tuition = IntegerField(
-        'Tuition',
-        validators=[InputRequired()])
-    room_and_board = IntegerField(
-        'Room and Board',
         validators=[InputRequired()])
     image = StringField(
         'URL for image of college',
@@ -210,6 +208,10 @@ class EditCollegeProfileStep2Form(Form):
         'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    scholarship_deadline = DateField(
+        'Scholarship Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
     fafsa_deadline = DateField(
         'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
@@ -220,12 +222,6 @@ class EditCollegeProfileStep2Form(Form):
         validators=[Optional()])
     cost_of_attendance = IntegerField(
         'Cost of Attendance',
-        validators=[InputRequired()])
-    tuition = IntegerField(
-        'Tuition',
-        validators=[InputRequired()])
-    room_and_board = IntegerField(
-        'Room and Board',
         validators=[InputRequired()])
     image = StringField(
         'URL to image of college',
