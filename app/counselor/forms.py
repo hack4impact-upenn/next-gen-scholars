@@ -163,6 +163,14 @@ class AddCollegeProfileForm(Form):
         'Regular Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    fafsa_deadline = DateField(
+        'Fafsa Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    acceptance_deadline = DateField(
+        'Acceptance Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
     cost_of_attendance = IntegerField(
         'Cost of Attendance',
         validators=[InputRequired()])
@@ -200,6 +208,14 @@ class EditCollegeProfileStep2Form(Form):
         validators=[Optional()])
     regular_deadline = DateField(
         'Regular Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    fafsa_deadline = DateField(
+        'Fafsa Deadline (yyyy-mm-dd)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    acceptance_deadline = DateField(
+        'Acceptance Deadline (yyyy-mm-dd)',
         format='%Y-%m-%d',
         validators=[Optional()])
     cost_of_attendance = IntegerField(

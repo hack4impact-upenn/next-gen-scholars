@@ -381,6 +381,8 @@ def add_college():
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data,
+                fafsa_deadline=form.fafsa_deadline.data,
+                acceptance_deadline=form.acceptance_deadline.data,
                 cost_of_attendance=form.cost_of_attendance.data,
                 tuition=form.tuition.data,
                 room_and_board=form.room_and_board.data,
@@ -423,6 +425,8 @@ def edit_college_step2(college_id):
         description=old_college.description,
         regular_deadline=old_college.regular_deadline,
         early_deadline=old_college.early_deadline,
+        fafsa_deadline=old_college.fafsa_deadline,
+        acceptance_deadline=old_college.acceptance_deadline,
         cost_of_attendance=old_college.cost_of_attendance,
         tuition=old_college.tuition,
         room_and_board=old_college.room_and_board,
@@ -433,6 +437,8 @@ def edit_college_step2(college_id):
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
+        college.fafsa_deadline = form.fafsa_deadline.data
+        college.acceptance_deadline = form.acceptance_deadline.data
         college.cost_of_attendance = form.cost_of_attendance.data
         college.tuition = form.tuition.data
         college.room_and_board = form.room_and_board.data
