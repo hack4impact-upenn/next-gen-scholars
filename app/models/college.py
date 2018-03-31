@@ -1,6 +1,6 @@
 from . import ScattergramData
 from .. import db
-
+    
 import os
 import random
 from datetime import datetime
@@ -30,9 +30,12 @@ class College(db.Model):
     image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
     early_deadline = db.Column(db.Date, index=True)
+    fafsa_deadline = db.Column(db.Date, index=True)
+    acceptance_deadline = db.Column(db.Date, index=True)
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
     plot_ACT = db.Column(db.String)
+    # TODO: Add college dates
 
     def update_plots(self):
         if (self.plot_SAT2400):
@@ -336,6 +339,24 @@ class College(db.Model):
             datetime(2017, 2, 1),
             datetime(2017, 1, 14)
         ]
+        fafsa_deadline = [
+            datetime(2017, 12, 31),
+            datetime(2017, 1, 1),
+            datetime(2017, 1, 2),
+            datetime(2017, 1, 3),
+            datetime(2017, 1, 5),
+            datetime(2017, 2, 1),
+            datetime(2017, 1, 14)
+        ]
+        acceptance_deadline = [
+            datetime(2017, 12, 31),
+            datetime(2017, 1, 1),
+            datetime(2017, 1, 2),
+            datetime(2017, 1, 3),
+            datetime(2017, 1, 5),
+            datetime(2017, 2, 1),
+            datetime(2017, 1, 14)
+        ]
         descriptions = [
             'Private research university', 'Ivy League university',
             'Liberal arts college', 'Public research university',
@@ -366,6 +387,8 @@ class College(db.Model):
                     room_and_board=random.choice(room_and_boards),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
+                    fafsa_deadline=random.choice(fafsa_deadline),
+                    acceptance_deadline=random.choice(acceptance_deadline),
                     image=random.choice(images))
             db.session.add(college)
         db.session.commit()

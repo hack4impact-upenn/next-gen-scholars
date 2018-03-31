@@ -63,7 +63,7 @@ def upload_college_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 4 and any(row):
+            if len(row) >= 10 and any(row):
                 # check that there are at least for columns
                 # and the row is not completely blank
                 college_data = College(
@@ -73,10 +73,14 @@ def upload_college_file():
                         row[2], "%m/%d/%y") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
                         row[3], "%m/%d/%y") if row[3] else None,
-                    cost_of_attendance = row[4],
-                    tuition = row[5],
-                    room_and_board = row[6],
-                    image = row[7]
+                    fafsa_deadline=datetime.datetime.strptime(
+                        row[4], "%m/%d/%y") if row[4] else None,
+                    acceptance_deadline=datetime.datetime.strptime(
+                        row[5], "%m/%d/%y") if row[5] else None,
+                    cost_of_attendance = row[6],
+                    tuition = row[7],
+                    room_and_board = row[8],
+                    image = row[9]
                 )
             db.session.add(college_data)
         db.session.commit()
@@ -381,6 +385,8 @@ def add_college():
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data,
+                fafsa_deadline=form.fafsa_deadline.data,
+                acceptance_deadline=form.acceptance_deadline.data,
                 cost_of_attendance=form.cost_of_attendance.data,
                 tuition=form.tuition.data,
                 room_and_board=form.room_and_board.data,
@@ -423,6 +429,8 @@ def edit_college_step2(college_id):
         description=old_college.description,
         regular_deadline=old_college.regular_deadline,
         early_deadline=old_college.early_deadline,
+        fafsa_deadline=old_college.fafsa_deadline,
+        acceptance_deadline=old_college.acceptance_deadline,
         cost_of_attendance=old_college.cost_of_attendance,
         tuition=old_college.tuition,
         room_and_board=old_college.room_and_board,
@@ -433,6 +441,8 @@ def edit_college_step2(college_id):
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
+        college.fafsa_deadline = form.fafsa_deadline.data
+        college.acceptance_deadline = form.acceptance_deadline.data
         college.cost_of_attendance = form.cost_of_attendance.data
         college.tuition = form.tuition.data
         college.room_and_board = form.room_and_board.data
