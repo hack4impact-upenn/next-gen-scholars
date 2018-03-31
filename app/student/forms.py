@@ -193,3 +193,30 @@ class AddCollegeForm(Form):
 class AddMajorForm(Form):
     major = StringField('Major', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Add Major')
+    
+
+class AddCompletedApplicationForm(Form):
+    college = QuerySelectField(
+        'College Name', validators=[InputRequired()], 
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
+    status = SelectField(
+        'Status',
+        choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
+        ('Denied','Denied'), ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+        validators=[InputRequired()])
+    submit = SubmitField('Add Completed Application')
+
+
+class EditCompletedApplicationForm(Form):
+    college = QuerySelectField(
+        'College Name', 
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
+    status = SelectField(
+        'Status',
+        choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
+        ('Denied','Denied'), ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+        validators=[InputRequired()])
+    submit = SubmitField('Update Completed Application')

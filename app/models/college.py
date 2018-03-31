@@ -24,6 +24,10 @@ class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
+    cost_of_attendance = db.Column(db.Integer, index=True)
+    tuition = db.Column(db.Integer, index=True)
+    room_and_board = db.Column(db.Integer, index=True)
+    image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
     early_deadline = db.Column(db.Date, index=True)
     fafsa_deadline = db.Column(db.Date, index=True)
@@ -358,6 +362,19 @@ class College(db.Model):
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
+        costs_of_attendance = [
+            60000, 50000
+        ]
+        tuitions = [
+            50000, 16000, 24000
+        ]
+        room_and_boards = [
+            10000, 15000, 8000
+        ]
+        images = [
+            'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
+            'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
+        ]
 
         for c in college_names:
             college = College.get_college_by_name(c)
@@ -365,10 +382,14 @@ class College(db.Model):
                 college = College(
                     name=c,
                     description=random.choice(descriptions),
+                    cost_of_attendance=random.choice(costs_of_attendance),
+                    tuition=random.choice(tuitions),
+                    room_and_board=random.choice(room_and_boards),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),
-                    acceptance_deadline=random.choice(acceptance_deadline))
+                    acceptance_deadline=random.choice(acceptance_deadline),
+                    image=random.choice(images))
             db.session.add(college)
         db.session.commit()
 
