@@ -376,7 +376,11 @@ def add_college():
                 name=form.name.data,
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
-                regular_deadline=form.regular_deadline.data)
+                regular_deadline=form.regular_deadline.data,
+                fafsa_deadline=form.fafsa_deadline.data,
+                acceptance_deadline=form.acceptance_deadline.data)
+
+
             db.session.add(college)
             db.session.commit()
         else:
@@ -414,13 +418,17 @@ def edit_college_step2(college_id):
         name=old_college.name,
         description=old_college.description,
         regular_deadline=old_college.regular_deadline,
-        early_deadline=old_college.early_deadline)
+        early_deadline=old_college.early_deadline,
+        fafsa_deadline=old_college.fafsa_deadline,
+        acceptance_deadline=old_college.acceptance_deadline)
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
+        college.fafsa_deadline = form.fafsa_deadline.data
+        college.acceptance_deadline = form.acceptance_deadline.data
         db.session.add(college)
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
