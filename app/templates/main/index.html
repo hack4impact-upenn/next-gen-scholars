@@ -2,10 +2,12 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-<div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
+<div style="height:300px; background-image:url('https://c.pxhere.com/photos/63/d6/cellphone_desk_iphone_laptop_macbook_notebook_notepad_pencil-972233.jpg!d');">
+    <h1 style="font-size:5em; color:white; text-align:center; padding-top:100px; font-family: 'Roboto', sans-serif; text-shadow: 2px 2px black;">Welcome to Next Generation Scholars</h1>
+</div>
+<div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px;">
     <div class="twelve wide computer sixteen wide mobile column">
         <div class="row">
-            <h1 class="ui dividing header">Welcome to Next Generation Scholars</h1>
             {{ page.render_inline_editor(editable_html_obj, current_user) }}
         </div>
     </div>

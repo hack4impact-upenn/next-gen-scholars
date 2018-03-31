@@ -32,9 +32,25 @@
                     </tr>
                 </thead>
                 <tbody>
+                
+                <script language='javascript'>
+                    $(document).ready(function () {
+                        $('.ui.accordion').accordion();
+                    });
+                </script>    
                 {% for c in colleges | sort(attribute='name') %}
+                    <div class="ui styled fluid accordion">
+                        <div class="title">
+                            <i style="display: inline-block;" class="dropdown icon"></i>
+                            <h3 style="display: inline-block;">{{ c.name }}</h3>
+                        </div>
+                        <div class="content">
+                            <p> {{ c.description }} <button style="float: right;" class="ui button" onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">View Profile</button></p>
+                            <p>Regular Deadline {{ c.regular_deadline }}</p>
+                            <p>Early Deadline {{ c.regular_deadline }}</p>
+                        </div>
+                    </div>
                     <tr onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">
-
                         <td>{{ c.name }}</td>
                         <td>{{ c.description }}</td>
                         <td>{{ c.regular_deadline }}</td>
