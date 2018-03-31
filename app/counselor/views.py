@@ -63,7 +63,7 @@ def upload_college_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 4 and any(row):
+            if len(row) >= 10 and any(row):
                 # check that there are at least for columns
                 # and the row is not completely blank
                 college_data = College(
@@ -73,10 +73,14 @@ def upload_college_file():
                         row[2], "%m/%d/%y") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
                         row[3], "%m/%d/%y") if row[3] else None,
-                    cost_of_attendance = row[4],
-                    tuition = row[5],
-                    room_and_board = row[6],
-                    image = row[7]
+                    fafsa_deadline=datetime.datetime.strptime(
+                        row[4], "%m/%d/%y") if row[4] else None,
+                    acceptance_deadline=datetime.datetime.strptime(
+                        row[5], "%m/%d/%y") if row[5] else None,
+                    cost_of_attendance = row[6],
+                    tuition = row[7],
+                    room_and_board = row[8],
+                    image = row[9]
                 )
             db.session.add(college_data)
         db.session.commit()
