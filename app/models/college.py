@@ -4,7 +4,7 @@ from .. import db
 import os
 import random
 from datetime import datetime
-import json
+import urllib.request, json
 import requests
 from requests.auth import HTTPBasicAuth
 import plotly.tools as tools
@@ -24,11 +24,8 @@ class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
-    cost_of_attendance = db.Column(db.Integer, index=True)
-    tuition = db.Column(db.Integer, index=True)
-    room_and_board = db.Column(db.Integer, index=True)
-    image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
+    admission_rate = db.Column(db.Float, index=True)
     early_deadline = db.Column(db.Date, index=True)
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
@@ -304,6 +301,35 @@ class College(db.Model):
         return College.query.filter_by(name=name).first()
 
     @staticmethod
+    def retrieve_college_info(name):
+        ''' This method uses the College Scorecard Data API to retrieve necessary information
+        about the college
+        @param name: name of the college we need to look up'''
+        # Dictionary of information
+        info = {}
+        # Split name by white space
+        tokens = name.split()
+        nameNewFormat = ''
+        for token in tokens:
+            nameNewFormat = nameNewFormat + token + "%20"
+        nameNewFormat = nameNewFormat[:-3]
+        urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
+         nameNewFormat, '&_fields=school.name,school.city,2015.admissions.admission_rate.overall,2015.student.size,school.school_url',
+         '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
+        with urllib.request.urlopen(urlStr) as url:
+            data = json.loads(url.read().decode())
+        result = {}
+        info['admission_rate'] = 0
+        if(len(data['results']) > 0):
+            result = data['results'][0]
+            for r in data['results']:
+                if (r['school.name'] == name):
+                    result = r
+            info['admission_rate'] = result['2015.admissions.admission_rate.overall']
+        print(result)
+        return(info)
+
+    @staticmethod
     def insert_colleges():
         college_names = {
             'University of Pennsylvania', 'Columbia University',
@@ -341,32 +367,17 @@ class College(db.Model):
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
-        costs_of_attendance = [
-            60000, 50000
-        ]
-        tuitions = [
-            50000, 16000, 24000
-        ]
-        room_and_boards = [
-            10000, 15000, 8000
-        ]
-        images = [
-            'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
-            'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
-        ]
 
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
+                info = College.retrieve_college_info(c)
                 college = College(
                     name=c,
+                    admission_rate = info['admission_rate'],
                     description=random.choice(descriptions),
-                    cost_of_attendance=random.choice(costs_of_attendance),
-                    tuition=random.choice(tuitions),
-                    room_and_board=random.choice(room_and_boards),
                     regular_deadline=random.choice(regular_deadlines),
-                    early_deadline=random.choice(early_deadlines),
-                    image=random.choice(images))
+                    early_deadline=random.choice(early_deadlines))
             db.session.add(college)
         db.session.commit()
 
