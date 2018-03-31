@@ -41,8 +41,8 @@
                 {% for c in colleges | sort(attribute='name') %}
                     <div class="ui styled fluid accordion">
                         <div class="title">
-                            <i style="display: inline-block;" class="dropdown icon"></i>
-                            <h3 style="display: inline-block;">{{ c.name }}</h3>
+                            <i class="dropdown icon"></i>
+                            {{ c.name }}
                         </div>
                         <div class="content">
                             <p> {{ c.description }} <button style="float: right;" class="ui button" onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">View Profile</button></p>
