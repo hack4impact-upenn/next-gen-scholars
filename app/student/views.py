@@ -46,6 +46,10 @@ def view_user_profile():
     else:
         abort(404)
 
+@student.route('/comparer')
+@login_required
+def comparer():
+    return render_template('student/college_comparer.html', authenticated=True)
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
