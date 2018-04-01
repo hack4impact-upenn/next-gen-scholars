@@ -1,7 +1,7 @@
-{% macro render_flashes(url, class) %}
+{% macro render_flashes(page, class) %}
     {% with msgs = get_flashed_messages(category_filter=[class]) %}
         {% for msg in msgs %}
-            {% if url == '/' %}
+            {% if page == 'home' or page == 'college_profile' %}
                 <div style="z-index:1; position: absolute; width:60%; margin-top:20px;" class="ui {{ class }} positive floating message">
                     <i class="close icon"></i>
                     {{ msg }}
@@ -18,9 +18,9 @@
 
 <div class="ui text container">
     <div class="flashes">
-        {{ render_flashes(url, 'error') }}
-        {{ render_flashes(url, 'warning') }}
-        {{ render_flashes(url, 'info') }}
-        {{ render_flashes(url, 'success') }}
+        {{ render_flashes(page, 'error') }}
+        {{ render_flashes(page, 'warning') }}
+        {{ render_flashes(page, 'info') }}
+        {{ render_flashes(page, 'success') }}
     </div>
 </div>

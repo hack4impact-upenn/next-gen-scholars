@@ -1,10 +1,11 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
+<div style="height:300px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
+    <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
+</div>
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <h1 class="ui dividing header">{{ college.name }}'s Profile:</h1>
-        <center><img style="height:300px; width:600px; object-fit:cover; margin-top:1em; margin-bottom:2em" src="{{ college.image }}"></center>
         <p>
             {{ college.description }}
         </p>
