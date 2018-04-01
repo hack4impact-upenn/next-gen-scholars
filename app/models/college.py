@@ -24,10 +24,13 @@ class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
+    cost_of_attendance = db.Column(db.Integer, index=True)
+    image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
     admission_rate = db.Column(db.Float, index=True)
     early_deadline = db.Column(db.Date, index=True)
     fafsa_deadline = db.Column(db.Date, index=True)
+    scholarship_deadline = db.Column(db.Date, index=True)    
     acceptance_deadline = db.Column(db.Date, index=True)
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
@@ -329,7 +332,6 @@ class College(db.Model):
                 if (r['school.name'] == name):
                     result = r
             info['admission_rate'] = result['2015.admissions.admission_rate.overall']
-        print(result)
         return(info)
 
     @staticmethod
@@ -383,10 +385,26 @@ class College(db.Model):
             datetime(2017, 2, 1),
             datetime(2017, 1, 14)
         ]
+        scholarship_deadlines = [
+            datetime(2017, 12, 31),
+            datetime(2017, 1, 1),
+            datetime(2017, 1, 2),
+            datetime(2017, 1, 3),
+            datetime(2017, 1, 5),
+            datetime(2017, 2, 1),
+            datetime(2017, 1, 14)
+        ]
         descriptions = [
             'Private research university', 'Ivy League university',
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
+        ]
+        costs_of_attendance = [
+            60000, 50000
+        ]
+        images = [
+            'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
+            'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
         ]
 
         for c in college_names:
@@ -397,10 +415,12 @@ class College(db.Model):
                     name=c,
                     admission_rate = info['admission_rate'],
                     description=random.choice(descriptions),
+                    cost_of_attendance=random.choice(costs_of_attendance),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),
                     acceptance_deadline=random.choice(acceptance_deadline),
+                    scholarship_deadline=random.choice(scholarship_deadlines),
                     image=random.choice(images))
             db.session.add(college)
         db.session.commit()

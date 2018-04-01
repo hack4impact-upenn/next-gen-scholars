@@ -156,29 +156,27 @@ class AddCollegeProfileForm(Form):
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
     early_deadline = DateField(
-        'Early Deadline (yyyy-mm-dd)',
+        'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     regular_deadline = DateField(
-        'Regular Deadline (yyyy-mm-dd)',
+        'Regular Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    scholarship_deadline = DateField(
+        'Scholarship Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     fafsa_deadline = DateField(
-        'Fafsa Deadline (yyyy-mm-dd)',
+        'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     acceptance_deadline = DateField(
-        'Acceptance Deadline (yyyy-mm-dd)',
+        'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     cost_of_attendance = IntegerField(
         'Cost of Attendance',
-        validators=[InputRequired()])
-    tuition = IntegerField(
-        'Tuition',
-        validators=[InputRequired()])
-    room_and_board = IntegerField(
-        'Room and Board',
         validators=[InputRequired()])
     image = StringField(
         'URL for image of college',
@@ -203,29 +201,27 @@ class EditCollegeProfileStep2Form(Form):
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
     early_deadline = DateField(
-        'Early Deadline (yyyy-mm-dd)',
+        'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     regular_deadline = DateField(
-        'Regular Deadline (yyyy-mm-dd)',
+        'Regular Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    scholarship_deadline = DateField(
+        'Scholarship Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     fafsa_deadline = DateField(
-        'Fafsa Deadline (yyyy-mm-dd)',
+        'Fafsa Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     acceptance_deadline = DateField(
-        'Acceptance Deadline (yyyy-mm-dd)',
+        'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     cost_of_attendance = IntegerField(
         'Cost of Attendance',
-        validators=[InputRequired()])
-    tuition = IntegerField(
-        'Tuition',
-        validators=[InputRequired()])
-    room_and_board = IntegerField(
-        'Room and Board',
         validators=[InputRequired()])
     image = StringField(
         'URL to image of college',

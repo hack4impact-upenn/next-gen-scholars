@@ -10,12 +10,11 @@
         </p>
         <h3 class="ui header">Costs</h3>
         <p><strong>Overall Cost of Attendance</strong>: ${{ college.cost_of_attendance }}</p>
-        <p><strong>Tuition</strong>: ${{ college.tuition }}</p>
-        <p><strong>Room and Board</strong>: ${{ college.room_and_board }}</p>
         <h3 class="ui header">Deadlines</h3>
         <p><strong>Early</strong>: {{ college.early_deadline }}</p>
         <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
-        <p><strong>Fafsa Deadline</strong>: {{ college.fafsa_deadline }}</p>
+        <p><strong>Scholarship</strong>: {{ college.scholarship_deadline }}</p>
+        <p><strong>FAFSA Deadline</strong>: {{ college.fafsa_deadline }}</p>
         <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
 
         {% if college.plot_SAT1600 %}
