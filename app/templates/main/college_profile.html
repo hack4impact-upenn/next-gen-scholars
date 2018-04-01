@@ -3,21 +3,61 @@
 {% block content %}
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <h1 class="ui dividing header">{{ college.name }}'s Profile:</h1>
+        <h1 class="ui dividing header">
+            {% if college.school_url != "" %}
+                <a href="http://{{ college.school_url }}"> {{ college.name }} </a>
+            {% else %} {{ college.name }}
+            {% endif %}
+        </h1>
+
         <center><img style="height:300px; width:600px; object-fit:cover; margin-top:1em; margin-bottom:2em" src="{{ college.image }}"></center>
-        <p>
-            {{ college.description }}
+        
+        <h3 class="ui header">General Information</h3>
+        <p> {{ college.description }} </p>
+        <p><strong>City</strong>: {{ college.school_city }}</p>
+        <p><strong>Undergraduate size</strong>: 
+            {% if college.school_size != 0 %}
+                {{ college.school_size }}
+            {% endif %}
         </p>
+        <p><strong>Admission Rate</strong>: 
+            {% if college.admission_rate != 0.0 %}
+            {{ college.admission_rate }}
+            {% endif %}
+        </p>
+        <p><strong>Average SAT Score</strong>: 
+            {% if college.sat_score_average_overall != 0.0 %}
+            {{ college.sat_score_average_overall }}
+            {% endif %}
+        </p>
+        <p><strong>Average ACT Score</strong>: 
+            {% if college.act_score_average_overall != 0.0 %}
+            {{ college.act_score_average_overall }}
+            {% endif %}
+        </p>
+
         <h3 class="ui header">Costs</h3>
-        <p><strong>Overall Cost of Attendance</strong>: ${{ college.cost_of_attendance }}</p>
-        <p><strong>Tuition</strong>: ${{ college.tuition }}</p>
-        <p><strong>Room and Board</strong>: ${{ college.room_and_board }}</p>
+        <p> Data collected for school year 2015-2016 </p>
+        <p><strong>Overall Cost of Attendance</strong>:
+            {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0 %}
+                In-state ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }} -- Out-of-state ${{ "{0:,.0f}".format(college.cost_of_attendance_out_of_state)}}
+            {% endif %}
+            </p>
+        <p><strong>Tuition</strong>:
+            {% if college.tuition_in_state != 0.0 and college.tuition_out_of_state %} 
+                In-state ${{ "{0:,.0f}".format(college.tuition_in_state) }} --  Out-of-state  ${{ "{0:,.0f}".format(college.tuition_out_of_state)}}
+            {% endif %} </p>
+        <p><strong>Room and Board</strong>:
+            {% if college.room_and_board != 0.0 %}
+                ${{"{0:,.0f}".format(college.room_and_board)}}
+            {% endif %} 
+        </p>
         <h3 class="ui header">Deadlines</h3>
         <p><strong>Early</strong>: {{ college.early_deadline }}</p>
         <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
         <p><strong>Fafsa Deadline</strong>: {{ college.fafsa_deadline }}</p>
         <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
-
+    
         {% if college.plot_SAT1600 %}
         <h4 class="ui header">GPA vs. SAT [1600] Scattergram</h4>
         <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>
