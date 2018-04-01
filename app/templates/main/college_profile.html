@@ -52,10 +52,12 @@
                 ${{"{0:,.0f}".format(college.room_and_board)}}
             {% endif %} 
         </p>
+
         <h3 class="ui header">Deadlines</h3>
         <p><strong>Early</strong>: {{ college.early_deadline }}</p>
         <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
-        <p><strong>Fafsa Deadline</strong>: {{ college.fafsa_deadline }}</p>
+        <p><strong>Scholarship</strong>: {{ college.scholarship_deadline }}</p>
+        <p><strong>FAFSA Deadline</strong>: {{ college.fafsa_deadline }}</p>
         <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
     
         {% if college.plot_SAT1600 %}

@@ -24,10 +24,13 @@ class College(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
+    cost_of_attendance = db.Column(db.Integer, index=True)
+    image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
     admission_rate = db.Column(db.Float, index=True)
     early_deadline = db.Column(db.Date, index=True)
     fafsa_deadline = db.Column(db.Date, index=True)
+    scholarship_deadline = db.Column(db.Date, index=True)    
     acceptance_deadline = db.Column(db.Date, index=True)
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
@@ -449,12 +452,26 @@ class College(db.Model):
             datetime(2017, 2, 1),
             datetime(2017, 1, 14)
         ]
+        scholarship_deadlines = [
+            datetime(2017, 12, 31),
+            datetime(2017, 1, 1),
+            datetime(2017, 1, 2),
+            datetime(2017, 1, 3),
+            datetime(2017, 1, 5),
+            datetime(2017, 2, 1),
+            datetime(2017, 1, 14)
+        ]
         descriptions = [
             'Private research university', 'Ivy League university',
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
-        images = ['https://images.unsplash.com/photo-1470378639897-89788e74b7bf?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=b29e53c8e9cc8ccbbe5cdca22be7e4b5&auto=format&fit=crop&w=1354&q=80']
+
+        images = [
+            'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
+            'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
+        ]
+
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
@@ -467,7 +484,6 @@ class College(db.Model):
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),
                     acceptance_deadline=random.choice(acceptance_deadline),
-                    image=random.choice(images),
                     school_url = info['school_url'],
                     school_size = info['school_size'],
                     school_city = info['school_city'],
@@ -477,9 +493,9 @@ class College(db.Model):
                     cost_of_attendance_out_of_state = info['cost_of_attendance_out_of_state'],
                     room_and_board = info['room_and_board'],
                     sat_score_average_overall = info['sat_score_average_overall'],
-                    act_score_average_overall = info['act_score_average_overall']
-                )
-
+                    act_score_average_overall = info['act_score_average_overall'],
+                    scholarship_deadline=random.choice(scholarship_deadlines),
+                    image=random.choice(images))
             db.session.add(college)
         db.session.commit()
 

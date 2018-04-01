@@ -16,16 +16,6 @@ student_majors = db.Table('student_majors',
                           db.Column('student_profile_id', db.Integer,
                                     db.ForeignKey('student_profile.id')))
 
-# student_completed_applications = db.Table('completed_applications',
-#                           db.Column('application_id', db.Integer,
-#                                     db.ForeignKey('application.id')),
-#                         #   db.Column('application_cost', db.Float,
-#                         #             db.ForeignKey('application.cost')),
-#                           db.Column('application_status', db.String,
-#                                     db.ForeignKey('application.status')),
-#                           db.Column('student_profile_id', db.Integer,
-#                                     db.ForeignKey('student_profile.id')))
-
 
 class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
