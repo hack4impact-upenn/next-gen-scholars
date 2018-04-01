@@ -71,20 +71,37 @@
 {% endmacro %}
 
 {% macro mobile_nav(url, current_user, dropdown=None) %}
-    <div class="mobile only row">
-        <div class="ui fixed inverted black main menu">
-            {{ header_items(current_user) }}
-            <div class="right menu">
-                <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
+    {% if url=='/' %}
+        <div style="padding-bottom:0px;" class="mobile only row">
+            <div class="ui fixed inverted blue main menu">
+                {{ header_items(current_user) }}
+                <div class="right menu">
+                    <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
+                </div>
+            </div>
+        
+            {# The menu items which will be shown when open-nav is clicked #}
+            <div class="ui fixed vertical fluid menu">
+              {{ account_items(current_user) }}
+              {{ create_dropdown(dropdown) }}
             </div>
         </div>
-
-        {# The menu items which will be shown when open-nav is clicked #}
-        <div class="ui fixed vertical fluid menu">
-          {{ account_items(current_user) }}
-          {{ create_dropdown(dropdown) }}
+    {% else %}
+        <div class="mobile only row">
+            <div class="ui fixed inverted blue main menu">
+              {{ header_items(current_user) }}
+              <div class="right menu">
+                  <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
+              </div>
+            </div>
+        
+          {# The menu items which will be shown when open-nav is clicked #}
+          <div class="ui fixed vertical fluid menu">
+            {{ account_items(current_user) }} 
+            {{ create_dropdown(dropdown) }}
+          </div>
         </div>
-    </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro create_dropdown(dropdown) %}
@@ -103,8 +120,20 @@
 
 {% macro desktop_nav(url, current_user, dropdown=None) %}
     {% if url == '/' %}
-      <div style="padding-bottom:0px;" class="computer tablet only row">
-        <div class="ui fixed inverted black main menu">
+        <div style="padding-bottom: 0px;" class="computer tablet only row">
+          <div class="ui fixed inverted blue main menu">
+            <div class="ui container">
+              {{ header_items(current_user) }}
+              <div class="right menu">
+                {{ account_items(current_user) }} 
+                {{ create_dropdown(dropdown) }}
+              </div>
+            </div>
+          </div>
+        </div>
+    {% else %}
+      <div class="computer tablet only row">
+        <div class="ui fixed inverted blue main menu">
           <div class="ui container">
             {{ header_items(current_user) }}
             <div class="right menu">
@@ -112,18 +141,6 @@
             </div>
           </div>
         </div>
-      </div>
-    {% else %}
-      <div class="computer tablet only row">
-          <div class="ui fixed inverted black main menu">
-              <div class="ui container">
-                  {{ header_items(current_user) }}
-                  <div class="right menu">
-                      {{ account_items(current_user) }}
-                      {{ create_dropdown(dropdown) }}
-                  </div>
-              </div>
-          </div>
       </div>
     {% endif %}
 {% endmacro %}
