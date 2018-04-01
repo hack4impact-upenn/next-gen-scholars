@@ -52,7 +52,7 @@
         </tr></thead>
         {% if completed|length > 0 %}
         {% for item in completed %}
-            <tr>
+            <tr class="positive">
                 <td class="collapsing">
                     <a class="ui small basic icon button" href="{{ url_for('student.undo_checklist_item', item_id=item.id) }}">
                         <i class="undo icon"></i>
@@ -102,7 +102,7 @@
         {% endif %}
         <div class="stretched divided very relaxed row">
         	{{ render_checklist(checklist) }}
-            <button class="ui button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
+            <button class="ui green button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
             {{ completed_list(completed) }}
         </div>
     </div>
