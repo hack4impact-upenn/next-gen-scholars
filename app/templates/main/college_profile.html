@@ -3,18 +3,13 @@
 {% block content %}
 <div style="height:300px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
     <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
+    {% if college.school_url != "" %}
+        <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
+    {% endif %}
 </div>
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <h1 class="ui dividing header">
-            {% if college.school_url != "" %}
-                <a href="http://{{ college.school_url }}"> {{ college.name }} </a>
-            {% else %} {{ college.name }}
-            {% endif %}
-        </h1>
 
-        <center><img style="height:300px; width:600px; object-fit:cover; margin-top:1em; margin-bottom:2em" src="{{ college.image }}"></center>
-        
         <h3 class="ui header">General Information</h3>
         <p> {{ college.description }} </p>
         <p><strong>City</strong>: {{ college.school_city }}</p>
