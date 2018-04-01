@@ -4,7 +4,7 @@ from .. import db
 import os
 import random
 from datetime import datetime
-import json
+import urllib.request, json
 import requests
 from requests.auth import HTTPBasicAuth
 import plotly.tools as tools
@@ -25,16 +25,27 @@ class College(db.Model):
     name = db.Column(db.String, index=True)
     description = db.Column(db.String, index=True)
     cost_of_attendance = db.Column(db.Integer, index=True)
-    tuition = db.Column(db.Integer, index=True)
-    room_and_board = db.Column(db.Integer, index=True)
     image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
+    admission_rate = db.Column(db.Float, index=True)
     early_deadline = db.Column(db.Date, index=True)
     fafsa_deadline = db.Column(db.Date, index=True)
+    scholarship_deadline = db.Column(db.Date, index=True)    
     acceptance_deadline = db.Column(db.Date, index=True)
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
     plot_ACT = db.Column(db.String)
+    image = db.Column(db.String, index=True)
+    school_url = db.Column(db.String, index=True)
+    school_size = db.Column(db.Integer, index=True)
+    school_city = db.Column(db.String, index=True)
+    tuition_in_state = db.Column(db.Float, index=True)
+    tuition_out_of_state = db.Column(db.Float, index=True)
+    cost_of_attendance_in_state = db.Column(db.Float, index=True)
+    cost_of_attendance_out_of_state = db.Column(db.Float, index=True)
+    room_and_board = db.Column(db.Float, index=True)
+    sat_score_average_overall = db.Column(db.Float, index=True)
+    act_score_average_overall = db.Column(db.Float, index=True)
     # TODO: Add college dates
 
     def update_plots(self):
@@ -307,6 +318,89 @@ class College(db.Model):
         return College.query.filter_by(name=name).first()
 
     @staticmethod
+    def search_college_scorecard(name):
+        ''' This method uses the College Scorecard Data API to retrieve a dictionary
+        of information about colleges that match with our query name
+        @param name: name of the college we need to look up
+        @return a dictionary of information about colleges that match with our query'''
+        # Split name by white space, add %20 as the encoding for the space chacracter in query
+        tokens = name.split()
+        nameNewFormat = ''
+        for token in tokens:
+            nameNewFormat = nameNewFormat + token + "%20"
+        nameNewFormat = nameNewFormat[:-3]
+        nameNewFormat  = nameNewFormat.replace(',', '')
+
+        urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
+         nameNewFormat, '&_fields=school.name,school.city,2015.admissions.admission_rate.overall,2015.student.size,school.school_url,',
+         '2015.cost.attendance.academic_year,2015.cost.tuition.in_state,2015.cost.tuition.out_of_state,',
+         '2015.admissions.act_scores.midpoint.cumulative,2015.admissions.sat_scores.average.overall'
+         '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
+        with urllib.request.urlopen(urlStr) as url:
+            data = json.loads(url.read().decode())
+        return(data)
+
+    @staticmethod
+    def retrieve_college_info(name):
+        ''' This method takes in a college's name, attempts to find the college that best matches
+        with our query, and fill in the variables of the college accordingly
+        @param name: name of the college we need to look up
+        @return a dictionary of information about the college'''
+        data = College.search_college_scorecard(name)
+        info = {}
+        result = {}
+
+        # Initialize values in the  dictionary to return
+        info['admission_rate'] = 0.0
+        info['school_url'] = ""
+        info['school_size'] = 0
+        info['school_city'] = ""
+        info['tuition_in_state'] = 0.0
+        info['tuition_out_of_state'] = 0.0
+        info['cost_of_attendance_in_state'] = 0.0
+        info['cost_of_attendance_out_of_state'] = 0.0
+        info['room_and_board'] = 0.0
+        info['sat_score_average_overall']  = 0.0
+        info['act_score_average_overall'] = 0.0
+        # If there are some colleges that match with the query
+        if(len(data['results']) > 0):
+            # Default to the first search result returned
+            result = data['results'][0]
+            firstFoundIdx = float("inf")
+            # Prioritize colleges whose name contain the query name, and of those who do, prioritize
+            # those wherein the query name appears earlier in the college's name
+            for r in data['results']:
+                idx = r['school.name'].find(name)
+                if idx != -1:
+                    if(firstFoundIdx > idx):
+                        firstFoundIdx = idx
+                        result = r
+            if result['2015.admissions.admission_rate.overall'] is not None:
+                info['admission_rate'] = result['2015.admissions.admission_rate.overall']
+            if result['school.school_url'] is not None:
+                info['school_url'] = result['school.school_url']
+            if result['2015.student.size'] is not None:
+                info['school_size'] = result['2015.student.size']
+            if result['school.city'] is not None:
+                info['school_city'] = result['school.city']
+            if result['2015.cost.tuition.in_state'] is not None:
+                info['tuition_in_state'] = result['2015.cost.tuition.in_state']
+            if result['2015.cost.tuition.out_of_state'] is not None:
+                info['tuition_out_of_state'] = result['2015.cost.tuition.out_of_state']
+            if result['2015.cost.attendance.academic_year'] is not None:
+                info['cost_of_attendance_in_state'] = result['2015.cost.attendance.academic_year']
+            if result['2015.cost.attendance.academic_year'] is not None and result['2015.cost.tuition.in_state'] is not None:
+                info['room_and_board'] = result['2015.cost.attendance.academic_year'] - result['2015.cost.tuition.in_state']
+                if result['2015.cost.tuition.out_of_state'] is not None:
+                    info['cost_of_attendance_out_of_state'] = info['tuition_out_of_state'] + info['room_and_board'] 
+            if result['2015.admissions.sat_scores.average.overall'] is not None:
+                info['sat_score_average_overall'] = result['2015.admissions.sat_scores.average.overall']
+            if result['2015.admissions.act_scores.midpoint.cumulative'] is not None:
+                info['act_score_average_overall'] = result['2015.admissions.act_scores.midpoint.cumulative']
+
+        return(info)
+
+    @staticmethod
     def insert_colleges():
         college_names = {
             'University of Pennsylvania', 'Columbia University',
@@ -314,7 +408,7 @@ class College(db.Model):
             'Harvard University', 'Cornell University', 'Yale University',
             'Brown University', 'Dartmouth College', 'New York University',
             'University of California, Berkeley',
-            'University of California, Los Angelos', 'University of Michigan',
+            'University of California, Los Angeles', 'University of Michigan-Ann Arbor',
             'Carnegie Mellon University', 'John Hopkins University',
             'University of Chicago', 'Amherst College', 'Williams College',
             'Massachusetts Institute of Technology',
@@ -357,20 +451,21 @@ class College(db.Model):
             datetime(2017, 2, 1),
             datetime(2017, 1, 14)
         ]
+        scholarship_deadlines = [
+            datetime(2017, 12, 31),
+            datetime(2017, 1, 1),
+            datetime(2017, 1, 2),
+            datetime(2017, 1, 3),
+            datetime(2017, 1, 5),
+            datetime(2017, 2, 1),
+            datetime(2017, 1, 14)
+        ]
         descriptions = [
             'Private research university', 'Ivy League university',
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
-        costs_of_attendance = [
-            60000, 50000
-        ]
-        tuitions = [
-            50000, 16000, 24000
-        ]
-        room_and_boards = [
-            10000, 15000, 8000
-        ]
+
         images = [
             'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
             'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
@@ -379,19 +474,31 @@ class College(db.Model):
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
+                info = College.retrieve_college_info(c)
                 college = College(
                     name=c,
+                    admission_rate = round(info['admission_rate']*100,2),
                     description=random.choice(descriptions),
-                    cost_of_attendance=random.choice(costs_of_attendance),
-                    tuition=random.choice(tuitions),
-                    room_and_board=random.choice(room_and_boards),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),
                     acceptance_deadline=random.choice(acceptance_deadline),
+                    school_url = info['school_url'],
+                    school_size = info['school_size'],
+                    school_city = info['school_city'],
+                    tuition_in_state = info['tuition_in_state'],
+                    tuition_out_of_state = info['tuition_out_of_state'],
+                    cost_of_attendance_in_state = info['cost_of_attendance_in_state'],
+                    cost_of_attendance_out_of_state = info['cost_of_attendance_out_of_state'],
+                    room_and_board = info['room_and_board'],
+                    sat_score_average_overall = info['sat_score_average_overall'],
+                    act_score_average_overall = info['act_score_average_overall'],
+                    scholarship_deadline=random.choice(scholarship_deadlines),
                     image=random.choice(images))
             db.session.add(college)
         db.session.commit()
+
+        #@TODOOOOO: DO THE SAME FOR ADD COLLEGE METHOD IN COUNSELOR:VIEWS.PY
 
     def __repr__(self):
         return '<College: {}>'.format(self.name)

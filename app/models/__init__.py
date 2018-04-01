@@ -17,3 +17,4 @@ from .student_profile import *
 from .user import *
 from .notification import *
 from .sms_alert import *
+from .scholarship import *
