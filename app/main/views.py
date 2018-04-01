@@ -8,8 +8,8 @@ from . import main
 def index():
     editable_html_obj = EditableHTML.get_editable_html('index')
     return render_template(
-        'main/index.html', editable_html_obj=editable_html_obj)
-    return render_template('main/index.html')
+        'main/index.html', editable_html_obj=editable_html_obj, url='/')
+    return render_template('main/index.html', url='/')
 
 
 @main.route('/about')

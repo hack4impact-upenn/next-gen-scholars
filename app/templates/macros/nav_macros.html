@@ -70,7 +70,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro mobile_nav(current_user, dropdown=None) %}
+{% macro mobile_nav(url, current_user, dropdown=None) %}
     <div class="mobile only row">
         <div class="ui fixed inverted black main menu">
             {{ header_items(current_user) }}
@@ -101,23 +101,36 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro desktop_nav(current_user, dropdown=None) %}
-    <div class="computer tablet only row">
+{% macro desktop_nav(url, current_user, dropdown=None) %}
+    {% if url == '/' %}
+      <div style="padding-bottom:0px;" class="computer tablet only row">
         <div class="ui fixed inverted black main menu">
-            <div class="ui container">
-                {{ header_items(current_user) }}
-                <div class="right menu">
-                    {{ account_items(current_user) }}
-                    {{ create_dropdown(dropdown) }}
-                </div>
+          <div class="ui container">
+            {{ header_items(current_user) }}
+            <div class="right menu">
+              {{ account_items(current_user) }} {{ create_dropdown(dropdown) }}
             </div>
+          </div>
         </div>
-    </div>
+      </div>
+    {% else %}
+      <div class="computer tablet only row">
+          <div class="ui fixed inverted black main menu">
+              <div class="ui container">
+                  {{ header_items(current_user) }}
+                  <div class="right menu">
+                      {{ account_items(current_user) }}
+                      {{ create_dropdown(dropdown) }}
+                  </div>
+              </div>
+          </div>
+      </div>
+    {% endif %}
 {% endmacro %}
 
-{% macro render_nav(current_user, dropdown=[]) %}
+{% macro render_nav(url, current_user, dropdown=[]) %}
     <nav class="ui navigation grid {% if endpoints %}has-submenu{% endif %}">
-        {{ mobile_nav(current_user, dropdown=dropdown) }}
-        {{ desktop_nav(current_user, dropdown=dropdown) }}
+        {{ mobile_nav(url, current_user, dropdown=dropdown) }}
+        {{ desktop_nav(url, current_user, dropdown=dropdown) }}
     </nav>
 {% endmacro %}

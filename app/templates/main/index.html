@@ -2,8 +2,12 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-<div style="height:300px; background-image:url('https://c.pxhere.com/photos/63/d6/cellphone_desk_iphone_laptop_macbook_notebook_notepad_pencil-972233.jpg!d');">
-    <h1 style="font-size:5em; color:white; text-align:center; padding-top:100px; font-family: 'Roboto', sans-serif; text-shadow: 2px 2px black;">Welcome to Next Generation Scholars</h1>
+<div style="height:400px; text-align: center; background-image:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('https://c.pxhere.com/photos/63/d6/cellphone_desk_iphone_laptop_macbook_notebook_notepad_pencil-972233.jpg!d');">
+    <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:150px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">Welcome to Next Generation Scholars</h1>
+     {% if not current_user.is_authenticated %}
+    <button onclick= "window.location.href='/account/register';" class="ui teal button">Register</button>
+    <button onclick= "window.location.href='/account/login';"class="ui blue button">Login</button>
+    {% endif %}
 </div>
 <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px;">
     <div class="twelve wide computer sixteen wide mobile column">

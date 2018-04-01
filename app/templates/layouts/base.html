@@ -7,6 +7,7 @@
         {# Any templates that extend this template can set custom_head_tags to add scripts to their page #}
         {% block custom_head_tags %}{% endblock %}
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Serif" rel="stylesheet">
         
     </head>
     <body>
@@ -49,7 +50,8 @@
 
         {% block nav %}
           {# add dropdown variable here to the render_nav method to render dropdowns #}
-          {{ nav.render_nav(current_user, dropdown) }}
+          {# add url variable here to the render_nav method for padding index page differently #}
+          {{ nav.render_nav(url, current_user, dropdown) }}
         {% endblock %}
 
         {% include 'partials/_flashes.html' %}
