@@ -4,10 +4,10 @@
     </div>
 
     {% if current_user.is_admin() or current_user.is_counselor() %}
-       <button class="ui button start-edit">
-        Edit
+       <button style="margin-top:30px" class="ui green button start-edit">
+        Add content to display on homepage
        </button>
-       <button class="ui primary button end-edit">
+       <button style="margin-top:30px" class="ui primary button end-edit">
         Save
        </button>
     {% endif %}
