@@ -398,7 +398,6 @@ class College(db.Model):
             if result['2015.admissions.act_scores.midpoint.cumulative'] is not None:
                 info['act_score_average_overall'] = result['2015.admissions.act_scores.midpoint.cumulative']
 
-        print(result)
         return(info)
 
     @staticmethod
