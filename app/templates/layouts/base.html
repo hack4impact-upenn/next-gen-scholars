@@ -50,8 +50,8 @@
 
         {% block nav %}
           {# add dropdown variable here to the render_nav method to render dropdowns #}
-          {# add page variable here to the render_nav method for padding pages differently #}
-          {{ nav.render_nav(page, current_user, dropdown) }}
+          {# add pageType variable here to the render_nav method for padding pages differently #}
+          {{ nav.render_nav(pageType, current_user, dropdown) }}
         {% endblock %}
 
         {% include 'partials/_flashes.html' %}

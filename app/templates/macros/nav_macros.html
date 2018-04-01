@@ -70,8 +70,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro mobile_nav(page, current_user, dropdown=None) %}
-    {% if page=='home' or page=='college_profile' %}
+{% macro mobile_nav(pageType, current_user, dropdown=None) %}
+    {% if pageType=='home' or pageType=='college_profile' %}
         <div style="padding-bottom:0px;" class="mobile only row">
             <div class="ui fixed inverted blue main menu">
                 {{ header_items(current_user) }}
@@ -118,8 +118,8 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro desktop_nav(page, current_user, dropdown=None) %}
-     {% if page=='home' or page=='college_profile' %}
+{% macro desktop_nav(pageType, current_user, dropdown=None) %}
+     {% if pageType=='home' or pageType=='college_profile' %}
         <div style="padding-bottom: 0px;" class="computer tablet only row">
           <div class="ui fixed inverted blue main menu">
             <div class="ui container">
