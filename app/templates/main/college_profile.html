@@ -9,7 +9,7 @@
 </div>
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <div class="ui raised secondary segment">
+        <div class="ui raised secondary green segment">
             <h1 style="color: #1A85D6;" class="ui header">General Information</h1>
             <p><strong>Description:</strong> {{ college.description }} </p>
             <p><strong>Admission Rate</strong>: {% if college.admission_rate != 0.0 %} {{ college.admission_rate }}% {% endif %}</p>
@@ -31,7 +31,7 @@
             </p>
         </div>
 
-        <div class="ui raised secondary segment"> 
+        <div class="ui raised secondary green segment"> 
             <h1 style="color: #1A85D6;" class="ui header">Costs</h1>
             <p><strong>Overall Cost of Attendance</strong>:
                 {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0 %}
@@ -49,7 +49,7 @@
             </p>
         </div>
 
-        <div class="ui raised secondary segment">
+        <div class="ui raised secondary green segment">
         <h1 style="color: #1A85D6;" class="ui header">Deadlines</h1>
             <p><strong>Early</strong>: {{ college.early_deadline }}</p>
             <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>

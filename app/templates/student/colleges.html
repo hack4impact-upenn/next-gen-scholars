@@ -56,10 +56,10 @@
                         <td>{{ c.description }}</td>
                         <td>{{ c.regular_deadline }}</td>
                         <td>{{ c.early_deadline }} </td>
-                        {% if c.admission_rate == 0 %}
+                        {% if c.admission_rate == 0 or c.admission_rate== none %}
                         <td> N/A </td>
                         {% else %}
-                        <td>{{ c.admission_rate }}</td>
+                        <td>{{ c.admission_rate }}%</td>
                         {% endif %}
                     </tr>
                 {% endfor %}
