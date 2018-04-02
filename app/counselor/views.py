@@ -63,7 +63,7 @@ def upload_college_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 9 and any(row):
+            if len(row) >= 8 and any(row):
                 # check that there are at least for columns
                 # and the row is not completely blank
                 college_data = College(
@@ -79,8 +79,7 @@ def upload_college_file():
                         row[5], "%m/%d/%y") if row[5] else None,
                     scholarship_deadline=datetime.datetime.strptime(
                         row[6], "%m/%d/%y") if row[6] else None,
-                    cost_of_attendance = row[7],
-                    image = row[8]
+                    image = row[7]
                 )
             db.session.add(college_data)
         db.session.commit()
@@ -388,7 +387,6 @@ def add_college():
                 scholarship_deadline=form.scholarship_deadline.data,
                 fafsa_deadline=form.fafsa_deadline.data,
                 acceptance_deadline=form.acceptance_deadline.data,
-                cost_of_attendance=form.cost_of_attendance.data,
                 image = form.image.data)
             db.session.add(college)
             db.session.commit()
@@ -431,7 +429,6 @@ def edit_college_step2(college_id):
         scholarship_deadline=old_college.scholarship_deadline,
         fafsa_deadline=old_college.fafsa_deadline,
         acceptance_deadline=old_college.acceptance_deadline,
-        cost_of_attendance=old_college.cost_of_attendance,
         image = old_college.image)
     if form.validate_on_submit():
         college = old_college
@@ -442,7 +439,6 @@ def edit_college_step2(college_id):
         college.scholarship_deadline = form.scholarship_deadline.data
         college.fafsa_deadline = form.fafsa_deadline.data
         college.acceptance_deadline = form.acceptance_deadline.data
-        college.cost_of_attendance = form.cost_of_attendance.data
         college.image = form.image.data
         db.session.add(college)
         db.session.commit()
