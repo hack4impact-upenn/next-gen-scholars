@@ -63,7 +63,7 @@ def upload_college_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 9 and any(row):
+            if len(row) >= 8 and any(row):
                 # check that there are at least for columns
                 # and the row is not completely blank
                 college_data = College(
