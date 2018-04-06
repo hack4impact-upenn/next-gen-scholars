@@ -1048,7 +1048,7 @@ def update_checklist_item(item_id):
 def view_college_profile(college_id):
     college = College.query.filter_by(id=college_id).first()
     return render_template(
-        'main/college_profile.html', college=college)
+        'main/college_profile.html', pageType='college_profile', college=college)
 
 
 def string_to_bool(str):

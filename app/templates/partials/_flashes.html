@@ -1,19 +1,26 @@
-{% macro render_flashes(class) %}
+{% macro render_flashes(page, class) %}
     {% with msgs = get_flashed_messages(category_filter=[class]) %}
         {% for msg in msgs %}
-            <div class="ui {{ class }} message">
-                <i class="close icon"></i>
-                {{ msg }}
-            </div>
+            {% if page == 'home' or page == 'college_profile' %}
+                <div style="z-index:1; position: absolute; width:60%; margin-top:20px;" class="ui {{ class }} positive floating message">
+                    <i class="close icon"></i>
+                    {{ msg }}
+                </div>
+             {% else %}
+                <div class="ui {{ class }} message">
+                    <i class="close icon"></i>
+                    {{ msg }}
+                </div>
+            {% endif %}
         {% endfor %}
     {% endwith %}
 {% endmacro %}
 
 <div class="ui text container">
     <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
+        {{ render_flashes(pageType, 'error') }}
+        {{ render_flashes(pageType, 'warning') }}
+        {{ render_flashes(pageType, 'info') }}
+        {{ render_flashes(pageType, 'success') }}
     </div>
 </div>
