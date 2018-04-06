@@ -14,7 +14,7 @@
 {% endmacro %}
 
 {# This is called for all users (including anonymous users). It renders the basic left side of the
-   navigation bar. In the default case, the left hand side will read 'Flask-Base'. In the logged in
+   navigation bar. In the default case, the left hand side will read 'qk-Base'. In the logged in
    admin case, there will also be an item that links to admin/ route. I have added an example use of
    render_menu_items.
 #}
@@ -71,6 +71,7 @@
 {% endmacro %}
 
 {% macro mobile_nav(pageType, current_user, dropdown=None) %}
+    <!-- TODO: remove duplicated code  -->    
     {% if pageType=='home' or pageType=='college_profile' %}
         <div style="padding-bottom:0px;" class="mobile only row">
             <div class="ui fixed inverted blue main menu">
@@ -119,6 +120,7 @@
 {% endmacro %}
 
 {% macro desktop_nav(pageType, current_user, dropdown=None) %}
+     <!-- TODO: remove duplicated code  -->
      {% if pageType=='home' or pageType=='college_profile' %}
         <div style="padding-bottom: 0px;" class="computer tablet only row">
           <div class="ui fixed inverted blue main menu">
