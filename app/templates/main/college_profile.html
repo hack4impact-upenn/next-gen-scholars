@@ -4,7 +4,7 @@
 <div class="container" style="padding-bottom:50px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
     <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
     {% if college.school_url != "" %}
-        <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
+    <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
     {% endif %}
 </div>
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
@@ -12,45 +12,69 @@
         <div class="ui raised secondary green segment">
             <h1 style="color: #1A85D6;" class="ui header">General Information</h1>
             <p><strong>Description:</strong> {{ college.description }} </p>
-            <p><strong>Admission Rate</strong>: {% if college.admission_rate != 0.0 %} {{ college.admission_rate }}% {% endif %}</p>
-            <p><strong>City</strong>: {{ college.school_city }}</p>
-            <p><strong>Undergraduate size</strong>: 
-                {% if college.school_size != 0 %}
-                    {{ college.school_size }}
-                {% endif %}
+            
+            {% if college.admission_rate != 0.0 %}
+            <p><strong>Admission Rate</strong>: 
+                {{ college.admission_rate }}% 
             </p>
+            {% endif %}
+            
+            {% if college.school_city != "" %}
+            <p><strong>City</strong>: 
+                {{ college.school_city }}
+            </p>
+            {% endif %}
+
+            {% if college.sat_score_average_overall != 0.0 %}
             <p><strong>Average SAT Score</strong>: 
-                {% if college.sat_score_average_overall != 0.0 %}
                 {{ college.sat_score_average_overall }}
-                {% endif %}
             </p>
+            {% endif %}
+
+            {% if college.act_score_average_overall != 0.0 %}
             <p><strong>Average ACT Score</strong>: 
-                {% if college.act_score_average_overall != 0.0 %}
                 {{ college.act_score_average_overall }}
-                {% endif %}
             </p>
+            {% endif %}
+
+            {% if college.school_size != 0 %}
+            <p><strong>Undergraduate size</strong>: 
+                {{ college.school_size }}
+            </p>
+            {% endif %}
         </div>
 
         <div class="ui raised secondary green segment"> 
             <h1 style="color: #1A85D6;" class="ui header">Costs</h1>
+            {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0.0 %}
             <p><strong>Overall Cost of Attendance</strong>:
-                {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0 %}
-                    In-state ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }} -- Out-of-state ${{ "{0:,.0f}".format(college.cost_of_attendance_out_of_state)}}
+                {% if college.cost_of_attendance_in_state == college.cost_of_attendance_out_of_state %}
+                ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }}
+                {% else %}
+                In-state ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }} -- Out-of-state ${{ "{0:,.0f}".format(college.cost_of_attendance_out_of_state)}}
                 {% endif %}
-                </p>
+            </p>
+            {% endif %}
+
+            {% if college.tuition_in_state != 0.0 and college.tuition_out_of_state != 0.0 %} 
             <p><strong>Tuition</strong>:
-                {% if college.tuition_in_state != 0.0 and college.tuition_out_of_state %} 
-                    In-state ${{ "{0:,.0f}".format(college.tuition_in_state) }} --  Out-of-state  ${{ "{0:,.0f}".format(college.tuition_out_of_state)}}
-                {% endif %} </p>
-            <p><strong>Room and Board</strong>:
-                {% if college.room_and_board != 0.0 %}
-                    ${{"{0:,.0f}".format(college.room_and_board)}}
+                {% if college.tuition_in_state == college.tuition_out_of_state %} 
+                ${{ "{0:,.0f}".format(college.tuition_in_state) }}
+                {% else %}
+                In-state ${{ "{0:,.0f}".format(college.tuition_in_state) }} --  Out-of-state  ${{ "{0:,.0f}".format(college.tuition_out_of_state)}}
                 {% endif %} 
             </p>
+            {% endif %} 
+
+            {% if college.room_and_board != 0.0 %}
+            <p><strong>Room and Board</strong>:
+                ${{"{0:,.0f}".format(college.room_and_board)}}
+            </p>
+            {% endif %} 
         </div>
 
         <div class="ui raised secondary green segment">
-        <h1 style="color: #1A85D6;" class="ui header">Deadlines</h1>
+            <h1 style="color: #1A85D6;" class="ui header">Deadlines</h1>
             <p><strong>Early</strong>: {{ college.early_deadline }}</p>
             <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
             <p><strong>Scholarship</strong>: {{ college.scholarship_deadline }}</p>
@@ -58,6 +82,57 @@
             <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
         </div>
 
+        <div class="ui raised secondary green segment"> 
+            <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
+            {% if college.first_generation_percentage != 0 %}
+            <p><strong>First generation students</strong>: 
+                {{ college.first_generation_percentage }}
+            </p>
+            {% endif %}
+
+            {% if college.race_white != 0 %}
+            <p><strong>Percentage of students that are white</strong>: 
+                {{ college.race_white }}
+            </p>
+            {% endif %}
+
+            {% if college.race_black != 0 %}
+            <p><strong>Percentage of students that are black</strong>: 
+                {{ college.race_black }}
+            </p>
+            {% endif %}
+
+            {% if college.race_hispanic != 0 %}
+            <p><strong>Percentage of students that are hispanic</strong>: 
+                {{ college.race_hispanic }}
+            </p>
+            {% endif %}
+
+            {% if college.race_asian != 0 %}
+            <p><strong>Percentage of students that are Asian</strong>: 
+                {{ college.race_asian }}
+            </p>
+            {% endif %}
+
+            {% if college.race_american_indian != 0 %}
+            <p><strong>Percentage of students that are Amerian Indian/ Alaska Native</strong>: 
+                {{ college.race_american_indian }}
+            </p>
+            {% endif %}
+
+            {% if college.race_native_hawaiian != 0 %}
+            <p><strong>Percentage of students that are Native Hawaiian/ Pacific Islander</strong>: 
+                {{ college.race_native_hawaiian }}
+            </p>
+            {% endif %}
+
+            {% if college.race_international != 0 %}
+            <p><strong>Percentage of students that are international</strong>: 
+                {{ college.race_international }}    
+            </p>
+            {% endif %}
+
+        </div>
         {% if college.plot_SAT1600 %}
         <h4 class="ui header">GPA vs. SAT [1600] Scattergram</h4>
         <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>
