@@ -178,6 +178,15 @@ class EditStudentProfile(Form):
                                 Length(1, 100)])
     city = StringField('City', validators=[InputRequired(), Length(1, 100)])
     state = StringField('State', validators=[InputRequired(), Length(1, 100)])
+    race = SelectMultipleField('Race/Scholarship Information', choices=['African-American', 
+        'Agriculture', 'Arts-related', 'Asian', 'Asian Pacific American', 'Community Service',
+        'Construction-related Fields', 'Disabled', 'Engineering', 'Enviornmental Interest', 
+        'Female', 'Filipino', 'First Generation College Student', 'Queer', 'General-open to all',
+        'Latinx', 'Immigrant/AB540/DACA', 'Interest in Journalism', 'Japanese', 'Jewish', 
+        'Indigenous', 'Open to all grade levels', 'Science/Engineering', 'Student-Athlete', 
+        'Teaching', 'Women in Math/Engineering'],coerce=unicode, option_widget=None)
+    gender = SelectMultipleField('Gender', choices ['Male', 'Female', 'Other'],coerce=unicode, 
+        option_widget=None)
     submit = SubmitField('Update Profile')
 
 

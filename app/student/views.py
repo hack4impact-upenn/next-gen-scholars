@@ -200,6 +200,8 @@ def edit_profile(student_profile_id):
             district=student_profile.district,
             city=student_profile.city,
             state=student_profile.state,
+            race=student_profile.race,
+            gender=student_profile.gender,
             fafsa_status=student_profile.fafsa_status,
             gpa=student_profile.gpa,
             early_deadline=bool_to_string(student_profile.early_deadline))
@@ -211,6 +213,8 @@ def edit_profile(student_profile_id):
             student_profile.district = form.district.data
             student_profile.city = form.city.data
             student_profile.state = form.state.data
+            student_profile.race = form.race.data
+            student_profile.gender = form.gender.data
             student_profile.fafsa_status = form.fafsa_status.data
             student_profile.gpa = form.gpa.data
             student_profile.early_deadline = string_to_bool(

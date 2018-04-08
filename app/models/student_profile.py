@@ -27,6 +27,8 @@ class StudentProfile(db.Model):
     state = db.Column(db.String, index=True)
     graduation_year = db.Column(db.String, index=True)
     grade = db.Column(db.Integer, index=True)
+    race = db.Column(db.String, index=True)
+    gender = db.Column(db.String, index=True)
     # ACADEMIC INFO
     gpa = db.Column(db.Float, index=True)
     test_scores = db.relationship(
@@ -79,6 +81,8 @@ class StudentProfile(db.Model):
             state=fake.state(),
             graduation_year=year[0],
             grade=year[1],
+            race=fake.race(),
+            gender=fake.gender(),
             gpa=round(random.uniform(2, 4), 2),
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),
@@ -100,6 +104,8 @@ class StudentProfile(db.Model):
         s += 'Gradution Year: {}\n'.format(self.graduation_year)
         s += 'Grade: {}\n'.format(self.grade)
         s += 'GPA: {}\n'.format(self.gpa)
+        s += 'Race/Scholarship Information: {}\n'.format(self.race)
+        s += 'Gender: {}\n'.format(self.gender)
         s += 'Test Scores: {}\n'.format(self.test_scores)
         s += 'Majors: {}\n'.format(','.join([m.name for m in self.majors]))
         s += 'Colleges: {}\n'.format(','.join([c.name for c in self.colleges]))
