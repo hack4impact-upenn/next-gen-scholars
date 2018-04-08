@@ -387,9 +387,19 @@ def add_college():
                 scholarship_deadline=form.scholarship_deadline.data,
                 fafsa_deadline=form.fafsa_deadline.data,
                 acceptance_deadline=form.acceptance_deadline.data,
-                image = form.image.data)
+                image = form.image.data,school_url = "",
+                school_size = 0,
+                school_city = "",
+                tuition_in_state = 0,
+                tuition_out_of_state = 0,
+                cost_of_attendance_in_state = 0,
+                cost_of_attendance_out_of_state = 0,
+                room_and_board = 0,
+                sat_score_average_overall = 0,
+                act_score_average_overall = 0)
             db.session.add(college)
             db.session.commit()
+            College.retrieve_college_info(college)
         else:
             flash('College could not be added - already existed in database.',
                   'error')
@@ -440,6 +450,7 @@ def edit_college_step2(college_id):
         college.fafsa_deadline = form.fafsa_deadline.data
         college.acceptance_deadline = form.acceptance_deadline.data
         college.image = form.image.data
+        College.retrieve_college_info(college)
         db.session.add(college)
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')
