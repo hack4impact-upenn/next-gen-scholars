@@ -14,11 +14,7 @@
             <p><strong>Description:</strong> {{ college.description }} </p>
             <p><strong>Admission Rate</strong>: {% if college.admission_rate != 0.0 %} {{ college.admission_rate }}% {% endif %}</p>
             <p><strong>City</strong>: {{ college.school_city }}</p>
-            <p><strong>Undergraduate size</strong>: 
-                {% if college.school_size != 0 %}
-                    {{ college.school_size }}
-                {% endif %}
-            </p>
+
             <p><strong>Average SAT Score</strong>: 
                 {% if college.sat_score_average_overall != 0.0 %}
                 {{ college.sat_score_average_overall }}
@@ -27,6 +23,11 @@
             <p><strong>Average ACT Score</strong>: 
                 {% if college.act_score_average_overall != 0.0 %}
                 {{ college.act_score_average_overall }}
+                {% endif %}
+            </p>
+            <p><strong>Undergraduate size</strong>: 
+                {% if college.school_size != 0 %}
+                    {{ college.school_size }}
                 {% endif %}
             </p>
         </div>
@@ -58,6 +59,50 @@
             <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
         </div>
 
+        <div class="ui raised secondary green segment"> 
+            <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
+            <p><strong>First generation students</strong>: 
+                {% if college.first_generation_percentage != 0 %}
+                    {{ college.first_generation_percentage }}
+                {% endif %}
+            </p>
+
+            <p><strong>Percentage of students that are white</strong>: 
+                {% if college.race_white != 0 %}
+                    {{ college.race_white }}
+                {% endif %}
+            </p>
+            <p><strong>Percentage of students that are black</strong>: 
+                {% if college.race_black != 0 %}
+                    {{ college.race_black }}
+                {% endif %}
+            </p>
+            <p><strong>Percentage of students that are hispanic</strong>: 
+                {% if college.race_hispanic != 0 %}
+                    {{ college.race_hispanic }}
+                {% endif %}
+            </p>
+            <p><strong>Percentage of students that are Asian</strong>: 
+                {% if college.race_asian != 0 %}
+                    {{ college.race_asian }}
+                {% endif %}
+            </p>
+            <p><strong>Percentage of students that are Amerian Indian/ Alaska Native</strong>: 
+                {% if college.race_american_indian != 0 %}
+                    {{ college.race_american_indian }}
+                {% endif %}
+            </p>
+            <p><strong>Percentage of students that are Native Hawaiian/ Pacific Islander</strong>: 
+                {% if college.race_native_hawaiian != 0 %}
+                    {{ college.race_native_hawaiian }}
+                {% endif %}
+            </p>
+            <p><strong>Percentage of students that are international</strong>: 
+                {% if college.race_international != 0 %}
+                    {{ college.race_international }}
+                {% endif %}
+            </p>
+        </div>
         {% if college.plot_SAT1600 %}
         <h4 class="ui header">GPA vs. SAT [1600] Scattergram</h4>
         <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>

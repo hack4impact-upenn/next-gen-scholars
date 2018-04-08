@@ -6,6 +6,7 @@ import random
 from datetime import datetime
 import urllib.request, json
 import requests
+from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import plotly.tools as tools
 import plotly.plotly as py
@@ -46,6 +47,15 @@ class College(db.Model):
     room_and_board = db.Column(db.Float, index=True)
     sat_score_average_overall = db.Column(db.Float, index=True)
     act_score_average_overall = db.Column(db.Float, index=True)
+    first_generation_percentage = db.Column(db.Float, index=True)
+    year_data_collected = db.Column(db.String, index=True)
+    race_white = db.Column(db.Float, index=True)
+    race_black = db.Column(db.Float, index=True)
+    race_hispanic = db.Column(db.Float, index=True)
+    race_asian = db.Column(db.Float, index=True)
+    race_american_indian = db.Column(db.Float, index=True)
+    race_native_hawaiian = db.Column(db.Float, index=True)
+    race_international = db.Column(db.Float, index=True)
     # TODO: Add college dates
 
     def update_plots(self):
@@ -318,12 +328,13 @@ class College(db.Model):
         return College.query.filter_by(name=name).first()
 
     @staticmethod
-    def search_college_scorecard(name):
+    def search_college_scorecard(college):
         ''' This method uses the College Scorecard Data API to retrieve a dictionary
         of information about colleges that match with our query name
         @param name: name of the college we need to look up
         @return a dictionary of information about colleges that match with our query'''
         # Split name by white space, add %20 as the encoding for the space chacracter in query
+        name = college.name
         tokens = name.split()
         nameNewFormat = ''
         for token in tokens:
@@ -331,37 +342,43 @@ class College(db.Model):
         nameNewFormat = nameNewFormat[:-3]
         nameNewFormat  = nameNewFormat.replace(',', '')
 
-        urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
-         nameNewFormat, '&_fields=school.name,school.city,2015.admissions.admission_rate.overall,2015.student.size,school.school_url,',
-         '2015.cost.attendance.academic_year,2015.cost.tuition.in_state,2015.cost.tuition.out_of_state,',
-         '2015.admissions.act_scores.midpoint.cumulative,2015.admissions.sat_scores.average.overall'
-         '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
-        with urllib.request.urlopen(urlStr) as url:
-            data = json.loads(url.read().decode())
+        # Get current year and keep decrementing the year to get the valid most recent data
+        now = datetime.now()
+        yearNum = now.year
+        while(True):
+            try:
+                year = str(yearNum)
+                urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
+                    nameNewFormat, '&_fields=school.name,school.city,', year, '.admissions.admission_rate.overall,',
+                    year, '.student.size,school.school_url,', year, '.cost.attendance.academic_year,',
+                    year, '.cost.tuition.in_state,', year, '.cost.tuition.out_of_state,', year,
+                    '.admissions.act_scores.midpoint.cumulative,', year, '.student.share_firstgeneration,', year,
+                    '.admissions.sat_scores.average.overall,', year, '.student.demographics.race_ethnicity.white,',
+                    year, '.student.demographics.race_ethnicity.black,', year, '.student.demographics.race_ethnicity.hispanic,',
+                    year, '.student.demographics.race_ethnicity.asian,', year, '.student.demographics.race_ethnicity.aian,',
+                    year, '.student.demographics.race_ethnicity.nhpi,', year, '.student.demographics.race_ethnicity.non_resident_alien',
+                    '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
+                r = requests.get(urlStr)
+                r.raise_for_status()
+                data = r.json()
+            except HTTPError:
+                yearNum = yearNum - 1
+            else:
+                college.year_data_collected = year
+                break
         return(data)
 
     @staticmethod
-    def retrieve_college_info(name):
-        ''' This method takes in a college's name, attempts to find the college that best matches
-        with our query, and fill in the variables of the college accordingly
+    def retrieve_college_info(college):
+        ''' This method takes in a College, attempts to find the college that best matches
+        with our query, and fill in the variables of the college accordingly.
+        Always called after college.name has been initialized
         @param name: name of the college we need to look up
         @return a dictionary of information about the college'''
-        data = College.search_college_scorecard(name)
-        info = {}
-        result = {}
+        if(college.name == ''):
+            return
+        data = College.search_college_scorecard(college)
 
-        # Initialize values in the  dictionary to return
-        info['admission_rate'] = 0.0
-        info['school_url'] = ""
-        info['school_size'] = 0
-        info['school_city'] = ""
-        info['tuition_in_state'] = 0.0
-        info['tuition_out_of_state'] = 0.0
-        info['cost_of_attendance_in_state'] = 0.0
-        info['cost_of_attendance_out_of_state'] = 0.0
-        info['room_and_board'] = 0.0
-        info['sat_score_average_overall']  = 0.0
-        info['act_score_average_overall'] = 0.0
         # If there are some colleges that match with the query
         if(len(data['results']) > 0):
             # Default to the first search result returned
@@ -370,35 +387,50 @@ class College(db.Model):
             # Prioritize colleges whose name contain the query name, and of those who do, prioritize
             # those wherein the query name appears earlier in the college's name
             for r in data['results']:
-                idx = r['school.name'].find(name)
+                idx = r['school.name'].find(college.name)
                 if idx != -1:
                     if(firstFoundIdx > idx):
                         firstFoundIdx = idx
                         result = r
-            if result['2015.admissions.admission_rate.overall'] is not None:
-                info['admission_rate'] = result['2015.admissions.admission_rate.overall']
+            y = college.year_data_collected
+            if result[y + '.admissions.admission_rate.overall'] is not None:
+                college.admission_rate = round(result[y + '.admissions.admission_rate.overall']*100,2)
             if result['school.school_url'] is not None:
-                info['school_url'] = result['school.school_url']
-            if result['2015.student.size'] is not None:
-                info['school_size'] = result['2015.student.size']
+                college.school_url = result['school.school_url']
+            if result[y + '.student.size'] is not None:
+                college.school_size = result[y + '.student.size']
             if result['school.city'] is not None:
-                info['school_city'] = result['school.city']
-            if result['2015.cost.tuition.in_state'] is not None:
-                info['tuition_in_state'] = result['2015.cost.tuition.in_state']
-            if result['2015.cost.tuition.out_of_state'] is not None:
-                info['tuition_out_of_state'] = result['2015.cost.tuition.out_of_state']
-            if result['2015.cost.attendance.academic_year'] is not None:
-                info['cost_of_attendance_in_state'] = result['2015.cost.attendance.academic_year']
-            if result['2015.cost.attendance.academic_year'] is not None and result['2015.cost.tuition.in_state'] is not None:
-                info['room_and_board'] = result['2015.cost.attendance.academic_year'] - result['2015.cost.tuition.in_state']
-                if result['2015.cost.tuition.out_of_state'] is not None:
-                    info['cost_of_attendance_out_of_state'] = info['tuition_out_of_state'] + info['room_and_board'] 
-            if result['2015.admissions.sat_scores.average.overall'] is not None:
-                info['sat_score_average_overall'] = result['2015.admissions.sat_scores.average.overall']
-            if result['2015.admissions.act_scores.midpoint.cumulative'] is not None:
-                info['act_score_average_overall'] = result['2015.admissions.act_scores.midpoint.cumulative']
-
-        return(info)
+                college.school_city = result['school.city']
+            if result[y + '.cost.tuition.in_state'] is not None:
+                college.tuition_in_state = result[y + '.cost.tuition.in_state']
+            if result[y + '.cost.tuition.out_of_state'] is not None:
+                college.tuition_out_of_state = result[y + '.cost.tuition.out_of_state']
+            if result[y + '.cost.attendance.academic_year'] is not None:
+                college.cost_of_attendance_in_state = result[y + '.cost.attendance.academic_year']
+            if result[y + '.cost.attendance.academic_year'] is not None and result[y + '.cost.tuition.in_state'] is not None:
+                college.room_and_board = result[y + '.cost.attendance.academic_year'] - result[y + '.cost.tuition.in_state']
+            if result[y + '.cost.tuition.out_of_state'] is not None:
+                college.cost_of_attendance_out_of_state = college.tuition_out_of_state + college.room_and_board
+            if result[y + '.admissions.sat_scores.average.overall'] is not None:
+                college.sat_score_average_overall = result[y + '.admissions.sat_scores.average.overall']
+            if result[y + '.admissions.act_scores.midpoint.cumulative'] is not None:
+                college.act_score_average_overall = result[y + '.admissions.act_scores.midpoint.cumulative']
+            if result[y + '.student.share_firstgeneration'] is not None:
+                college.first_generation_percentage = round(result[y + '.student.share_firstgeneration']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.white'] is not None:
+                college.race_white = round(result[y + '.student.demographics.race_ethnicity.white']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.black'] is not None:
+                college.race_black = round(result[y + '.student.demographics.race_ethnicity.black']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.hispanic'] is not None:
+                college.race_hispanic = round(result[y + '.student.demographics.race_ethnicity.hispanic']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.asian'] is not None:
+                college.race_asian= round(result[y + '.student.demographics.race_ethnicity.asian']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.aian'] is not None:
+                college.race_american_indian = round(result[y + '.student.demographics.race_ethnicity.aian']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.nhpi'] is not None:
+                college.race_native_hawaiian = round(result[y + '.student.demographics.race_ethnicity.nhpi']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.non_resident_alien'] is not None:
+                college.race_international = round(result[y + '.student.demographics.race_ethnicity.non_resident_alien']*100,2)
 
     @staticmethod
     def insert_colleges():
@@ -474,27 +506,36 @@ class College(db.Model):
         for c in college_names:
             college = College.get_college_by_name(c)
             if college is None:
-                info = College.retrieve_college_info(c)
                 college = College(
                     name=c,
-                    admission_rate = round(info['admission_rate']*100,2),
+                    admission_rate = 0,
                     description=random.choice(descriptions),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),
                     acceptance_deadline=random.choice(acceptance_deadline),
-                    school_url = info['school_url'],
-                    school_size = info['school_size'],
-                    school_city = info['school_city'],
-                    tuition_in_state = info['tuition_in_state'],
-                    tuition_out_of_state = info['tuition_out_of_state'],
-                    cost_of_attendance_in_state = info['cost_of_attendance_in_state'],
-                    cost_of_attendance_out_of_state = info['cost_of_attendance_out_of_state'],
-                    room_and_board = info['room_and_board'],
-                    sat_score_average_overall = info['sat_score_average_overall'],
-                    act_score_average_overall = info['act_score_average_overall'],
+                    school_url = "",
+                    school_size = 0,
+                    school_city = "",
+                    tuition_in_state = 0,
+                    tuition_out_of_state = 0,
+                    cost_of_attendance_in_state = 0,
+                    cost_of_attendance_out_of_state = 0,
+                    room_and_board = 0,
+                    sat_score_average_overall = 0,
+                    act_score_average_overall = 0,
+                    first_generation_percentage = 0,
+                    year_data_collected = "",
+                    race_white = 0,
+                    race_black = 0,
+                    race_hispanic = 0,
+                    race_asian = 0,
+                    race_american_indian = 0,
+                    race_native_hawaiian = 0,
+                    race_international = 0,
                     scholarship_deadline=random.choice(scholarship_deadlines),
                     image=random.choice(images))
+                College.retrieve_college_info(college)
             db.session.add(college)
         db.session.commit()
 
