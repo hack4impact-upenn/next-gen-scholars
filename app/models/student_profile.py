@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem
+from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, CompletedApplication
 from .. import db
 from sqlalchemy.orm import validates
 
@@ -51,6 +51,7 @@ class StudentProfile(db.Model):
     early_deadline = db.Column(db.Boolean, default=False)
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
+    completed_applications = db.relationship('CompletedApplication')
     checklist = db.relationship('ChecklistItem')
     cal_token = db.Column(db.String, index=True)
     cal_refresh_token = db.Column(db.String, index=True)
@@ -93,6 +94,7 @@ class StudentProfile(db.Model):
             early_deadline=bool(random.getrandbits(1)),
             essays=Essay.generate_fake(),
             recommendation_letters=RecommendationLetter.generate_fake(),
+            completed_applications=CompletedApplication.generate_fake(),
             checklist=ChecklistItem.generate_fake())
         return profile
 
@@ -114,4 +116,6 @@ class StudentProfile(db.Model):
         s += 'Essays: {}\n'.format(self.essays)
         s += 'Recommendation Letters: {}'.format(
             self.recommendation_letters) + '>'
+        s += 'Completed Applications: {}'.format(
+            self.completed_applications) + '>'
         return s
