@@ -42,6 +42,15 @@ def index():
 @counselor.route('/colleges')
 @login_required
 @counselor_required
+def scholarships():
+    """View all scholarships"""
+    scholarships = Scholarship.query.all()
+    return render_template('counselor/scholarships.html', scholarships=scholarships)
+
+
+@counselor.route('/colleges')
+@login_required
+@counselor_required
 def colleges():
     """View all colleges."""
     colleges = College.query.all()
@@ -584,3 +593,9 @@ def upload_scattergram():
             message, message_type = 'Error with upload. Please make sure the format of the CSV file matches the description.', 'negative'
         return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
     return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
+
+@counselor.route('/')
+@login_required
+@counselor_required
+def view_checklist():
+    return render_template('account/checklist.html')
