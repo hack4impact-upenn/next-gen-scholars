@@ -6,10 +6,65 @@
     <link rel='stylesheet' href='../static/styles/fullcalendar.css' />
     <script src='../static/scripts/moment.min.js'></script>
     <script type="text/javascript">
-$(document).ready(function() {
-
-}
+$(document).ready(function() {}
 </script>
 </head>
+
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide computer sixteen wide mobile centered column">
+        <h2 class="ui dividing header">
+            College Comparer
+            <div class="sub header">
+                Compare colleges you're interested in
+            </div>
+        </h2>
+
+        {# Use overflow-x: scroll so that mobile views don't freak out
+         # when the table is too wide #}
+        <div style="overflow-x: scroll;">
+            <table class="ui searchable sortable unstackable selectable celled table">
+                <thead>
+                    <tr>
+                        <th>Your GPA</th>
+                        <th>Your SAT Score</th>
+                        <th>Your ACT Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {# Use overflow-x: scroll so that mobile views don't freak out
+         # when the table is too wide #}
+        <div style="overflow-x: scroll;">
+            <table class="ui searchable sortable unstackable selectable celled table">
+                <thead>
+                    <tr>
+                        <th class="sorted ascending">College</th>
+                        <th>Student Interest</th>
+                        <th>Average SAT</th>
+                        <th>Average ACT</th>
+                        <th>Scattergram</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for c in colleges | sort(attribute='name') %}
+                    <tr onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">
+
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.interest }}</td>
+                        <td>{{ c.sat }}</td>
+                        <td>{{ c.act }} </td>
+                        <td>{{ c.scattergram_link }} </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
