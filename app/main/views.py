@@ -1,4 +1,4 @@
-from flask import render_template, redirect
+from flask import render_template
 from flask_login import login_required
 from ..models import EditableHTML
 from . import main
@@ -21,8 +21,9 @@ def about():
 
 @main.route('/resources')
 def resources():
-    return redirect("http://www.nextgenerationscholars.org")
-
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template(
+    'main/resources.html', editable_html_obj=editable_html_obj)
 
 @main.route('/calendar', methods=['GET', 'POST'])
 def calendar():

@@ -12,43 +12,4 @@
 
 <iframe style="width:100%; height:500px; margin-bottom:0px;" src="http://ngsapp.strikingly.com/" frameborder="0"></iframe>    
 
-<!-- <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px;">
-    <div class="twelve wide computer sixteen wide mobile column">
-        <div class="row">
-            {{ page.render_inline_editor(editable_html_obj, current_user) }}
-            <div class="intrinsic-container intrinsic-container-16x9">
-            	<iframe src="http://ngsapp.strikingly.com/" ></iframe>
-            <div>
-        </div>
-    </div>
-</div> -->
-
-
-<script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
-<!-- script handles rendering the iFrame for mobile/desktop -->
-<style type="text/css">
-.intrinsic-container {
-  position: relative;
-  height: 0;
-  overflow: hidden;
-}
- 
-/* 16x9 Aspect Ratio */
-.intrinsic-container-16x9 {
-  padding-bottom: 56.25%;
-}
- 
-/* 4x3 Aspect Ratio */
-.intrinsic-container-4x3 {
-  padding-bottom: 75%;
-}
- 
-.intrinsic-container iframe {
-  position: absolute;
-  top:0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-</style>
 {% endblock %}
