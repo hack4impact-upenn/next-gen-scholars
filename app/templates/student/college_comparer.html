@@ -22,16 +22,16 @@ $(document).ready(function() {}
         {# Use overflow-x: scroll so that mobile views don't freak out
          # when the table is too wide #}
         <div style="overflow-x: scroll;">
-            <table class="ui searchable sortable unstackable selectable celled table">
+            <table class="ui unstackable celled table">
                 <thead>
                     <tr>
-                        <th>Your GPA</th>
                         <th>Your SAT Score</th>
                         <th>Your ACT Score</th>
                     </tr>
                 </thead>
                 <tbody>
-
+                        <td>{{ sat }}</td>
+                        <td>{{ act }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -51,14 +51,12 @@ $(document).ready(function() {}
                     </tr>
                 </thead>
                 <tbody>
-                {% for c in colleges | sort(attribute='name') %}
-                    <tr onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">
-
-                        <td>{{ c.name }}</td>
-                        <td>{{ c.interest }}</td>
-                        <td>{{ c.sat }}</td>
-                        <td>{{ c.act }} </td>
-                        <td>{{ c.scattergram_link }} </td>
+                {% for c in colleges %}
+                        <td>{{ c[0] }}</td>
+                        <td>{{ c[1] }}</td>
+                        <td>{{ c[2] }}</td>
+                        <td>{{ c[3] }} </td>
+                        <td>{{ c[4] }} </td>
                     </tr>
                 {% endfor %}
                 </tbody>

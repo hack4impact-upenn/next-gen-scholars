@@ -24,10 +24,8 @@ import datetime
 from datetime import date
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
-
-@student.route('/profile')
-@login_required
-def view_user_profile():
+#load student profile, test scores for profile and comparer
+def load_student_profile(current_user):
     sat = 'N/A'
     act = 'N/A'
     student_profile = current_user.student_profile
@@ -38,6 +36,16 @@ def view_user_profile():
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
+
+    return student_profile, sat, act
+
+@student.route('/profile')
+@login_required
+def view_user_profile():
+    sat = 'N/A'
+    act = 'N/A'
+    student_profile, sat, act = load_student_profile(current_user)
+    if student_profile is not None:
         return render_template(
             'student/student_profile.html',
             user=current_user,
@@ -46,10 +54,24 @@ def view_user_profile():
     else:
         abort(404)
 
+def load_sample_comparer_data():
+    colleges = ['University of Richmond', 'Tufts', 'UC Berkely', 'Harvard',
+    'UCLA', 'UCSB', 'Swarthmore', 'UCD']
+    scores_sat = "1380 1490 1440 1540 1370 1330 1490 1290".split()
+    scores_act = "30 32 32 34 29 27 27 32 27".split()
+
+    for i in range(len(colleges)):
+        colleges[i] = (colleges[i], "high", scores_sat[i], scores_act[i], "link")
+
+    return colleges
+
 @student.route('/comparer')
 @login_required
 def comparer():
-    return render_template('student/college_comparer.html', authenticated=True)
+    student_profile, sat, act = load_student_profile(current_user)
+    colleges = load_sample_comparer_data()
+    return render_template('student/college_comparer.html', user=current_user, 
+        act=act, sat=sat, colleges=colleges, authenticated=True)
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
