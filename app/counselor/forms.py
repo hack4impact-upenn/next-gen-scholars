@@ -5,7 +5,7 @@ from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
                             HiddenField, BooleanField, TextAreaField,
-                            SelectField)
+                            SelectField, IntegerField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
@@ -156,13 +156,29 @@ class AddCollegeProfileForm(Form):
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
     early_deadline = DateField(
-        'Early Deadline (yyyy-mm-dd)',
+        'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     regular_deadline = DateField(
-        'Regular Deadline (yyyy-mm-dd)',
+        'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    scholarship_deadline = DateField(
+        'Scholarship Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    fafsa_deadline = DateField(
+        'Fafsa Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    acceptance_deadline = DateField(
+        'Acceptance Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    image = StringField(
+        'URL for image of college',
+        validators=[InputRequired()]
+    )
     submit = SubmitField('Add College Profile')
 
 
@@ -182,13 +198,28 @@ class EditCollegeProfileStep2Form(Form):
     description = StringField(u'Description', widget=TextArea())
     # Input not required for either deadline.
     early_deadline = DateField(
-        'Early Deadline (yyyy-mm-dd)',
+        'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     regular_deadline = DateField(
-        'Regular Deadline (yyyy-mm-dd)',
+        'Regular Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
+    scholarship_deadline = DateField(
+        'Scholarship Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    fafsa_deadline = DateField(
+        'Fafsa Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    acceptance_deadline = DateField(
+        'Acceptance Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    image = StringField(
+        'URL to image of college',
+        validators=[InputRequired()])
     submit = SubmitField('Save College Profile')
 
 

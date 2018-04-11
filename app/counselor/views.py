@@ -63,16 +63,23 @@ def upload_college_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 4 and any(row):
+            if len(row) >= 8 and any(row):
                 # check that there are at least for columns
                 # and the row is not completely blank
                 college_data = College(
                     name=row[0],
                     description=row[1],
                     regular_deadline=datetime.datetime.strptime(
-                        row[2], "%Y-%m-%d") if row[2] else None,
+                        row[2], "%m/%d/%y") if row[2] else None,
                     early_deadline=datetime.datetime.strptime(
-                        row[3], "%Y-%m-%d") if row[3] else None,
+                        row[3], "%m/%d/%y") if row[3] else None,
+                    fafsa_deadline=datetime.datetime.strptime(
+                        row[4], "%m/%d/%y") if row[4] else None,
+                    acceptance_deadline=datetime.datetime.strptime(
+                        row[5], "%m/%d/%y") if row[5] else None,
+                    scholarship_deadline=datetime.datetime.strptime(
+                        row[6], "%m/%d/%y") if row[6] else None,
+                    image = row[7]
                 )
             db.session.add(college_data)
         db.session.commit()
@@ -376,9 +383,23 @@ def add_college():
                 name=form.name.data,
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
-                regular_deadline=form.regular_deadline.data)
+                regular_deadline=form.regular_deadline.data,
+                scholarship_deadline=form.scholarship_deadline.data,
+                fafsa_deadline=form.fafsa_deadline.data,
+                acceptance_deadline=form.acceptance_deadline.data,
+                image = form.image.data,school_url = "",
+                school_size = 0,
+                school_city = "",
+                tuition_in_state = 0,
+                tuition_out_of_state = 0,
+                cost_of_attendance_in_state = 0,
+                cost_of_attendance_out_of_state = 0,
+                room_and_board = 0,
+                sat_score_average_overall = 0,
+                act_score_average_overall = 0)
             db.session.add(college)
             db.session.commit()
+            College.retrieve_college_info(college)
         else:
             flash('College could not be added - already existed in database.',
                   'error')
@@ -414,13 +435,22 @@ def edit_college_step2(college_id):
         name=old_college.name,
         description=old_college.description,
         regular_deadline=old_college.regular_deadline,
-        early_deadline=old_college.early_deadline)
+        early_deadline=old_college.early_deadline,
+        scholarship_deadline=old_college.scholarship_deadline,
+        fafsa_deadline=old_college.fafsa_deadline,
+        acceptance_deadline=old_college.acceptance_deadline,
+        image = old_college.image)
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
+        college.scholarship_deadline = form.scholarship_deadline.data
+        college.fafsa_deadline = form.fafsa_deadline.data
+        college.acceptance_deadline = form.acceptance_deadline.data
+        college.image = form.image.data
+        College.retrieve_college_info(college)
         db.session.add(college)
         db.session.commit()
         flash('College profile successfully edited.', 'form-success')

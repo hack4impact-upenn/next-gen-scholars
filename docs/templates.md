@@ -37,7 +37,7 @@ This will cover various methods used in our jinja templates.
 
         {% block nav %}
           {# add dropdown variable here to the render_nav method to render dropdowns #}
-          {{ nav.render_nav(current_user) }}
+          {{ nav.render_nav(current_user, pageType) }}
         {% endblock %}
 
         {% include 'partials/_flashes.html' %}
