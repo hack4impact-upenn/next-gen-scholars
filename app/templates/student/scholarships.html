@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %} {% block content %}
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide computer sixteen wide mobile centered column">
+        <h2 class="ui dividing header">
+            Scholarships
+            <div class="sub header">
+                View scholarships.
+            </div>
+        </h2>
+
+        <div class="ui menu">
+            <div class="ui search item">
+                <div class="ui transparent icon input">
+                    <input id="search-users" type="text" placeholder="Search scholarships...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </div>
+
+        {# Use overflow-x: scroll so that mobile views don't freak out # when the table is too wide #}
+        <div style="overflow-x: scroll;">
+            <table class="ui searchable sortable unstackable selectable celled table">
+                <thead>
+                    <tr>
+                        <th class="sorted ascending">Name</th>
+                        <th>Description</th>
+                        <th>Award Amount</th>
+                        <th>Deadline</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in scholarships | sort(attribute='name') %}
+                    <!-- <tr> -->
+                    <tr onclick="window.location.href = '{{ url_for('student.view_scholarship_profile', scholarship_id=s.id) }}';">
+
+                        <td>{{ s.name }}</td>
+                        <td>{{ s.description }}</td>
+                        <td>{{ s.award_amount }}</td>
+                        <td>{{ s.deadline }} </td>
+                        <td>{{ s.category }} </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#search-users').keyup(function () {
+            var searchText = $(this).val();
+            if (searchText.length > 0) {
+                $('tbody td:icontains(' + searchText + ')').addClass('positive');
+                $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
+                $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
+                $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
+            } else {
+                $('td.positive').removeClass('positive');
+                $('tr.hidden').removeClass('hidden').show();
+            }
+        });
+
+        $('#select-role').dropdown({
+            onChange: function (value, text, $selectedItem) {
+                $('td.user.role:contains(' + value + ')').closest('tr').removeClass('hidden').show();
+                $('td.user.role').not(':contains(' + value + ')').closest('tr').addClass('hidden').hide();
+            }
+        });
+    });
+</script> {% endblock %}
