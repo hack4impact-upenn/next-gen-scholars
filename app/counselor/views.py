@@ -42,6 +42,15 @@ def index():
 @counselor.route('/colleges')
 @login_required
 @counselor_required
+def scholarships():
+    """View all scholarships"""
+    scholarships = Scholarship.query.all()
+    return render_template('counselor/scholarships.html', scholarships=scholarships)
+
+
+@counselor.route('/colleges')
+@login_required
+@counselor_required
 def colleges():
     """View all colleges."""
     colleges = College.query.all()

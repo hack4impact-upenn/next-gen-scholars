@@ -12,6 +12,7 @@ class CompletedApplication(db.Model):
     # statuses include 'Pending Results', 'Accepted', 'Denied', 'Waitlisted',
     #    'Deferred'
     status = db.Column(db.String, index=True)
+    cost_of_attendance = db.Column(db.Float, index=True)
 
     @validates('status')
     def validate_status(self, key, status):
