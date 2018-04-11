@@ -407,6 +407,7 @@ def add_completed_application(student_profile_id):
         new_item = CompletedApplication(
             student_profile_id = student_profile_id,
             college = form.college.data.name,
+            cost_of_attendance = form.college.data.cost_of_attendance,
             status = form.status.data)
         db.session.add(new_item)
         db.session.commit()
@@ -434,6 +435,7 @@ def edit_completed_application(item_id):
             status=application.status)
         if form.validate_on_submit():
             application.college = form.college.data.name
+            application.cost_of_attendance = form.college.data.cost_of_attendance
             application.status = form.status.data
             db.session.add(application)
             db.session.commit()
