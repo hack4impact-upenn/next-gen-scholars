@@ -46,8 +46,8 @@ class Scholarship(db.Model):
     @staticmethod
     def insert_scholarships():
         scholarship_names = {
-            'Science Scholarship', 'Math Scholarship', 'Music Scholarship',
-            'Chemistry Scholarship', 'History Scholarship', 'English Scholarship',
+            'Science Scholar', 'Math Achievement Scholarship', 'Music Scholarship',
+            'Oldham Scholarship', 'Boatwright Scholarship', 'Bonner Scholarship',
         }
         category = [
             'African-American', 'Agriculture', 'Arts-related','Asian','Asian Pacific American',
