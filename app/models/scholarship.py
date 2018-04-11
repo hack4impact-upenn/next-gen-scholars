@@ -2,7 +2,7 @@ import random
 from faker import Faker
 from .. import db
 from sqlalchemy.orm import validates
-
+from datetime import datetime
 
 class Scholarship(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,14 +111,6 @@ class Scholarship(db.Model):
                     status = random.choice(statuses))
                 db.session.add(scholarship)
             db.session.commit()
-
-
-    # @staticmethod
-    # def generate_fake(count=2):
-    #     fake = Faker()
-    #     scholarships = Scholarship(
-            
-    #         )
         
 
         # return scholarships

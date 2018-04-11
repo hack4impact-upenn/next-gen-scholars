@@ -18,7 +18,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData)
+                      ScattergramData, Scholarship)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -39,7 +39,7 @@ def index():
     return render_template('counselor/index.html')
 
 
-@counselor.route('/colleges')
+@counselor.route('/scholarships')
 @login_required
 @counselor_required
 def scholarships():
