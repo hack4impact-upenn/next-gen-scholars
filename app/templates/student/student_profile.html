@@ -363,7 +363,6 @@
           {% if user.student_profile.completed_applications|length > 0 %} {% for application in 
             user.student_profile.completed_applications|sort(attribute='college') %}
             <tr>
-              <td>{{ application.college.cost_of_attendance }}</td>
               <td>{{ application.college }}</td>
               <td>{{ application.status }}</td>
               <td class="collapsing">
