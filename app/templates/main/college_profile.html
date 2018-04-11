@@ -7,6 +7,7 @@
     <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
     {% endif %}
 </div>
+
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
         <div class="ui raised secondary green segment">
@@ -85,51 +86,35 @@
         <div class="ui raised secondary green segment"> 
             <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
             {% if college.first_generation_percentage != 0 %}
-            <p><strong>First generation students</strong>: 
-                {{ college.first_generation_percentage }}
-            </p>
+            <p><strong>{{ college.first_generation_percentage }}%</strong> First Generation Students</p>
             {% endif %}
 
             {% if college.race_white != 0 %}
-            <p><strong>Percentage of students that are white</strong>: 
-                {{ college.race_white }}
-            </p>
+            <p><strong>{{ college.race_white }}%</strong> White</p>
             {% endif %}
 
             {% if college.race_black != 0 %}
-            <p><strong>Percentage of students that are black</strong>: 
-                {{ college.race_black }}
-            </p>
+            <p><strong>{{ college.race_black }}%</strong> Black</p>
             {% endif %}
 
             {% if college.race_hispanic != 0 %}
-            <p><strong>Percentage of students that are hispanic</strong>: 
-                {{ college.race_hispanic }}
-            </p>
+            <p><strong>{{ college.race_hispanic }}%</strong> Hispanic</p>
             {% endif %}
 
             {% if college.race_asian != 0 %}
-            <p><strong>Percentage of students that are Asian</strong>: 
-                {{ college.race_asian }}
-            </p>
+            <p><strong>{{ college.race_asian }}%</strong> Asian</p>
             {% endif %}
 
             {% if college.race_american_indian != 0 %}
-            <p><strong>Percentage of students that are Amerian Indian/ Alaska Native</strong>: 
-                {{ college.race_american_indian }}
-            </p>
+            <p><strong>{{ college.race_american_indian }}%</strong> American Indian/Alaska Native</p>
             {% endif %}
 
             {% if college.race_native_hawaiian != 0 %}
-            <p><strong>Percentage of students that are Native Hawaiian/ Pacific Islander</strong>: 
-                {{ college.race_native_hawaiian }}
-            </p>
+            <p><strong>{{ college.race_native_hawaiian }}%</strong> Native Hawaiian/ Pacific Islander</p>
             {% endif %}
 
             {% if college.race_international != 0 %}
-            <p><strong>Percentage of students that are international</strong>: 
-                {{ college.race_international }}    
-            </p>
+            <p><strong>{{ college.race_international }}%</strong> International</p>
             {% endif %}
 
         </div>
