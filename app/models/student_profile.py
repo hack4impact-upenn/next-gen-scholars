@@ -1,8 +1,10 @@
 import random
 from faker import Faker
-from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, CompletedApplication
+from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, CompletedApplication, Race
 from .. import db
 from sqlalchemy.orm import validates
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects.postgresql import ARRAY
 
 student_colleges = db.Table('student_colleges',
                             db.Column('college_id', db.Integer,
@@ -16,6 +18,12 @@ student_majors = db.Table('student_majors',
                           db.Column('student_profile_id', db.Integer,
                                     db.ForeignKey('student_profile.id')))
 
+student_race = db.Table('student_race',
+                        db.Column('race_id', db.Integer,
+                                db.ForeignKey('race.id')),
+                        db.Column('student_profile_id', db.Integer,
+                                db.ForeignKey('student_profile.id')))
+
 
 class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,12 +35,12 @@ class StudentProfile(db.Model):
     state = db.Column(db.String, index=True)
     graduation_year = db.Column(db.String, index=True)
     grade = db.Column(db.Integer, index=True)
-    race = db.Column(db.String, index=True)
+    race = db.relationship('Race', secondary=student_race,backref='student_profiles', lazy=True)
     gender = db.Column(db.String, index=True)
     # ACADEMIC INFO
     gpa = db.Column(db.Float, index=True)
     test_scores = db.relationship(
-        'TestScore', backref='student_profile', lazy=True)
+        'TestScore', backref='student_profiles', lazy=True)
     majors = db.relationship(
         'Major',
         secondary=student_majors,
@@ -75,6 +83,8 @@ class StudentProfile(db.Model):
         fafsa_status = random.choice(['Incomplete', 'Complete'])
         essay_status = random.choice(
             ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'])
+        # race = random.choice(['African-American', 'Jewish'])
+        gender = random.choice(['Female', 'Male', 'Other'])
         profile = StudentProfile(
             high_school='{} High School'.format(fake.street_name()),
             district='{} District'.format(fake.city()),
@@ -82,8 +92,8 @@ class StudentProfile(db.Model):
             state=fake.state(),
             graduation_year=year[0],
             grade=year[1],
-            race=fake.race(),
-            gender=fake.gender(),
+            race=random.sample(Race.query.all(),3),
+            gender=gender,
             gpa=round(random.uniform(2, 4), 2),
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),

@@ -8,6 +8,7 @@ from .scattergram_data import *
 from .college import *
 from .essay import *
 from .major import *
+from .race import *
 from .miscellaneous import *
 from .recommendation_letter import *
 from .completed_application import *

@@ -10,7 +10,7 @@ from rq import Connection, Queue, Worker
 
 from app import create_app, db
 from app.models import (Role, User, College, Major, SMSAlert,
-                        StudentProfile, ChecklistItem, TestName)
+                        StudentProfile, ChecklistItem, TestName, Race)
 
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -78,6 +78,7 @@ def setup_general():
        Also sets up first admin, counselor, and student users.."""
     College.insert_colleges()
     Major.insert_majors()
+    Race.insert_races()
     Role.insert_roles()
     TestName.insert_tests()
     admin_query = Role.query.filter_by(name='Administrator')

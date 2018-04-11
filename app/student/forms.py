@@ -6,7 +6,7 @@ from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
                             IntegerField, FloatField, SelectField,
-                            BooleanField)
+                            BooleanField, SelectMultipleField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 from wtforms.fields.html5 import EmailField
@@ -178,15 +178,8 @@ class EditStudentProfile(Form):
                                 Length(1, 100)])
     city = StringField('City', validators=[InputRequired(), Length(1, 100)])
     state = StringField('State', validators=[InputRequired(), Length(1, 100)])
-    race = SelectMultipleField('Race/Scholarship Information', choices=['African-American', 
-        'Agriculture', 'Arts-related', 'Asian', 'Asian Pacific American', 'Community Service',
-        'Construction-related Fields', 'Disabled', 'Engineering', 'Enviornmental Interest', 
-        'Female', 'Filipino', 'First Generation College Student', 'Queer', 'General-open to all',
-        'Latinx', 'Immigrant/AB540/DACA', 'Interest in Journalism', 'Japanese', 'Jewish', 
-        'Indigenous', 'Open to all grade levels', 'Science/Engineering', 'Student-Athlete', 
-        'Teaching', 'Women in Math/Engineering'],coerce=unicode, option_widget=None)
-    gender = SelectMultipleField('Gender', choices ['Male', 'Female', 'Other'],coerce=unicode, 
-        option_widget=None)
+    race = SelectMultipleField('Race/Scholarship Information', choices=[('African-American','African-American'), ('Agriculture','Agriculture'), ('Arts-related','Arts-related'), ('Asian','Asian'), ('Asian Pacific American','Asian Pacific American'), ('Community Service','Community Service'),('Construction-related Fields','Construction-related Fields'), ('Disabled','Disabled'), ('Engineering','Engineering'), ('Enviornmental Interest','Enviornmental Interest'), ('Female','Female'), ('Filipino','Filipino'), ('First Generation College Student','First Generation College Student'), ('Queer','Queer'), ('General-open to all','General-open to all'), ('Latinx','Latinx'), ('Immigrant/AB540/DACA','Immigrant/AB540/DACA'), ('Interest in Journalism','Interest in Journalism'), ('Japanese','Japanese'), ('Jewish','Jewish'), ('Indigenous','Indigenous'), ('Open to all grade levels','Open to all grade levels'), ('Science/Engineering','Science/Engineering'), ('Student-Athlete','Student-Athlete'), ('Teaching','Teaching'), ('Women in Math/Engineering','Women in Math/Engineering')], coerce=str, option_widget=None)
+    gender = SelectField('Gender', choices=[('Male','Male'), ('Female','Female'), ('Other','Other')])
     submit = SubmitField('Update Profile')
 
 
