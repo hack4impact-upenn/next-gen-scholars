@@ -519,6 +519,17 @@ def delete_college(item_id, student_profile_id):
     return jsonify({"success": "False"})
 
 
+# scholarship methods
+
+@student.route('/scholarships')
+@login_required
+def scholarships():
+    """View all scholarships"""
+    scholarships = Scholarship.query.all()
+    return render_template('student/scholarship.html')
+
+
+
 # common app essay methods
 
 
