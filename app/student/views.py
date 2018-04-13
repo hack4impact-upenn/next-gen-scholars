@@ -24,6 +24,8 @@ import datetime
 from datetime import date
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
+import random #for fake college interest
+
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
     sat = 'N/A'
@@ -71,6 +73,12 @@ def load_comparer_data():
 def comparer():
     student_profile, sat, act = load_student_profile(current_user)
     colleges = load_comparer_data()
+    for col in colleges:
+        col.sat_score_average_overall = int(col.sat_score_average_overall)
+        col.act_score_average_overall = int(col.act_score_average_overall)
+        col.scatter_link = '/student/college_profile/' + str(col.id)
+        col.interest = random.choice(['high', 'medium', 'low'])
+
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
         colleges=colleges, authenticated=True)
