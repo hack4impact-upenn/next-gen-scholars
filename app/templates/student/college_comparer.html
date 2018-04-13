@@ -52,11 +52,11 @@ $(document).ready(function() {}
                 </thead>
                 <tbody>
                 {% for c in colleges %}
-                        <td>{{ c[0] }}</td>
-                        <td>{{ c[1] }}</td>
-                        <td>{{ c[2] }}</td>
-                        <td>{{ c[3] }} </td>
-                        <td>{{ c[4] }} </td>
+                        <td>{{ c.name }}</td>
+                        <td>{{ 'high' }}</td>
+                        <td>{{ c.sat_score_average_overall }}</td>
+                        <td>{{ c.act_score_average_overall }} </td>
+                        <td><a href="{{ c.school_url }}"></a> </td>
                     </tr>
                 {% endfor %}
                 </tbody>

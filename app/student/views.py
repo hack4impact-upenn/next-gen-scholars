@@ -44,7 +44,7 @@ def load_student_profile(current_user):
 def view_user_profile():
     sat = 'N/A'
     act = 'N/A'
-    student_profile, sat, act = load_student_profile(current_user)
+    current_user.student_profile, sat, act = load_student_profile(current_user)
     if student_profile is not None:
         return render_template(
             'student/student_profile.html',
@@ -54,14 +54,15 @@ def view_user_profile():
     else:
         abort(404)
 
-def load_sample_comparer_data():
-    colleges = ['University of Richmond', 'Tufts', 'UC Berkely', 'Harvard',
-    'UCLA', 'UCSB', 'Swarthmore', 'UCD']
-    scores_sat = "1380 1490 1440 1540 1370 1330 1490 1290".split()
-    scores_act = "30 32 32 34 29 27 27 32 27".split()
+def load_comparer_data():
+    colleges = (current_user.student_profile.colleges)
+    #= ['University of Richmond', 'Tufts', 'UC Berkely', 'Harvard',
+    #'UCLA', 'UCSB', 'Swarthmore', 'UCD']
+    #scores_sat = "1380 1490 1440 1540 1370 1330 1490 1290".split()
+    #scores_act = "30 32 32 34 29 27 27 32 27".split()
 
-    for i in range(len(colleges)):
-        colleges[i] = (colleges[i], "high", scores_sat[i], scores_act[i], "link")
+    #for i in range(len(colleges)):
+    #    colleges[i] = (colleges[i], "high", scores_sat[i], scores_act[i], "link")
 
     return colleges
 
@@ -69,9 +70,10 @@ def load_sample_comparer_data():
 @login_required
 def comparer():
     student_profile, sat, act = load_student_profile(current_user)
-    colleges = load_sample_comparer_data()
+    colleges = load_comparer_data()
     return render_template('student/college_comparer.html', user=current_user, 
-        act=act, sat=sat, colleges=colleges, authenticated=True)
+        act=act, sat=sat, 
+        colleges=colleges, authenticated=True)
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
