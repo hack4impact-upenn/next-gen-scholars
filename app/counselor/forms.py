@@ -175,9 +175,6 @@ class AddCollegeProfileForm(Form):
         'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
-    cost_of_attendance = IntegerField(
-        'Cost of Attendance',
-        validators=[InputRequired()])
     image = StringField(
         'URL for image of college',
         validators=[InputRequired()]
@@ -220,9 +217,6 @@ class EditCollegeProfileStep2Form(Form):
         'Acceptance Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
-    cost_of_attendance = IntegerField(
-        'Cost of Attendance',
-        validators=[InputRequired()])
     image = StringField(
         'URL to image of college',
         validators=[InputRequired()])

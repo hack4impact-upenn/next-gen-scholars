@@ -14,7 +14,7 @@
 {% endmacro %}
 
 {# This is called for all users (including anonymous users). It renders the basic left side of the
-   navigation bar. In the default case, the left hand side will read 'Flask-Base'. In the logged in
+   navigation bar. In the default case, the left hand side will read 'qk-Base'. In the logged in
    admin case, there will also be an item that links to admin/ route. I have added an example use of
    render_menu_items.
 #}
@@ -73,21 +73,39 @@
     {% endif %}
 {% endmacro %}
 
-{% macro mobile_nav(current_user, dropdown=None) %}
-    <div class="mobile only row">
-        <div class="ui fixed inverted black main menu">
-            {{ header_items(current_user) }}
-            <div class="right menu">
-                <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
+{% macro mobile_nav(pageType, current_user, dropdown=None) %}
+    <!-- TODO: remove duplicated code  -->    
+    {% if pageType=='home' or pageType=='college_profile' %}
+        <div style="padding-bottom:0px;" class="mobile only row">
+            <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
+                {{ header_items(current_user) }}
+                <div class="right menu">
+                    <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
+                </div>
+            </div>
+        
+            {# The menu items which will be shown when open-nav is clicked #}
+            <div class="ui fixed vertical fluid menu">
+              {{ account_items(current_user) }}
+              {{ create_dropdown(dropdown) }}
             </div>
         </div>
-
-        {# The menu items which will be shown when open-nav is clicked #}
-        <div class="ui fixed vertical fluid menu">
-          {{ account_items(current_user) }}
-          {{ create_dropdown(dropdown) }}
+    {% else %}
+        <div class="mobile only row">
+            <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
+              {{ header_items(current_user) }}
+              <div class="right menu">
+                  <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
+              </div>
+            </div>
+        
+          {# The menu items which will be shown when open-nav is clicked #}
+          <div class="ui fixed vertical fluid menu">
+            {{ account_items(current_user) }} 
+            {{ create_dropdown(dropdown) }}
+          </div>
         </div>
-    </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro create_dropdown(dropdown) %}
@@ -104,23 +122,37 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro desktop_nav(current_user, dropdown=None) %}
-    <div class="computer tablet only row">
-        <div class="ui fixed inverted black main menu">
+{% macro desktop_nav(pageType, current_user, dropdown=None) %}
+     <!-- TODO: remove duplicated code  -->
+     {% if pageType=='home' or pageType=='college_profile' %}
+        <div style="padding-bottom: 0px;" class="computer tablet only row">
+          <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
             <div class="ui container">
-                {{ header_items(current_user) }}
-                <div class="right menu">
-                    {{ account_items(current_user) }}
-                    {{ create_dropdown(dropdown) }}
-                </div>
+              {{ header_items(current_user) }}
+              <div class="right menu">
+                {{ account_items(current_user) }} 
+                {{ create_dropdown(dropdown) }}
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+    {% else %}
+      <div class="computer tablet only row">
+        <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
+          <div class="ui container">
+            {{ header_items(current_user) }}
+            <div class="right menu">
+              {{ account_items(current_user) }} {{ create_dropdown(dropdown) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
 {% endmacro %}
 
-{% macro render_nav(current_user, dropdown=[]) %}
+{% macro render_nav(page, current_user, dropdown=[]) %}
     <nav class="ui navigation grid {% if endpoints %}has-submenu{% endif %}">
-        {{ mobile_nav(current_user, dropdown=dropdown) }}
-        {{ desktop_nav(current_user, dropdown=dropdown) }}
+        {{ mobile_nav(page, current_user, dropdown=dropdown) }}
+        {{ desktop_nav(page, current_user, dropdown=dropdown) }}
     </nav>
 {% endmacro %}
