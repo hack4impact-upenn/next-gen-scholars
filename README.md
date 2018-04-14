@@ -8,6 +8,7 @@
 * Steven Bursztyn
 
 ## Setting up for Python 3
+__Must use Python3__
 
 #####  Clone the repo
 
@@ -19,18 +20,12 @@ $ cd next-gen-scholars
 ##### Initialize a virtualenv
 
 ```bash
-$ pip install virtualenv
-$ virtualenv -p /path/to/python3.x/installation env
+$ pip install venv
+$ python3 -m venv env
 $ source env/bin/activate
 ```
 
-For mac users it will most likely be
-```bash
-$ pip install virtualenv
-$ virtualenv -p python3 env
-$ source env/bin/activate
-```
-Note: if you are using a python2.x version, point the -p value towards your python2.x path
+Note: you must use python3+
 
 ##### (If you're on a mac) Make sure xcode tools are installed
 
@@ -112,13 +107,13 @@ $ sudo apt-get install libpq-dev
 ##### Create the database
 
 ```bash
-$ python manage.py recreate_db
+$ python3 manage.py recreate_db
 ```
 
 ##### Other setup (e.g. creating roles in database)
 
 ```bash
-$ python manage.py setup_dev
+$ python3 manage.py setup_dev
 ```
 
 Note that this will create an admin user with email and password specified by the `ADMIN_EMAIL` and `ADMIN_PASSWORD` config variables. If not specified, they are both `flask-base-admin@example.com` and `password` respectively.
@@ -126,7 +121,7 @@ Note that this will create an admin user with email and password specified by th
 ##### [Optional] Add fake data to the database
 
 ```bash
-$ python manage.py add_fake_data
+$ python3 manage.py add_fake_data
 ```
 
 ## Running the app

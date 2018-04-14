@@ -2,14 +2,24 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-<div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
+<!-- <div class="container" style="padding-bottom:75px; background-size: cover; text-align: center; background-image:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('https://c.pxhere.com/photos/63/d6/cellphone_desk_iphone_laptop_macbook_notebook_notepad_pencil-972233.jpg!d');">
+    <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">Welcome to Next Generation Scholars</h1>
+     {% if not current_user.is_authenticated %}
+    <button onclick= "window.location.href='/account/register';" class="ui red button">Register</button>
+    <button onclick= "window.location.href='/account/login';"class="ui green button">Login</button>
+    {% endif %}
+</div> -->
+
+<iframe style="width:100%; height:500px; margin-bottom:0px;" src="http://ngsapp.strikingly.com/" frameborder="0"></iframe>    
+
+<!-- <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px;">
     <div class="twelve wide computer sixteen wide mobile column">
         <div class="row">
-            <h1 class="ui dividing header">Welcome to Next Generation Scholars</h1>
             {{ page.render_inline_editor(editable_html_obj, current_user) }}
         </div>
     </div>
-</div>
+</div> -->
+
 
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 {% endblock %}
