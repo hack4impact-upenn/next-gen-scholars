@@ -48,7 +48,7 @@ def scholarships():
     return render_template('counselor/scholarships.html', scholarships=scholarships)
 
 @csrf.exempt
-@counselor.route('/upload_', methods=['GET', 'POST'])
+@counselor.route('/upload_scholarships', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def upload_scholarship_file():
