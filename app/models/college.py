@@ -4,8 +4,9 @@ from .. import db
 import os
 import random
 from datetime import datetime
-import json
+import urllib.request, json
 import requests
+from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import plotly.tools as tools
 import plotly.plotly as py
@@ -27,6 +28,7 @@ class College(db.Model):
     cost_of_attendance = db.Column(db.Integer, index=True)
     image = db.Column(db.String, index=True)
     regular_deadline = db.Column(db.Date, index=True)
+    admission_rate = db.Column(db.Float, index=True)
     early_deadline = db.Column(db.Date, index=True)
     fafsa_deadline = db.Column(db.Date, index=True)
     scholarship_deadline = db.Column(db.Date, index=True)    
@@ -34,6 +36,26 @@ class College(db.Model):
     plot_SAT2400 = db.Column(db.String)
     plot_SAT1600 = db.Column(db.String)
     plot_ACT = db.Column(db.String)
+    image = db.Column(db.String, index=True)
+    school_url = db.Column(db.String, index=True)
+    school_size = db.Column(db.Integer, index=True)
+    school_city = db.Column(db.String, index=True)
+    tuition_in_state = db.Column(db.Float, index=True)
+    tuition_out_of_state = db.Column(db.Float, index=True)
+    cost_of_attendance_in_state = db.Column(db.Float, index=True)
+    cost_of_attendance_out_of_state = db.Column(db.Float, index=True)
+    room_and_board = db.Column(db.Float, index=True)
+    sat_score_average_overall = db.Column(db.Float, index=True)
+    act_score_average_overall = db.Column(db.Float, index=True)
+    first_generation_percentage = db.Column(db.Float, index=True)
+    year_data_collected = db.Column(db.String, index=True)
+    race_white = db.Column(db.Float, index=True)
+    race_black = db.Column(db.Float, index=True)
+    race_hispanic = db.Column(db.Float, index=True)
+    race_asian = db.Column(db.Float, index=True)
+    race_american_indian = db.Column(db.Float, index=True)
+    race_native_hawaiian = db.Column(db.Float, index=True)
+    race_international = db.Column(db.Float, index=True)
     # TODO: Add college dates
 
     def update_plots(self):
@@ -306,6 +328,111 @@ class College(db.Model):
         return College.query.filter_by(name=name).first()
 
     @staticmethod
+    def search_college_scorecard(college):
+        ''' This method uses the College Scorecard Data API to retrieve a dictionary
+        of information about colleges that match with our query name
+        @param name: name of the college we need to look up
+        @return a dictionary of information about colleges that match with our query'''
+        # Split name by white space, add %20 as the encoding for the space chacracter in query
+        name = college.name
+        tokens = name.split()
+        nameNewFormat = ''
+        for token in tokens:
+            nameNewFormat = nameNewFormat + token + "%20"
+        nameNewFormat = nameNewFormat[:-3]
+        nameNewFormat  = nameNewFormat.replace(',', '')
+
+        # Get current year and keep decrementing the year to get the valid most recent data
+        now = datetime.now()
+        yearNum = now.year
+        while(True):
+            try:
+                year = str(yearNum)
+                urlStr = '' .join(['https://api.data.gov/ed/collegescorecard/v1/schools.json?school.name=',
+                    nameNewFormat, '&_fields=school.name,school.city,', year, '.admissions.admission_rate.overall,',
+                    year, '.student.size,school.school_url,', year, '.cost.attendance.academic_year,',
+                    year, '.cost.tuition.in_state,', year, '.cost.tuition.out_of_state,', year,
+                    '.admissions.act_scores.midpoint.cumulative,', year, '.student.share_firstgeneration,', year,
+                    '.admissions.sat_scores.average.overall,', year, '.student.demographics.race_ethnicity.white,',
+                    year, '.student.demographics.race_ethnicity.black,', year, '.student.demographics.race_ethnicity.hispanic,',
+                    year, '.student.demographics.race_ethnicity.asian,', year, '.student.demographics.race_ethnicity.aian,',
+                    year, '.student.demographics.race_ethnicity.nhpi,', year, '.student.demographics.race_ethnicity.non_resident_alien',
+                    '&api_key=jjHzFLWEyba3YYtWiv7jaQN8kGSkMuf55A9sRsxl'])
+                r = requests.get(urlStr)
+                r.raise_for_status()
+                data = r.json()
+            except HTTPError:
+                yearNum = yearNum - 1
+            else:
+                college.year_data_collected = year
+                break
+        return(data)
+
+    @staticmethod
+    def retrieve_college_info(college):
+        ''' This method takes in a College, attempts to find the college that best matches
+        with our query, and fill in the variables of the college accordingly.
+        Always called after college.name has been initialized
+        @param name: name of the college we need to look up
+        @return a dictionary of information about the college'''
+        if(college.name == ''):
+            return
+        data = College.search_college_scorecard(college)
+
+        # If there are some colleges that match with the query
+        if(len(data['results']) > 0):
+            # Default to the first search result returned
+            result = data['results'][0]
+            firstFoundIdx = float("inf")
+            # Prioritize colleges whose name contain the query name, and of those who do, prioritize
+            # those wherein the query name appears earlier in the college's name
+            for r in data['results']:
+                idx = r['school.name'].find(college.name)
+                if idx != -1:
+                    if(firstFoundIdx > idx):
+                        firstFoundIdx = idx
+                        result = r
+            y = college.year_data_collected
+            if result[y + '.admissions.admission_rate.overall'] is not None:
+                college.admission_rate = round(result[y + '.admissions.admission_rate.overall']*100,2)
+            if result['school.school_url'] is not None:
+                college.school_url = result['school.school_url']
+            if result[y + '.student.size'] is not None:
+                college.school_size = result[y + '.student.size']
+            if result['school.city'] is not None:
+                college.school_city = result['school.city']
+            if result[y + '.cost.tuition.in_state'] is not None:
+                college.tuition_in_state = result[y + '.cost.tuition.in_state']
+            if result[y + '.cost.tuition.out_of_state'] is not None:
+                college.tuition_out_of_state = result[y + '.cost.tuition.out_of_state']
+            if result[y + '.cost.attendance.academic_year'] is not None:
+                college.cost_of_attendance_in_state = result[y + '.cost.attendance.academic_year']
+            if result[y + '.cost.attendance.academic_year'] is not None and result[y + '.cost.tuition.in_state'] is not None:
+                college.room_and_board = result[y + '.cost.attendance.academic_year'] - result[y + '.cost.tuition.in_state']
+            if result[y + '.cost.tuition.out_of_state'] is not None:
+                college.cost_of_attendance_out_of_state = college.tuition_out_of_state + college.room_and_board
+            if result[y + '.admissions.sat_scores.average.overall'] is not None:
+                college.sat_score_average_overall = result[y + '.admissions.sat_scores.average.overall']
+            if result[y + '.admissions.act_scores.midpoint.cumulative'] is not None:
+                college.act_score_average_overall = result[y + '.admissions.act_scores.midpoint.cumulative']
+            if result[y + '.student.share_firstgeneration'] is not None:
+                college.first_generation_percentage = round(result[y + '.student.share_firstgeneration']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.white'] is not None:
+                college.race_white = round(result[y + '.student.demographics.race_ethnicity.white']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.black'] is not None:
+                college.race_black = round(result[y + '.student.demographics.race_ethnicity.black']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.hispanic'] is not None:
+                college.race_hispanic = round(result[y + '.student.demographics.race_ethnicity.hispanic']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.asian'] is not None:
+                college.race_asian= round(result[y + '.student.demographics.race_ethnicity.asian']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.aian'] is not None:
+                college.race_american_indian = round(result[y + '.student.demographics.race_ethnicity.aian']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.nhpi'] is not None:
+                college.race_native_hawaiian = round(result[y + '.student.demographics.race_ethnicity.nhpi']*100,2)
+            if result[y + '.student.demographics.race_ethnicity.non_resident_alien'] is not None:
+                college.race_international = round(result[y + '.student.demographics.race_ethnicity.non_resident_alien']*100,2)
+
+    @staticmethod
     def insert_colleges():
         college_names = {
             'University of Pennsylvania', 'Columbia University',
@@ -313,7 +440,7 @@ class College(db.Model):
             'Harvard University', 'Cornell University', 'Yale University',
             'Brown University', 'Dartmouth College', 'New York University',
             'University of California, Berkeley',
-            'University of California, Los Angelos', 'University of Michigan',
+            'University of California, Los Angeles', 'University of Michigan-Ann Arbor',
             'Carnegie Mellon University', 'John Hopkins University',
             'University of Chicago', 'Amherst College', 'Williams College',
             'Massachusetts Institute of Technology',
@@ -370,9 +497,7 @@ class College(db.Model):
             'Liberal arts college', 'Public research university',
             'Private doctorate university'
         ]
-        costs_of_attendance = [
-            60000, 50000
-        ]
+
         images = [
             'http://www.collegerank.net/wp-content/uploads/2015/08/morehouse-college-quad.jpg',
             'https://static1.squarespace.com/static/52f11228e4b0a96c7b51a92d/t/55e705bee4b03fc234f02b5e/1441203647587/'
@@ -383,16 +508,38 @@ class College(db.Model):
             if college is None:
                 college = College(
                     name=c,
+                    admission_rate = 0,
                     description=random.choice(descriptions),
-                    cost_of_attendance=random.choice(costs_of_attendance),
                     regular_deadline=random.choice(regular_deadlines),
                     early_deadline=random.choice(early_deadlines),
                     fafsa_deadline=random.choice(fafsa_deadline),
                     acceptance_deadline=random.choice(acceptance_deadline),
+                    school_url = "",
+                    school_size = 0,
+                    school_city = "",
+                    tuition_in_state = 0,
+                    tuition_out_of_state = 0,
+                    cost_of_attendance_in_state = 0,
+                    cost_of_attendance_out_of_state = 0,
+                    room_and_board = 0,
+                    sat_score_average_overall = 0,
+                    act_score_average_overall = 0,
+                    first_generation_percentage = 0,
+                    year_data_collected = "",
+                    race_white = 0,
+                    race_black = 0,
+                    race_hispanic = 0,
+                    race_asian = 0,
+                    race_american_indian = 0,
+                    race_native_hawaiian = 0,
+                    race_international = 0,
                     scholarship_deadline=random.choice(scholarship_deadlines),
                     image=random.choice(images))
+                College.retrieve_college_info(college)
             db.session.add(college)
         db.session.commit()
+
+        #@TODOOOOO: DO THE SAME FOR ADD COLLEGE METHOD IN COUNSELOR:VIEWS.PY
 
     def __repr__(self):
         return '<College: {}>'.format(self.name)
