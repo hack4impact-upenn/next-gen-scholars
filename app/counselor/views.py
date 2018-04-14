@@ -47,6 +47,44 @@ def scholarships():
     scholarships = Scholarship.query.all()
     return render_template('counselor/scholarships.html', scholarships=scholarships)
 
+@csrf.exempt
+@counselor.route('/upload_', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def upload_scholarship_file():
+    if request.method == 'POST':
+        f = request.files['file']
+
+        stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
+        csv_input = csv.reader(stream)
+        header_row = True
+        for row in csv_input:
+            if header_row:
+                header_row = False
+                continue
+            if len(row) >= 13 and any(row):
+                # check that there are at least for columns
+                # and the row is not completely blank
+                scholarship_data = Scholarship(
+                    name=row[0],
+                    description=row[1],
+                    scholarship_deadline=datetime.datetime.strptime(
+                        row[2], "%m/%d/%y") if row[2] else None,
+                    award_amount = row[3],
+                    category = row[4],
+                    description = row[5],
+                    merit_based = row[6],
+                    service_based = row[7],
+                    need_based = row[8],
+                    minimum_gpa = row[9],
+                    interview_required = row[10],
+                    link = row[11],
+                    status = row[12]
+                )
+            db.session.add(scholarship_data)
+        db.session.commit()
+        return redirect(url_for('counselor.scholarships'))
+    return render_template('counselor/upload_scholarships.html')
 
 @counselor.route('/colleges')
 @login_required
