@@ -62,8 +62,8 @@ def upload_scholarship_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 13 and any(row):
-                # check that there are at least for columns
+            if len(row) >= 12 and any(row):
+                # check that there are at least for columns  
                 # and the row is not completely blank
                 scholarship_data = Scholarship(
                     name=row[0],
@@ -72,14 +72,13 @@ def upload_scholarship_file():
                         row[2], "%m/%d/%y") if row[2] else None,
                     award_amount = row[3],
                     category = row[4],
-                    description = row[5],
-                    merit_based = row[6],
-                    service_based = row[7],
-                    need_based = row[8],
-                    minimum_gpa = row[9],
-                    interview_required = row[10],
-                    link = row[11],
-                    status = row[12]
+                    merit_based = row[5],
+                    service_based = row[6],
+                    need_based = row[7],
+                    minimum_gpa = row[8],
+                    interview_required = row[9],
+                    link = row[10],
+                    status = row[11]
                 )
             db.session.add(scholarship_data)
         db.session.commit()
