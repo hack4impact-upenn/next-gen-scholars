@@ -1,0 +1,69 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
+   <div class="twelve wide column">
+      <div class="row">
+         <h2 class="ui header">
+            Upload Scholarship Data
+            <div class="sub header">
+               Upload CSV of scholarhip data.
+            </div>
+         </h2>
+         <h4 class="ui header">Instructions for Uploading Scholarships</h4>
+         <p>
+            To add more data to the scholarship database, create an excel sheet with the following columns in order:
+            <ol>
+               <li>Scholarship Name</li>
+               <li>Scholarship Description</li>
+               <li>Scholarship Deadline (M-D-Y) (Excel should autoformat dates correctly)</li>
+               <li>Award Amount (Format Amount Without Dollar Signs and Commas)</li>
+               <li>Category</li>
+               <li>Merit Based</li>
+               <li>Service Based</li>
+               <li>Need Based</li>
+               <li>Minimum GPA (Excel should autoformat dates correctly)</li>
+               <li>Interview Required</li>
+               <li>Link</li>
+               <li>Status</li>
+               <li>Image URL</li>
+            </ol>
+         </p>
+         <p>
+            <img src="/static/images/scholarship_data.png" width="100%" />
+         </p>
+         <p>
+            Enter data as in the sample image above in an excel file.
+            When you are finished entering all the data, save your excel sheet as a CSV file, then upload it to this portal and click "Submit."
+         </p>
+         <h4 class="ui header">Upload CSV File</h4>
+         <form class="ui form" method="POST" enctype="multipart/form-data">
+            <label id="scholarship-data-file-label" for="scholarship-data-file" class="ui icon button">
+               <i class="file icon"></i>
+               Open File</label>
+            <input type="file" accept=".csv" id="scholarship-data-file" name="file" style="display:none">
+            <br /><br />
+            <input class="ui submit primary button" type="submit"/>
+         </form>
+      </div>
+   </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+   $('#scholarship-data-file').on('change', function(e) {
+      var filename;
+      var $label = $('#scholarship-data-file-label');
+      if (e.target.value) {
+         filename = e.target.value.split('\\').pop();
+      }
+      if (filename) {
+         $label.html('<i class="file icon"></i>&nbsp' + filename);
+      } else {
+         $label.html();
+      }
+   });
+});
+</script>
+
+{% endblock %}
