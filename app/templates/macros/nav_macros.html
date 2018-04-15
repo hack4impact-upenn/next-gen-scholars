@@ -129,9 +129,9 @@
           <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
             <div class="ui container">
               {{ header_items(current_user) }}
+               {{ create_dropdown(dropdown) }}
               <div class="right menu">
                 {{ account_items(current_user) }} 
-                {{ create_dropdown(dropdown) }}
               </div>
             </div>
           </div>
@@ -141,8 +141,9 @@
         <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
           <div class="ui container">
             {{ header_items(current_user) }}
+             {{ create_dropdown(dropdown) }}
             <div class="right menu">
-              {{ account_items(current_user) }} {{ create_dropdown(dropdown) }}
+              {{ account_items(current_user) }} 
             </div>
           </div>
         </div>

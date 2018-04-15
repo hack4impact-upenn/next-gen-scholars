@@ -65,20 +65,20 @@ def upload_scholarship_file():
             if len(row) >= 12 and any(row):
                 # check that there are at least for columns  
                 # and the row is not completely blank
+                
                 scholarship_data = Scholarship(
                     name=row[0],
                     description=row[1],
-                    scholarship_deadline=datetime.datetime.strptime(
+                    deadline=datetime.datetime.strptime(
                         row[2], "%m/%d/%y") if row[2] else None,
                     award_amount = row[3],
                     category = row[4],
-                    merit_based = row[5],
-                    service_based = row[6],
-                    need_based = row[7],
+                    merit_based = (row[5] == "Yes" or row[5] == "yes"),
+                    service_based = (row[6] == "Yes" or row[6] == "yes"),
+                    need_based = (row[7] == "Yes" or row[7] == "yes"),
                     minimum_gpa = row[8],
-                    interview_required = row[9],
-                    link = row[10],
-                    status = row[11]
+                    interview_required = (row[9] == "Yes" or row[9] == "yes"),
+                    link = row[10]
                 )
             db.session.add(scholarship_data)
         db.session.commit()
