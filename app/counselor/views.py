@@ -506,7 +506,7 @@ def add_alert():
     if form.validate_on_submit():
         hour, minute = form.time.data.split(':')
         am_pm = form.am_pm.data
-        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        hour = (int(hour) % 12) + (12 if am_pm == 'PM' else 0)
         alert = SMSAlert(
             title=form.title.data,
             content=form.content.data,
@@ -537,7 +537,7 @@ def edit_alert(alert_id):
     if form.validate_on_submit():
         hour, minute = form.time.data.split(':')
         am_pm = form.am_pm.data
-        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        hour = (int(hour) % 12) + (12 if am_pm == 'PM' else 0)
         alert.title = form.title.data
         alert.content = form.content.data
         alert.date = form.date.data
