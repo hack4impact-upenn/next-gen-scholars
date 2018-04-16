@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %} {% block content %}
+<div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide computer sixteen wide mobile centered column">
+        <h1 class="ui dividing header">{{ scholarship.name }}</h1>
+        <p>
+            {{ scholarship.description }}
+        </p>
+        <h4 class="ui header">Deadlines</h4>
+        <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
+        <p><strong>Award Amount: </strong> {{ scholarship.award_amount }}</p>
+        <p><strong>Category: </strong> {{ scholarship.category }}</p>
+        <p><strong>Merit based: </strong> {{ scholarship.merit_based }}</p>
+        <p><strong>Service based: </strong> {{ scholarship.service_based }}</p>
+        <p><strong>Need based: </strong> {{ scholarship.need_based }}</p>
+        <p><strong>Minimum GPA: </strong> {{ scholarship.minimum_gpa }}</p>
+        <p><strong>Interview Required: </strong> {{ scholarship.interview_required }}</p>
+        <p><strong>Link: </strong> {{ scholarship.link }}</p>
+        <p><strong>Status: </strong> {{ scholarship.status }}</p>  
+    </div>
+</div>
+
+{% endblock %}

@@ -13,7 +13,8 @@ from .forms import (
     EditRecommendationLetterForm, AddCommonAppEssayForm, AddCompletedApplicationForm,
     EditCompletedApplicationForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
-                      RecommendationLetter, TestName, Notification, CompletedApplication)
+                      RecommendationLetter, TestName, Notification, CompletedApplication,
+                      Scholarship)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -517,6 +518,17 @@ def delete_college(item_id, student_profile_id):
         db.session.commit()
         return jsonify({"success": "True"})
     return jsonify({"success": "False"})
+
+
+# scholarship methods
+
+@student.route('/scholarships')
+@login_required
+def scholarships():
+    """View all scholarships"""
+    scholarships = Scholarship.query.all()
+    return render_template('student/scholarships.html', scholarships=scholarships)
+
 
 
 # common app essay methods
@@ -1049,6 +1061,13 @@ def view_college_profile(college_id):
     college = College.query.filter_by(id=college_id).first()
     return render_template(
         'main/college_profile.html', pageType='college_profile', college=college)
+
+@student.route('/scholarship_profile/<int:scholarship_id>')
+@login_required
+def view_scholarship_profile(scholarship_id):
+    scholarship = Scholarship.query.filter_by(id=scholarship_id).first()
+    return render_template(
+        'main/scholarship_profile.html', pageType='scholarship_profile', scholarship=scholarship)
 
 
 def string_to_bool(str):

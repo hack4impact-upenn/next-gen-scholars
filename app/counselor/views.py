@@ -18,7 +18,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData)
+                      ScattergramData, Scholarship)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -38,6 +38,52 @@ def index():
     """Counselor dashboard page."""
     return render_template('counselor/index.html')
 
+
+@counselor.route('/scholarships')
+@login_required
+@counselor_required
+def scholarships():
+    """View all scholarships"""
+    scholarships = Scholarship.query.all()
+    return render_template('counselor/scholarships.html', scholarships=scholarships)
+
+@csrf.exempt
+@counselor.route('/upload_scholarships', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def upload_scholarship_file():
+    if request.method == 'POST':
+        f = request.files['file']
+
+        stream = io.StringIO(f.stream.read().decode("UTF8"), newline=None)
+        csv_input = csv.reader(stream)
+        header_row = True
+        for row in csv_input:
+            if header_row:
+                header_row = False
+                continue
+            if len(row) >= 12 and any(row):
+                # check that there are at least for columns  
+                # and the row is not completely blank
+                
+                scholarship_data = Scholarship(
+                    name=row[0],
+                    description=row[1],
+                    deadline=datetime.datetime.strptime(
+                        row[2], "%m/%d/%y") if row[2] else None,
+                    award_amount = row[3],
+                    category = row[4],
+                    merit_based = (row[5] == "Yes" or row[5] == "yes"),
+                    service_based = (row[6] == "Yes" or row[6] == "yes"),
+                    need_based = (row[7] == "Yes" or row[7] == "yes"),
+                    minimum_gpa = row[8],
+                    interview_required = (row[9] == "Yes" or row[9] == "yes"),
+                    link = row[10]
+                )
+            db.session.add(scholarship_data)
+        db.session.commit()
+        return redirect(url_for('counselor.scholarships'))
+    return render_template('counselor/upload_scholarships.html')
 
 @counselor.route('/colleges')
 @login_required
@@ -584,3 +630,9 @@ def upload_scattergram():
             message, message_type = 'Error with upload. Please make sure the format of the CSV file matches the description.', 'negative'
         return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
     return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
+
+@counselor.route('/')
+@login_required
+@counselor_required
+def view_checklist():
+    return render_template('account/checklist.html')

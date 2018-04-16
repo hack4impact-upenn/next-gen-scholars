@@ -32,6 +32,7 @@
           ('student.view_user_profile', 'Profile', 'user'),
           ('student.calendar', 'Calendar', 'calendar'),
           ('student.colleges', 'Colleges', 'university'),
+          ('student.scholarships', 'Scholarships', 'money bill alternate outline icon'),
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% elif current_user.is_counselor() %}
@@ -41,6 +42,7 @@
           ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
+          ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% else %}
@@ -50,6 +52,7 @@
           ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
+          ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),          
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% endif %}
@@ -126,9 +129,9 @@
           <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
             <div class="ui container">
               {{ header_items(current_user) }}
+               {{ create_dropdown(dropdown) }}
               <div class="right menu">
                 {{ account_items(current_user) }} 
-                {{ create_dropdown(dropdown) }}
               </div>
             </div>
           </div>
@@ -138,8 +141,9 @@
         <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
           <div class="ui container">
             {{ header_items(current_user) }}
+             {{ create_dropdown(dropdown) }}
             <div class="right menu">
-              {{ account_items(current_user) }} {{ create_dropdown(dropdown) }}
+              {{ account_items(current_user) }} 
             </div>
           </div>
         </div>
@@ -148,7 +152,7 @@
 {% endmacro %}
 
 {% macro render_nav(page, current_user, dropdown=[]) %}
-    <nav class="ui navigation grid {% if endpoints %}has-submenu{% endif %}">
+    <nav class="ui navigation grid {% if endpoints %}has-submenu{% endif %} myNav">
         {{ mobile_nav(page, current_user, dropdown=dropdown) }}
         {{ desktop_nav(page, current_user, dropdown=dropdown) }}
     </nav>
