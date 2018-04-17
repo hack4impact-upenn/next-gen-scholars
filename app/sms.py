@@ -34,7 +34,7 @@ def check_alerts():
         next = next_timestamp(datetime.now())
         alerts = []
         for alert in SMSAlert.query.filter_by(date=next.date()).all():
-            if not alert.sent and alert.time.hour == next.hour and alert.time.minute == next.minute:
+            if alert.time.hour == next.hour and alert.time.minute == next.minute:
                 alerts.append(alert)
         students = User.query.filter(User.student_profile_id != None).filter(
             User.phone_number != None).all()
@@ -54,6 +54,3 @@ def check_alerts():
                 client.messages.create(to=format_phone(student.phone_number),
                                        from_=twilio_phone,
                                        body=alert.content)
-            alert.sent = True
-            db.session.add(alert)
-        db.session.commit()
