@@ -39,9 +39,14 @@ def check_alerts():
         students = User.query.filter(User.student_profile_id != None).filter(
             User.phone_number != None).all()
 
-        account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-        auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-        twilio_phone = os.environ.get('TWILIO_PHONE_NO')
+        account_sid = os.environ.get('TWILIO_ACCOUNT_SID') or None
+        auth_token = os.environ.get('TWILIO_AUTH_TOKEN') or None
+        twilio_phone = os.environ.get('TWILIO_PHONE_NO') or None
+
+        if not account_sid or not auth_token or not twilio_phone:
+            print('Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NO to config.env file')
+            return
+
         client = Client(account_sid, auth_token)
 
         for alert in alerts:
