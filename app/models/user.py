@@ -59,6 +59,8 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(64), index=True)
     last_name = db.Column(db.String(64), index=True)
     email = db.Column(db.String(64), unique=True, index=True)
+    # phone_number should be in the form of +[country code][phone number]
+    # ex: +10123456789
     phone_number = db.Column(db.String(20), index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -192,6 +194,7 @@ class User(UserMixin, db.Model):
                 role = roles[1]
             else:
                 role = roles[2]
+            # removed fake phone numbers so setting SMS alerts doesn't notify random people
             u = User(
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
@@ -199,7 +202,6 @@ class User(UserMixin, db.Model):
                 password=fake.password(),
                 confirmed=True,
                 role=role,
-                phone_number=fake.phone_number(),
                 **kwargs)
             if role.name == 'User':
                 u.student_profile = StudentProfile.generate_fake()
