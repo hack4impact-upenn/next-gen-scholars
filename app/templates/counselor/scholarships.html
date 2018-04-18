@@ -36,7 +36,12 @@
                 <button class="ui primary button" type="submit">Filter</button>
             </form>
             <h4 class="ui header">Search</h4>
-            
+            <div class="ui input focus">
+                <div class="ui icon input">
+                    <input id="search-scholarships" type="text" placeholder="Search scholarships...">
+                    <i class="search icon"></i>
+                </div>
+            </div>
             <h4 class="ui header">Upload Scholarship CSV</h4>
             <div class="ui item">
                 <a class="ui black basic button" href="{{ url_for('counselor.upload_scholarship_file') }}">Upload Scholarships</a>
@@ -50,14 +55,6 @@
                 View scholarships.
             </div>
         </h2>
-        <div class="ui menu">
-            <div class="ui search item">
-                <div class="ui transparent icon input">
-                    <input id="search-scholarships" type="text" placeholder="Search colleges...">
-                    <i class="search icon"></i>
-                </div>
-            </div>
-        </div>
         {# Use overflow-x: scroll so that mobile views don't freak out # when the table is too wide #}
         <div style="overflow-x: scroll;">
             <table class="ui searchable sortable unstackable selectable celled table">
@@ -74,11 +71,11 @@
                     {% for s in scholarships | sort(attribute='name') %}
                     <tr class = "scholarship-row" onclick="window.location.href = '{{ url_for('student.view_scholarship_profile', scholarship_id=s.id) }}';">
 
-                        <td>{{ s.name }}</td>
-                        <td>{{ s.description }}</td>
-                        <td>{{ s.award_amount }}</td>
-                        <td>{{ s.deadline }} </td>
-                        <td class='td-category' data-category={{ s.category }}>{{ s.category }} </td>
+                        <td class="searchable-td">{{ s.name }}</td>
+                        <td class="searchable-td">{{ s.description }}</td>
+                        <td class="searchable-td">{{ s.award_amount }}</td>
+                        <td class="searchable-td">{{ s.deadline }} </td>
+                        <td class="td-category searchable-td" data-category={{ s.category }}>{{ s.category }} </td>
                     </tr>
                     {% endfor %}
                 </tbody>
