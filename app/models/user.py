@@ -194,12 +194,12 @@ class User(UserMixin, db.Model):
                 role = roles[1]
             else:
                 role = roles[2]
-            # removed fake phone numbers so setting SMS alerts doesn't notify random people
             u = User(
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
                 email=fake.email(),
                 password=fake.password(),
+                phone_number=fake.phone_number(),
                 confirmed=True,
                 role=role,
                 **kwargs)

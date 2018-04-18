@@ -21,6 +21,7 @@ class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.relationship("User", back_populates="student_profile")
     # PERSONAL INFO
+    phone_number = db.Column(db.String(15), index=True)
     high_school = db.Column(db.String, index=True)
     district = db.Column(db.String, index=True)
     city = db.Column(db.String, index=True)

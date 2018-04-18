@@ -7,7 +7,7 @@ from twilio.rest import Client
 import re
 
 from app import create_app, db
-from app.models import SMSAlert, User
+from app.models import SMSAlert, StudentProfile
 
 
 def format_phone(number):
@@ -36,8 +36,7 @@ def check_alerts():
         for alert in SMSAlert.query.filter_by(date=next.date()).all():
             if alert.time.hour == next.hour and alert.time.minute == next.minute:
                 alerts.append(alert)
-        students = User.query.filter(User.student_profile_id != None).filter(
-            User.phone_number != None).all()
+        students = StudentProfile.query.filter_by(StudentProfile.phone_number != None).all()
 
         account_sid = os.environ.get('TWILIO_ACCOUNT_SID') or None
         auth_token = os.environ.get('TWILIO_AUTH_TOKEN') or None
