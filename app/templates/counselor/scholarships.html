@@ -50,9 +50,9 @@
     </div>
     <div class="twelve wide computer sixteen wide mobile centered column">
         <h2 class="ui dividing header">
-            Counselor Scholarships Page
-            <div class="sub header">
-                View scholarships.
+            Scholarships
+            <div style="margin-top:5px; margin-bottom:5px;" class="sub header">
+                View and upload scholarships.
             </div>
         </h2>
         {# Use overflow-x: scroll so that mobile views don't freak out # when the table is too wide #}
@@ -92,9 +92,6 @@
                 $('select.dropdown').dropdown();
                 $('.ui.checkbox').checkbox();
 
-                // Allows counselor to send checklist items to selected student profile ids
-                var selectedProfileIds = new Set();
-
                 // Apply current filters to table
                 function filterScholarships() {
                     // 'All', 'Incomplete', and 'Complete'
@@ -103,7 +100,7 @@
                         $this = $(this);
                         $this.show();
 
-                        // Filter by FAFSA status
+                        // Filter by Scholarship Category
                         let category = $this.find('.td-category').data('category');
                         if (categoryFilter != 'All' && category != categoryFilter) {
                             $this.hide();
@@ -117,21 +114,6 @@
                     return false;
                 })
 
-                // Allows counselor to select students
-                $('.scholarship-row').click(function (e) {
-                    scholarshipProfileId = this.getAttribute('data-profile-id');
-                    if (selectedProfileIds.has(scholarshipProfileId)) {
-                        selectedProfileIds.delete(scholarshipProfileId);
-                        $(this).removeClass('active');
-                    } else {
-                        selectedProfileIds.add(scholarshipProfileId);
-                        $(this).addClass('active');
-                    }
-                    console.log(selectedProfileIds);
-                    $('#assignee_ids').val(Array.from(selectedProfileIds));
-                    console.log($('#assignee_ids'));
-                });
-
                 // Search through students (with the filter applied)
                 $('#search-scholarships').keyup(function () {
                     filterScholarships();
@@ -143,29 +125,6 @@
                         $('.positive').closest('tr').addClass('matches');
                         $('tbody tr').not('.matches').hide();
                     }
-                });
-
-                // Select all filtered students
-                $('#select-all').click(function () {
-                    $('.scholarship-row').each(function (index) {
-                        if ($(this).css('display') != 'none') {
-                            scholarshipProfileId = this.getAttribute('data-profile-id');
-                            selectedProfileIds.add(scholarshipProfileId);
-                            $(this).addClass('active');
-                        }
-                    });
-                });
-
-                // Deselect all filtered students
-                $('#select-none').click(function () {
-                    var selectedProfileIds = new Set();
-                    $('.scholarship-row').each(function (index) {
-                        if ($(this).css('display') != 'none') {
-                            let scholarshipProfileId = this.getAttribute('data-profile-id');
-                            selectedProfileIds.delete(scholarshipProfileId);
-                            $(this).removeClass('active');
-                        }
-                    });
                 });
             });
 </script> {% endblock %}
