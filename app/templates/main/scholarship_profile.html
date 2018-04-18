@@ -6,7 +6,7 @@
             {{ scholarship.description }}
         </p>
         <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
-        <p><strong>Award Amount: </strong> {{ scholarship.award_amount }}</p>
+        <p><strong>Award Amount: </strong> ${{ scholarship.award_amount }}</p>
         <p><strong>Category: </strong> {{ scholarship.category }}</p>
         <p><strong>Merit based: </strong> 
             {% if scholarship.merit_based %} 
@@ -14,23 +14,20 @@
             {% else %} 
                 No 
             {% endif %}
-            {{ scholarship.merit_based }}
         </p>
         <p><strong>Service based: </strong>
             {% if scholarship.service_based %} 
                 Yes 
             {% else %} 
                 No 
-            {% endif %}
-            {{ scholarship.service_based }}            
+            {% endif %}      
         </p>
         <p><strong>Need based: </strong> 
             {% if scholarship.need_based %} 
                 Yes 
             {% else %} 
                 No 
-            {% endif %}
-            {{ scholarship.need_based }}            
+            {% endif %}         
         </p>
         <p><strong>Minimum GPA: </strong> {{ scholarship.minimum_gpa }}</p>
         <p><strong>Interview Required: </strong> {{ scholarship.interview_required }}</p>

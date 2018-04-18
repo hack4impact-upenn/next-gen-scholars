@@ -62,10 +62,9 @@ def upload_scholarship_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 12 and any(row):
-                # check that there are at least twelve columns  
+            if len(row) >= 11 and any(row):
+                # check that there are at least eleven columns  
                 # and the row is not completely blank
-                
                 scholarship_data = Scholarship(
                     name=row[0],
                     description=row[1],
@@ -80,7 +79,7 @@ def upload_scholarship_file():
                     interview_required = (row[9] == "Yes" or row[9] == "yes"),
                     link = row[10]
                 )
-            db.session.add(scholarship_data)
+                db.session.add(scholarship_data)
         db.session.commit()
         return redirect(url_for('counselor.scholarships'))
     return render_template('counselor/upload_scholarships.html')
@@ -464,11 +463,12 @@ def add_college():
                 act_score_average_overall = 0)
             College.retrieve_college_info(college)
             db.session.add(college)
-            db.session.commit()
+        
         else:
-            flash('College could not be added - already existed in database.',
+            flash('College could not be added - already exists in database.',
                   'error')
         return redirect(url_for('counselor.index'))
+    db.session.commit()
     return render_template(
         'counselor/add_college.html', form=form, header='Add College Profile')
 
