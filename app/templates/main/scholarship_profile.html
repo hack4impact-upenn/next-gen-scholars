@@ -5,17 +5,36 @@
         <p>
             {{ scholarship.description }}
         </p>
-        <h4 class="ui header">Deadlines</h4>
         <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
         <p><strong>Award Amount: </strong> {{ scholarship.award_amount }}</p>
         <p><strong>Category: </strong> {{ scholarship.category }}</p>
-        <p><strong>Merit based: </strong> {{ scholarship.merit_based }}</p>
-        <p><strong>Service based: </strong> {{ scholarship.service_based }}</p>
-        <p><strong>Need based: </strong> {{ scholarship.need_based }}</p>
+        <p><strong>Merit based: </strong> 
+            {% if scholarship.merit_based %} 
+                Yes 
+            {% else %} 
+                No 
+            {% endif %}
+            {{ scholarship.merit_based }}
+        </p>
+        <p><strong>Service based: </strong>
+            {% if scholarship.service_based %} 
+                Yes 
+            {% else %} 
+                No 
+            {% endif %}
+            {{ scholarship.service_based }}            
+        </p>
+        <p><strong>Need based: </strong> 
+            {% if scholarship.need_based %} 
+                Yes 
+            {% else %} 
+                No 
+            {% endif %}
+            {{ scholarship.need_based }}            
+        </p>
         <p><strong>Minimum GPA: </strong> {{ scholarship.minimum_gpa }}</p>
         <p><strong>Interview Required: </strong> {{ scholarship.interview_required }}</p>
-        <p><strong>Link: </strong> {{scholarship.link}} </p>
-        <p><strong>Status: </strong> {{ scholarship.status }}</p>  
+        <p><strong>Link: </strong> {{scholarship.link}} </p> 
     </div>
 </div>
 

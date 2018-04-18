@@ -73,7 +73,7 @@ def upload_scholarship_file():
                         row[2], "%m/%d/%y") if row[2] else None,
                     award_amount = row[3],
                     category = row[4],
-                    merit_based = (row[5] == "Yes" or row[5] == "yes"),
+                    merit_based = (row[5] == "Yes"),
                     service_based = (row[6] == "Yes" or row[6] == "yes"),
                     need_based = (row[7] == "Yes" or row[7] == "yes"),
                     minimum_gpa = row[8],
