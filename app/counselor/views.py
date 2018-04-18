@@ -64,24 +64,43 @@ def upload_college_file():
                 header_row = False
                 continue
             if len(row) >= 8 and any(row):
-                # check that there are at least for columns
+                # check that there are at least eight columns
                 # and the row is not completely blank
-                college_data = College(
-                    name=row[0],
-                    description=row[1],
-                    regular_deadline=datetime.datetime.strptime(
-                        row[2], "%m/%d/%y") if row[2] else None,
-                    early_deadline=datetime.datetime.strptime(
-                        row[3], "%m/%d/%y") if row[3] else None,
-                    fafsa_deadline=datetime.datetime.strptime(
-                        row[4], "%m/%d/%y") if row[4] else None,
-                    acceptance_deadline=datetime.datetime.strptime(
-                        row[5], "%m/%d/%y") if row[5] else None,
-                    scholarship_deadline=datetime.datetime.strptime(
-                        row[6], "%m/%d/%y") if row[6] else None,
-                    image = row[7]
-                )
-            db.session.add(college_data)
+                college = College.query.filter_by(name=row[0]).first()
+                # College didn't already exist in database, so add it.
+                if college is None:
+                    college = College(
+                        name=row[0],
+                        description=row[1],
+                        regular_deadline=datetime.datetime.strptime(
+                            row[2], "%m/%d/%y") if row[2] else None,
+                        early_deadline=datetime.datetime.strptime(
+                            row[3], "%m/%d/%y") if row[3] else None,
+                        fafsa_deadline=datetime.datetime.strptime(
+                            row[4], "%m/%d/%y") if row[4] else None,
+                        acceptance_deadline=datetime.datetime.strptime(
+                            row[5], "%m/%d/%y") if row[5] else None,
+                        scholarship_deadline=datetime.datetime.strptime(
+                            row[6], "%m/%d/%y") if row[6] else None,
+                        image = row[7]
+                    )
+                    College.retrieve_college_info(college)
+                # else update the existing college
+                else:
+                    college.description = row[1]
+                    college.regular_deadline = datetime.datetime.strptime(
+                            row[2], "%m/%d/%y") if row[2] else None
+                    college.early_deadline = datetime.datetime.strptime(
+                            row[3], "%m/%d/%y") if row[3] else None
+                    college.fafsa_deadline = datetime.datetime.strptime(
+                            row[4], "%m/%d/%y") if row[4] else None
+                    college.acceptance_deadline = datetime.datetime.strptime(
+                            row[5], "%m/%d/%y") if row[5] else None
+                    college.scholarship_deadline = datetime.datetime.strptime(
+                            row[6], "%m/%d/%y") if row[6] else None
+                    college.image = row[7]
+                    College.retrieve_college_info(college)
+                db.session.add(college)
         db.session.commit()
         return redirect(url_for('counselor.colleges'))
     return render_template('counselor/upload_colleges.html')
@@ -397,9 +416,9 @@ def add_college():
                 room_and_board = 0,
                 sat_score_average_overall = 0,
                 act_score_average_overall = 0)
+            College.retrieve_college_info(college)
             db.session.add(college)
             db.session.commit()
-            College.retrieve_college_info(college)
         else:
             flash('College could not be added - already existed in database.',
                   'error')
