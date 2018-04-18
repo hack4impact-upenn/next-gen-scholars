@@ -63,7 +63,7 @@ def upload_scholarship_file():
                 header_row = False
                 continue
             if len(row) >= 12 and any(row):
-                # check that there are at least for columns  
+                # check that there are at least twelve columns  
                 # and the row is not completely blank
                 
                 scholarship_data = Scholarship(
