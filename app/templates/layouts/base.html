@@ -14,7 +14,7 @@
         {% if current_user.is_admin() %}
             {% set dropdown =
               [
-                ('Welcome ' + current_user.first_name + '!',
+                ('Account',
                   [
                     ('account.manage', 'Your Account', 'settings'),
                     ('admin.index', 'Manage Users', 'user'),
@@ -26,7 +26,7 @@
         {% elif current_user.is_counselor() %}
           {% set dropdown =
             [
-              ('Welcome ' + current_user.first_name + '!',
+              ('Account',
                 [
                   ('account.manage', 'Your Account', 'settings'),
                   ('account.logout', 'Log out', 'sign out'),
@@ -37,7 +37,7 @@
         {% elif current_user.is_authenticated %}
           {% set dropdown =
             [
-              ('Welcome ' + current_user.first_name + '!',
+              ('Account',
                 [
                   ('account.manage', 'Your Account', 'settings'),
                   ('account.logout', 'Log out', 'sign out'),

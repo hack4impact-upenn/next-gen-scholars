@@ -66,9 +66,9 @@
     {% endif %}
 {% endmacro %}
 
-{% macro mobile_nav(pageType, current_user, dropdown=None) %}
-    <!-- TODO: remove duplicated code  -->    
+{% macro mobile_nav(pageType, current_user, dropdown=None) %}  
     {% if pageType=='home' or pageType=='college_profile' %}
+        <!-- Removes padding under navbar for pages with image jumbotrons -->
         <div style="padding-bottom:0px;" class="mobile tablet only row">
     {% else %}
         <div class="mobile tablet only row">
@@ -104,8 +104,8 @@
 {% endmacro %}
 
 {% macro desktop_nav(pageType, current_user, dropdown=None) %}
-     <!-- TODO: remove duplicated code  -->
     {% if pageType=='home' or pageType=='college_profile' %}
+        <!-- Removes padding under navbar for pages with image jumbotrons -->        
         <div style="padding-bottom: 0px;" class="computer only row">
     {% else %}
       <div class="computer only row">
