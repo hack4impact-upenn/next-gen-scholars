@@ -22,12 +22,10 @@
 {% macro header_items(current_user) %}
     {% if not current_user.is_authenticated %}
       {% set endpoints = [
-        ('main.index', config.APP_NAME, ''),
       ] %}
     {% else %}
       {% if current_user.is_student() %}
         {% set endpoints = [
-          ('main.index', config.APP_NAME, ''),
           ('student.dashboard', 'Tasks', 'tasks'),
           ('student.view_user_profile', 'Profile', 'user'),
           ('student.calendar', 'Calendar', 'calendar'),
@@ -36,7 +34,6 @@
         ] %}
       {% elif current_user.is_counselor() %}
         {% set endpoints = [
-          ('main.index', config.APP_NAME, ''),
           ('counselor.index', 'Dashboard', 'dashboard'),
           ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
@@ -45,7 +42,6 @@
         ] %}
       {% else %}
         {% set endpoints = [
-          ('main.index', config.APP_NAME, ''),
           ('admin.index', 'Dashboard', 'dashboard'),
           ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
@@ -70,27 +66,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro mobile_nav(pageType, current_user, dropdown=None) %}
-    <!-- TODO: remove duplicated code  -->    
+{% macro mobile_nav(pageType, current_user, dropdown=None) %}  
     {% if pageType=='home' or pageType=='college_profile' %}
-        <div style="padding-bottom:0px;" class="mobile only row">
-            <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
-                {{ header_items(current_user) }}
-                <div class="right menu">
-                    <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
-                </div>
-            </div>
-        
-            {# The menu items which will be shown when open-nav is clicked #}
-            <div class="ui fixed vertical fluid menu">
-              {{ account_items(current_user) }}
-              {{ create_dropdown(dropdown) }}
-            </div>
-        </div>
+        <!-- Removes padding under navbar for pages with image jumbotrons -->
+        <div style="padding-bottom:0px;" class="mobile tablet only row">
     {% else %}
-        <div class="mobile only row">
+        <div class="mobile tablet only row">
+    {% endif %}
             <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
-              {{ header_items(current_user) }}
+             <a class="item" href="/">Next Generation Scholars</a>
               <div class="right menu">
                   <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
               </div>
@@ -98,11 +82,11 @@
         
           {# The menu items which will be shown when open-nav is clicked #}
           <div class="ui fixed vertical fluid menu">
+            {{ header_items(current_user) }}
             {{ account_items(current_user) }} 
             {{ create_dropdown(dropdown) }}
           </div>
         </div>
-    {% endif %}
 {% endmacro %}
 
 {% macro create_dropdown(dropdown) %}
@@ -120,31 +104,23 @@
 {% endmacro %}
 
 {% macro desktop_nav(pageType, current_user, dropdown=None) %}
-     <!-- TODO: remove duplicated code  -->
-     {% if pageType=='home' or pageType=='college_profile' %}
-        <div style="padding-bottom: 0px;" class="computer tablet only row">
-          <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
-            <div class="ui container">
-              {{ header_items(current_user) }}
-              <div class="right menu">
-                {{ account_items(current_user) }} 
-                {{ create_dropdown(dropdown) }}
-              </div>
-            </div>
-          </div>
-        </div>
+    {% if pageType=='home' or pageType=='college_profile' %}
+        <!-- Removes padding under navbar for pages with image jumbotrons -->        
+        <div style="padding-bottom: 0px;" class="computer only row">
     {% else %}
-      <div class="computer tablet only row">
+      <div class="computer only row">
+    {% endif %}   
         <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
           <div class="ui container">
-            {{ header_items(current_user) }}
+            <a class="item" href="/">Next Generation Scholars</a>
             <div class="right menu">
-              {{ account_items(current_user) }} {{ create_dropdown(dropdown) }}
+              {{ header_items(current_user) }}
+              {{ account_items(current_user) }} 
+              {{ create_dropdown(dropdown) }}
             </div>
           </div>
         </div>
       </div>
-    {% endif %}
 {% endmacro %}
 
 {% macro render_nav(page, current_user, dropdown=[]) %}
