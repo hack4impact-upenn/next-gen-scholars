@@ -38,4 +38,4 @@ class CompletedApplication(db.Model):
 
     def __repr__(self):
         return '<CompletedApplication {}, {}>'.format(
-            self.name, self.status)
+            self.college, self.status)
