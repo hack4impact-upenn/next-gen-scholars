@@ -29,7 +29,8 @@ class StudentProfile(db.Model):
     graduation_year = db.Column(db.String, index=True)
     grade = db.Column(db.Integer, index=True)
     # ACADEMIC INFO
-    gpa = db.Column(db.Float, index=True)
+    unweighted_gpa = db.Column(db.Float, index=True)
+    weighted_gpa = db.Column(db.Float, index=True)
     test_scores = db.relationship(
         'TestScore', backref='student_profile', lazy=True)
     majors = db.relationship(
@@ -81,7 +82,8 @@ class StudentProfile(db.Model):
             state=fake.state(),
             graduation_year=year[0],
             grade=year[1],
-            gpa=round(random.uniform(2, 4), 2),
+            unweighted_gpa=round(random.uniform(2, 4), 2),
+            weighted_gpa=round(random.uniform(2,5), 2),
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),
             fafsa_status=fafsa_status,
@@ -102,7 +104,8 @@ class StudentProfile(db.Model):
         s += 'City, State: {}, {}\n'.format(self.city, self.state)
         s += 'Gradution Year: {}\n'.format(self.graduation_year)
         s += 'Grade: {}\n'.format(self.grade)
-        s += 'GPA: {}\n'.format(self.gpa)
+        s += 'Unweighted GPA: {}\n'.format(self.unweighted_gpa)
+        s += 'Weighted GPA: {}\n'.format(self.weighted_gpa)
         s += 'Test Scores: {}\n'.format(self.test_scores)
         s += 'Majors: {}\n'.format(','.join([m.name for m in self.majors]))
         s += 'Colleges: {}\n'.format(','.join([c.name for c in self.colleges]))

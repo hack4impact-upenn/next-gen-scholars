@@ -50,12 +50,17 @@
         <h3>Academic Information</h3>
       </div>
     </div>
-    <div class="eight wide column">
-      <div class="ui mini three statistics">
+    <div class="nine wide column">
+      <div class="ui mini four statistics">
         <div class="statistic">
-          <div class="label">GPA</div>
+          <div class="label">Unweighted GPA</div>
           <span style="padding:0.25em"></span>
-          <div class="value">{{ user.student_profile.gpa }}</div>
+          <div class="value">{{ user.student_profile.unweighted_gpa }}</div>
+        </div>
+        <div class="statistic">
+          <div class="label">Weighted GPA</div>
+          <span style="padding:0.25em"></span>
+          <div class="value">{{ user.student_profile.weighted_gpa }}</div>
         </div>
         <div class="statistic">
           <div class="label">SAT</div>
