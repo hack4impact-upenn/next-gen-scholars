@@ -9,16 +9,13 @@ class Acceptance(db.Model):
         db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
     # college name
     college = db.Column(db.String, index=True)
-    # statuses include 'Pending Results', 'Accepted', 'Denied', 'Waitlisted',
-    #    'Deferred'
+    # statuses include 'Accepted', 'Accepted with award letter', 'Pending Award Letter Parsing'
     status = db.Column(db.String, index=True)
     link = db.Column(db.String, index=True)
 
     @validates('status')
     def validate_status(self, key, status):
-        assert status in [
-            'Pending Results', 'Accepted with award letter', 'Accepted',
-            'Denied', 'Waitlisted', 'Deferred'
+        assert status in ['Accepted with award letter', 'Accepted', 'Pending Award Letter Parsing'
         ]
         return status
 
@@ -32,17 +29,17 @@ class Acceptance(db.Model):
             'University of Richmond',
         ], count)
         statuses = [
-            'Pending Results', 'Accepted', 'Accepted with award letter',
-            'Denied', 'Waitlisted', 'Deferred'
+            'Accepted', 'Accepted with award letter',
+            'Pending Award Letter Parsing'
         ]
-        comp_apps = []
+        acc = []
         for i in range(count):
-            comp_apps.append(
+            acc.append(
                 Acceptance(
                     college=names[i],
                     status=random.choice(statuses),
                     link='https://google.com'))
-        return comp_apps
+        return acc
 
     def __repr__(self):
         return '<Acceptance {}, {}>'.format(self.name, self.status)

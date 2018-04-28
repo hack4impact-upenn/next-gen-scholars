@@ -204,11 +204,9 @@ class AddAcceptanceForm(Form):
         query_factory=lambda: db.session.query(College).order_by('name'))
     status = SelectField(
         'Status',
-        choices=[('Pending Results', 'Pending Results'), ('Accepted',
-                                                          'Accepted'),
-                 ('Accepted with award letter',
-                  'Accepted with award letter'), ('Denied', 'Denied'),
-                 ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+        choices=[('Accepted', 'Accepted'),('Accepted with award letter',
+                  'Accepted with award letter'), ('Pending Award Letter Parsing',
+                   'Pending Award Letter Parsing')],
         validators=[InputRequired()])
     submit = SubmitField('Add Acceptance')
 
@@ -224,10 +222,9 @@ class EditAcceptanceForm(Form):
         query_factory=lambda: db.session.query(College).order_by('name'))
     status = SelectField(
         'Status',
-        choices=[('Pending Results', 'Pending Results'), ('Accepted',
-                                                          'Accepted'),
+        choices=[('Accepted', 'Accepted'),
                  ('Accepted with award letter',
-                  'Accepted with award letter'), ('Denied', 'Denied'),
-                 ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+                  'Accepted with award letter'), ('Pending Award Letter Parsing', 
+                  'Pending Award Letter Parsing')],
         validators=[InputRequired()])
     submit = SubmitField('Update Acceptance')
