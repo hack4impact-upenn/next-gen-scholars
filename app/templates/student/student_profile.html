@@ -346,11 +346,11 @@
   </div>
 
 
-  <!-- DISPLAY COMPLETED APPLICATIONS -->
+  <!-- DISPLAY Acceptances -->
   <div class="row">
     <div class="twelve wide column">
       <div style="color: #1A85D6;" class="ui horizontal divider">
-        <h3>Completed Applications</h3>
+        <h3>Acceptances</h3>
       </div>
       <table class="ui compact table">
         <thead class="full-width">
@@ -359,19 +359,19 @@
           <th></th>
         </thead>
         <tbody class="full-width">
-          {% if user.student_profile.completed_applications|length > 0 %} {% for application in 
-            user.student_profile.completed_applications|sort(attribute='college') %}
+          {% if user.student_profile.acceptances|length > 0 %} {% for acceptance in 
+            user.student_profile.acceptances|sort(attribute='college') %}
             <tr>
-              <td>{{ application.college }}</td>
-              <td>{{ application.status }}</td>
+              <td>{{ acceptance.college }}</td>
+              <td>{{ acceptance.status }}</td>
               <td class="collapsing">
                 <div class="ui tiny buttons">
                   <a class="ui icon blue basic button"
-                    href="/student/profile/completed_application/edit/{{ application.id }}">
+                    href="/student/profile/acceptance/edit/{{ acceptance.id }}">
                     <i class="edit icon"></i>
                   </a>
-                  <div class="ui icon red basic button delete-application-button" data-id=
-                  "{{ application.id }}">
+                  <div class="ui icon red basic button delete-acceptance-button" data-id=
+                  "{{ acceptance.id }}">
                     <i class="x icon"></i>
                   </div>
                 </div>
@@ -380,7 +380,7 @@
             {% endfor %}{% else %}
             <tr>
               <td colspan="3">
-                No completed applications.
+                No acceptances added.
               </td>
             </tr>
             {% endif %}
@@ -389,8 +389,8 @@
           <tr>
             <th colspan="3">
               <a class="ui right floated small green basic labeled icon button" href="{{ url_for
-                ('student.add_completed_application', student_profile_id=user.student_profile.id) }}">
-                <i class="plus icon"></i>Add Completed Application
+                ('student.add_acceptance', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i>Add Acceptance
               </a>
             </th>
           </tr>
@@ -493,9 +493,9 @@
       });
     });
 
-    // Delete Completed Application
-    $('.delete-application-button').click(function() {
-      var url = '/student/profile/completed_application/delete/' + $(this).data('id');
+    // Delete Acceptance 
+    $('.delete-acceptance-button').click(function() {
+      var url = '/student/profile/acceptance/delete/' + $(this).data('id');
       $(this).parent().parent().parent().remove();
       $.ajax({
         url: url,

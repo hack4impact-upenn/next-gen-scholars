@@ -3,7 +3,7 @@ from faker import Faker
 from .. import db
 from sqlalchemy.orm import validates
 
-class CompletedApplication(db.Model):
+class Acceptance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_profile_id = db.Column(
         db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
@@ -12,10 +12,14 @@ class CompletedApplication(db.Model):
     # statuses include 'Pending Results', 'Accepted', 'Denied', 'Waitlisted',
     #    'Deferred'
     status = db.Column(db.String, index=True)
+    link = db.Column(db.String, index=True)
 
     @validates('status')
     def validate_status(self, key, status):
-        assert status in ['Pending Results', 'Accepted', 'Denied', 'Waitlisted', 'Deferred']
+        assert status in [
+            'Pending Results', 'Accepted with award letter', 'Accepted',
+            'Denied', 'Waitlisted', 'Deferred'
+        ]
         return status
 
     @staticmethod
@@ -27,15 +31,18 @@ class CompletedApplication(db.Model):
             'University of Florida',
             'University of Richmond',
         ], count)
-        statuses = ['Pending Results', 'Accepted', 'Denied', 'Waitlisted', 'Deferred']
+        statuses = [
+            'Pending Results', 'Accepted', 'Accepted with award letter',
+            'Denied', 'Waitlisted', 'Deferred'
+        ]
         comp_apps = []
         for i in range(count):
             comp_apps.append(
-                CompletedApplication(
+                Acceptance(
                     college=names[i],
-                    status=random.choice(statuses)))
+                    status=random.choice(statuses),
+                    link='https://google.com'))
         return comp_apps
 
     def __repr__(self):
-        return '<CompletedApplication {}, {}>'.format(
-            self.college, self.status)
+        return '<Acceptance {}, {}>'.format(self.name, self.status)
