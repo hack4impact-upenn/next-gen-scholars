@@ -204,7 +204,8 @@ def edit_profile(student_profile_id):
             city=student_profile.city,
             state=student_profile.state,
             fafsa_status=student_profile.fafsa_status,
-            gpa=student_profile.gpa,
+            unweighted_gpa=student_profile.unweighted_gpa,
+            weighted_gpa=student_profile.weighted_gpa,
             early_deadline=bool_to_string(student_profile.early_deadline))
         if form.validate_on_submit():
             # Update user profile information.
@@ -215,7 +216,8 @@ def edit_profile(student_profile_id):
             student_profile.city = form.city.data
             student_profile.state = form.state.data
             student_profile.fafsa_status = form.fafsa_status.data
-            student_profile.gpa = form.gpa.data
+            student_profile.unweighted_gpa = form.unweighted_gpa.data
+            student_profile.weighted_gpa = form.weighted_gpa.data
             student_profile.early_deadline = string_to_bool(
                 form.early_deadline.data)
             db.session.add(student_profile)

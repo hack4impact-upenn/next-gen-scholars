@@ -166,7 +166,8 @@ class EditStudentProfile(Form):
                                    Length(1, 100)])
     graduation_year = IntegerField(
         'Graduation Year', validators=[InputRequired()])
-    gpa = FloatField('GPA', validators=[InputRequired()])
+    unweighted_gpa = FloatField('Unweighted GPA', validators=[InputRequired()])
+    weighted_gpa = FloatField('Weighted GPA', validators=[Optional()])
     fafsa_status = SelectField(
         'FAFSA Status',
         choices=[('Incomplete', 'Incomplete'), ('Submitted', 'Submitted'),
