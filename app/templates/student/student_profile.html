@@ -370,6 +370,10 @@
               <td>{{ acceptance.college }}</td>
               <td>{{ acceptance.status }}</td>
               <td class="collapsing">
+                <a class="ui basic tiny labeled icon button" href="{{ acceptance.link }}" target="_blank">
+                    <i class="external icon"></i>
+                    View Award Letter
+                  </a>
                 <div class="ui tiny buttons">
                   <a class="ui icon blue basic button"
                     href="/student/profile/acceptance/edit/{{ acceptance.id }}">
