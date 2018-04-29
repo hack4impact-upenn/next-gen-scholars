@@ -123,16 +123,16 @@ def user_info(user_id):
 @counselor_required
 def view_user_profile(user_id):
     """ See a student's profile - containing all info from DB """
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
+    student = User.query.filter_by(id=user_id).first()
+    if student is None:
         abort(404)
-    if user.is_admin():
+    if student.is_admin():
         abort(404)
-    if not user.is_student():
+    if not student.is_student():
         abort(404)
     sat = 'N/A'
     act = 'N/A'
-    student_profile = user.student_profile
+    student_profile = student.student_profile
     if student_profile is not None:
         test_scores = student_profile.test_scores
         for t in test_scores:
@@ -141,7 +141,7 @@ def view_user_profile(user_id):
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
         return render_template(
-            'student/student_profile.html', user=user, sat=sat, act=act)
+            'counselor/student_profile.html', user=student, sat=sat, act=act)
     else:
         abort(404)
 
