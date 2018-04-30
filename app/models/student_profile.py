@@ -91,6 +91,7 @@ class StudentProfile(db.Model):
             gpa=round(random.uniform(2, 4), 2),
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),
+            colleges=random.sample(College.query.all(), 3),
             fafsa_status=fafsa_status,
             common_app_essay='https://google.com',
             common_app_essay_status=essay_status,

@@ -66,7 +66,10 @@ def comparer():
     colleges = load_comparer_data_col()
     for col in colleges:
         interest = Interest.query.filter_by(name=col.name).first()
-        col.interest = interest.lvl
+        try:
+            col.interest = interest.lvl
+        except:
+            col.interest = "High"
         col.sat_score_average_overall = int(col.sat_score_average_overall)
         col.act_score_average_overall = int(col.act_score_average_overall)
         col.scatter_link = '/student/college_profile/' + str(col.id)
@@ -448,7 +451,7 @@ def add_completed_application(student_profile_id):
 
 
 @student.route(
-    '/profile/completed_application/edit/<int:item_id>',
+    '/profile/completed_application/edit/<int:tem_id>',
     methods=['GET','POST'])
 @login_required
 def edit_completed_application(item_id):
@@ -513,6 +516,10 @@ def add_college(student_profile_id):
             student_profile.interests.append(interest)
             db.session.add(student_profile)
             db.session.commit()
+        elif form.name.data in student_profile.colleges:
+            interest = Interest.query.filter_by(name=form.name.data.name).first()
+            interest.lvl = form.lvl.data
+
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
@@ -545,8 +552,9 @@ def delete_college(item_id, student_profile_id):
     interest = Interest.query.filter_by(name=college.name).first()
     if college and student_profile:
         student_profile.colleges.remove(college)
-        student_profile.interests.remove(interest)
-        db.session.delete(interest)
+        if interest is not None:
+            student_profile.interests.remove(interest)
+            db.session.delete(interest)
         db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})
