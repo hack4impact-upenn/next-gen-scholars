@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, CompletedApplication
+from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, CompletedApplication, Interest
 from .. import db
 from sqlalchemy.orm import validates
 
@@ -9,13 +9,16 @@ student_colleges = db.Table('student_colleges',
                                       db.ForeignKey('college.id')),
                             db.Column('student_profile_id', db.Integer,
                                       db.ForeignKey('student_profile.id')))
-
+student_interests = db.Table('student_interests',
+                            db.Column('interest_id', db.Integer,
+                                      db.ForeignKey('interest.id')),
+                            db.Column('student_profile_id', db.Integer,
+                                      db.ForeignKey('student_profile.id')))
 student_majors = db.Table('student_majors',
                           db.Column('major_id', db.Integer,
                                     db.ForeignKey('major.id')),
                           db.Column('student_profile_id', db.Integer,
                                     db.ForeignKey('student_profile.id')))
-
 
 class StudentProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +43,11 @@ class StudentProfile(db.Model):
         'College',
         secondary=student_colleges,
         backref=db.backref('student_profiles', lazy='dynamic'))
+    interests = db.relationship(
+        'Interest',
+        secondary=student_interests,
+        backref=db.backref('student_profiles', lazy='dynamic'))
+    
     # APPLICATION INFO
     # either 'Incomplete' or 'Complete'
     fafsa_status = db.Column(db.String, index=True, default='Incomplete')
@@ -84,8 +92,8 @@ class StudentProfile(db.Model):
             gpa=round(random.uniform(2, 4), 2),
             test_scores=TestScore.generate_fake(),
             majors=random.sample(Major.query.all(), 3),
-            fafsa_status=fafsa_status,
             colleges=random.sample(College.query.all(), 3),
+            fafsa_status=fafsa_status,
             common_app_essay='https://google.com',
             common_app_essay_status=essay_status,
             early_deadline=bool(random.getrandbits(1)),

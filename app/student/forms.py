@@ -187,6 +187,11 @@ class AddCollegeForm(Form):
         validators=[InputRequired()],
         get_label='name',
         query_factory=lambda: db.session.query(College).order_by('name'))
+    lvl = SelectField(
+        'Interest Level',
+        choices= [('High','High'), ('Medium','Medium'),
+        ('Low','Low')],
+        validators=[InputRequired()])
     submit = SubmitField('Add College')
 
 
