@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData, CompletedApplication
+from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData, CompletedApplication, Interest
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -47,7 +47,7 @@ def view_user_profile():
     sat = 'N/A'
     act = 'N/A'
     current_user.student_profile, sat, act = load_student_profile(current_user)
-    if student_profile is not None:
+    if current_user.student_profile is not None:
         return render_template(
             'student/student_profile.html',
             user=current_user,
@@ -56,28 +56,20 @@ def view_user_profile():
     else:
         abort(404)
 
-def load_comparer_data():
+def load_comparer_data_col():
     colleges = (current_user.student_profile.colleges)
-    #= ['University of Richmond', 'Tufts', 'UC Berkely', 'Harvard',
-    #'UCLA', 'UCSB', 'Swarthmore', 'UCD']
-    #scores_sat = "1380 1490 1440 1540 1370 1330 1490 1290".split()
-    #scores_act = "30 32 32 34 29 27 27 32 27".split()
-
-    #for i in range(len(colleges)):
-    #    colleges[i] = (colleges[i], "high", scores_sat[i], scores_act[i], "link")
-
     return colleges
-
 @student.route('/comparer')
 @login_required
 def comparer():
     student_profile, sat, act = load_student_profile(current_user)
-    colleges = load_comparer_data()
+    colleges = load_comparer_data_col()
     for col in colleges:
+        interest = Interest.query.filter_by(name=col.name).first()
+        col.interest = interest.lvl
         col.sat_score_average_overall = int(col.sat_score_average_overall)
         col.act_score_average_overall = int(col.act_score_average_overall)
         col.scatter_link = '/student/college_profile/' + str(col.id)
-        col.interest = random.choice(['high', 'medium', 'low'])
 
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
@@ -516,6 +508,9 @@ def add_college(student_profile_id):
     if form.validate_on_submit():
         if form.name.data not in student_profile.colleges:
             student_profile.colleges.append(form.name.data)
+            interest = Interest(lvl=form.lvl.data)
+            interest.name = form.name.data.name
+            student_profile.interests.append(interest)
             db.session.add(student_profile)
             db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -547,8 +542,11 @@ def delete_college(item_id, student_profile_id):
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     college = College.query.filter_by(id=item_id).first()
+    interest = Interest.query.filter_by(name=college.name).first()
     if college and student_profile:
         student_profile.colleges.remove(college)
+        student_profile.interests.remove(interest)
+        db.session.delete(interest)
         db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})

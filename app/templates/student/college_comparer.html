@@ -36,7 +36,7 @@ $(document).ready(function() {}
                 </tbody>
             </table>
         </div>
-
+        </br>
         {# Use overflow-x: scroll so that mobile views don't freak out
          # when the table is too wide #}
         <div style="overflow-x: scroll;">
@@ -47,13 +47,13 @@ $(document).ready(function() {}
                         <th>Student Interest</th>
                         <th>Average SAT</th>
                         <th>Average ACT</th>
-                        <th>Scattergram</th>
+                        <th>College Profile</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for c in colleges %}
                         <td>{{ c.name }}</td>
-                        <td>{{ c.interest }}</td>
+                        <td>{{ c.interest }}</td> 
                         <td>{{ c.sat_score_average_overall }}</td>
                         <td>{{ c.act_score_average_overall }} </td>
                         <td><a href="{{ c.scatter_link}}">Profile</a> </td>
