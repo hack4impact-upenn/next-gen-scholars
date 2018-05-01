@@ -26,10 +26,10 @@ from datetime import date
 os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
+import random #for fake college interest
 
-@student.route('/profile')
-@login_required
-def view_user_profile():
+#load student profile, test scores for profile and comparer
+def load_student_profile(current_user):
     sat = 'N/A'
     act = 'N/A'
     student_profile = current_user.student_profile
@@ -40,6 +40,16 @@ def view_user_profile():
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
+
+    return student_profile, sat, act
+
+@student.route('/profile')
+@login_required
+def view_user_profile():
+    sat = 'N/A'
+    act = 'N/A'
+    current_user.student_profile, sat, act = load_student_profile(current_user)
+    if current_user.student_profile is not None:
         return render_template(
             'student/student_profile.html',
             user=current_user,
@@ -48,6 +58,27 @@ def view_user_profile():
     else:
         abort(404)
 
+def load_comparer_data_col():
+    colleges = (current_user.student_profile.colleges)
+    return colleges
+@student.route('/comparer')
+@login_required
+def comparer():
+    student_profile, sat, act = load_student_profile(current_user)
+    colleges = load_comparer_data_col()
+    for col in colleges:
+        interest = Interest.query.filter_by(name=col.name).first()
+        try:
+            col.interest = interest.lvl
+        except:
+            col.interest = "High"
+        col.sat_score_average_overall = int(col.sat_score_average_overall)
+        col.act_score_average_overall = int(col.act_score_average_overall)
+        col.scatter_link = '/student/college_profile/' + str(col.id)
+
+    return render_template('student/college_comparer.html', user=current_user, 
+        act=act, sat=sat, 
+        colleges=colleges, authenticated=True)
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
@@ -425,7 +456,11 @@ def add_acceptance(student_profile_id):
 
 
 @student.route(
+<<<<<<< HEAD
     '/profile/acceptance/edit/<int:item_id>',
+=======
+    '/profile/completed_application/edit/<int:tem_id>',
+>>>>>>> 67f29619ff4f1cfd8f5114cc27511b8d522d996e
     methods=['GET','POST'])
 @login_required
 def edit_acceptance(item_id):
@@ -487,8 +522,15 @@ def add_college(student_profile_id):
     if form.validate_on_submit():
         if form.name.data not in student_profile.colleges:
             student_profile.colleges.append(form.name.data)
+            interest = Interest(lvl=form.lvl.data)
+            interest.name = form.name.data.name
+            student_profile.interests.append(interest)
             db.session.add(student_profile)
             db.session.commit()
+        elif form.name.data in student_profile.colleges:
+            interest = Interest.query.filter_by(name=form.name.data.name).first()
+            interest.lvl = form.lvl.data
+
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
@@ -518,8 +560,12 @@ def delete_college(item_id, student_profile_id):
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     college = College.query.filter_by(id=item_id).first()
+    interest = Interest.query.filter_by(name=college.name).first()
     if college and student_profile:
         student_profile.colleges.remove(college)
+        if interest is not None:
+            student_profile.interests.remove(interest)
+            db.session.delete(interest)
         db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})

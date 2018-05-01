@@ -5,7 +5,7 @@ from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
                             HiddenField, BooleanField, TextAreaField,
-                            SelectField, IntegerField)
+                            SelectField, IntegerField, FloatField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
@@ -233,3 +233,13 @@ class DeleteCollegeProfileForm(Form):
         'Are you sure you want to delete this college?',
         validators=[InputRequired()])
     submit = SubmitField('Delete College Profile')
+
+
+class ParseAwardLetterForm(Form):
+    cost = FloatField('Cost', validators=[InputRequired()])
+    loans = FloatField('Loans', validators=[InputRequired()])
+    work_study = FloatField('Work Study', validators=[InputRequired()])
+    financial_aid = FloatField('Financial Aid', validators=[InputRequired()])
+    institutional_scholarships = FloatField('Institutional Scholarships', validators=[InputRequired()])
+    net_cost = FloatField('Net Cost to Student', validators=[InputRequired()])
+    submit = SubmitField('Parse Award Letter')

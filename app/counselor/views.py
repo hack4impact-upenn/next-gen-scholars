@@ -603,3 +603,31 @@ def upload_scattergram():
             message, message_type = 'Error with upload. Please make sure the format of the CSV file matches the description.', 'negative'
         return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
     return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
+
+
+@csrf.exempt
+@counselor.route('/parse_award_letter', methods=['GET', 'POST'])
+@login_required
+def parse_award_letter(item_id):
+    acceptance = Acceptance.query.filter_by(id=item_id).first()
+    if acceptance:
+        if current_user.role_id == 1:
+            abort(404)
+        form = ParseAwardLetterForm()
+        if form.validate_on_submit():
+            acceptance.cost = form.cost.data
+            acceptance.loans = form.loans.data
+            acceptance.work_study = form.work_study.data
+            acceptance.financial_aid = form.financial_aid.data
+            acceptance.institutional_scholarships = form.institutional_scholarships.data
+            acceptance.net_cost = form.net_cost.data
+            db.session.add(acceptance)
+            db.session.commit()
+            url = get_redirect_url(acceptance.student_profile_id)
+            return redirect(url)
+        return render_template(
+            'student/edit_academic_info.html',
+            form=form,
+            header="Parse Award Letter",
+            student_profile_id=acceptance.student_profile_id)
+    abort(404)
