@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData, Acceptance
+from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -456,11 +456,7 @@ def add_acceptance(student_profile_id):
 
 
 @student.route(
-<<<<<<< HEAD
     '/profile/acceptance/edit/<int:item_id>',
-=======
-    '/profile/completed_application/edit/<int:tem_id>',
->>>>>>> 67f29619ff4f1cfd8f5114cc27511b8d522d996e
     methods=['GET','POST'])
 @login_required
 def edit_acceptance(item_id):
