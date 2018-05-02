@@ -1,0 +1,45 @@
+{% extends 'layouts/base.html' %}
+
+
+{% block content %}
+<div class="container" style="padding-bottom:50px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
+    <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
+    {% if college.school_url != "" %}
+    <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
+    {% endif %}
+</div>
+{% if acceptance.scholarships == -1 %}
+<h1>Award Letter Not Parsed By Counselor Yet</h1>
+
+{% else %}
+<div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide computer sixteen wide mobile centered column">
+        <div class="ui raised secondary green segment">
+            <h1 style="color:#1A85D6;" class="ui header">Net Cost to Student</h1>
+            <p><strong>Net Cost:</strong> ${{ acceptance.net_cost }}</p>
+        </div>
+        <div class="ui raised secondary green segment">
+            <h1 style="color: #1A85D6;" class="ui header">Gross Cost to Student</h1>
+            {% if acceptance.cost >= 0 %}
+            <p><strong>Cost of Tuition and Fees:</strong> ${{ acceptance.cost }} </p>
+            {% else %}
+            <p><strong>Cost of Tuition and Fees:</strong> ${{ college.cost_of_attendance }}</p>
+            {% endif %}
+        </div>
+
+        <div class="ui raised secondary green segment"> 
+            <h1 style="color: #1A85D6;" class="ui header">Cost with Scholarships and Financial Aid</h1>
+            <p><strong>Cost of Attendance - Scholarships:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships }}</p>
+            <p><strong>Cost of Attendance - Scholarships and Financial Aid:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships - acceptance.financial_aid }}</p>
+        </div>
+
+        <div class="ui raised secondary green segment">
+            <h1 style="color: #1A85D6;" class="ui header">Cost with Loans and Work Study</h1>
+            <p><strong>Cost of Attendance - Work Study:</strong> ${{ acceptance.cost - acceptance.work_study }}</p>
+            <p><strong>Cost of Attendance - Work Study and Loans:</strong> ${{ acceptance.cost - acceptance.work_study - acceptance.loans }}</p>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+{% endblock %}

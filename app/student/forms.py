@@ -234,3 +234,9 @@ class EditAcceptanceForm(Form):
                   'Pending Award Letter Parsing')],
         validators=[InputRequired()])
     submit = SubmitField('Update Acceptance')
+
+
+class AddStudentScholarshipForm(Form):
+    name = StringField('Scholarship Name', validators=[InputRequired()])
+    award_amount = FloatField('Award Amount', validators=[InputRequired()])
+    submit = SubmitField('Add Scholarship Award')

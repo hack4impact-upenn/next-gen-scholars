@@ -12,12 +12,12 @@ class Acceptance(db.Model):
     # statuses include 'Accepted', 'Accepted with award letter', 'Pending Award Letter Parsing'
     status = db.Column(db.String, index=True)
     link = db.Column(db.String, index=True)
-    cost = db.Column(db.Float, index=True)
-    loans = db.Column(db.Float, index=True)
-    work_study = db.Column(db.Float, index=True)
-    financial_aid = db.Column(db.Float, index=True)
-    institutional_scholarships = db.Column(db.Float, index=True)
-    net_cost = db.Column(db.Float, index=True)
+    cost = db.Column(db.Float, index=True, default=-1)
+    loans = db.Column(db.Float, index=True, default=-1)
+    work_study = db.Column(db.Float, index=True, default=-1)
+    financial_aid = db.Column(db.Float, index=True, default=-1)
+    institutional_scholarships = db.Column(db.Float, index=True, default=-1)
+    net_cost = db.Column(db.Float, index=True, default=-1)
 
     @validates('status')
     def validate_status(self, key, status):

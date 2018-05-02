@@ -10,7 +10,7 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditTestNameForm, DeleteTestNameForm,
                     AddCollegeProfileForm, EditCollegeProfileStep1Form,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
-                    NewSMSAlertForm, EditSMSAlertForm)
+                    NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
@@ -18,7 +18,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData)
+                      ScattergramData, Acceptance)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -605,14 +605,14 @@ def upload_scattergram():
     return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
 
 
+# adds parsed award letter information to an acceptance
 @csrf.exempt
-@counselor.route('/parse_award_letter', methods=['GET', 'POST'])
+@counselor.route('/parse_award_letter/<int:item_id>', methods=['GET', 'POST'])
 @login_required
+@counselor_required
 def parse_award_letter(item_id):
     acceptance = Acceptance.query.filter_by(id=item_id).first()
     if acceptance:
-        if current_user.role_id == 1:
-            abort(404)
         form = ParseAwardLetterForm()
         if form.validate_on_submit():
             acceptance.cost = form.cost.data
@@ -623,11 +623,25 @@ def parse_award_letter(item_id):
             acceptance.net_cost = form.net_cost.data
             db.session.add(acceptance)
             db.session.commit()
-            url = get_redirect_url(acceptance.student_profile_id)
+            url = url_for('counselor.student_database')
             return redirect(url)
         return render_template(
             'student/edit_academic_info.html',
             form=form,
             header="Parse Award Letter",
             student_profile_id=acceptance.student_profile_id)
+    abort(404)
+
+
+@csrf.exempt
+@counselor.route('/acceptance/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def view_acceptance_profile(item_id):
+    acceptance = Acceptance.query.filter_by(it=item_id).first()
+    if acceptance:
+        college = College.query.filter_by(name=acceptance.college).first()
+        return render_template(
+            'student/acceptance_profile.html',
+            acceptance=acceptance, 
+            college=college)
     abort(404)

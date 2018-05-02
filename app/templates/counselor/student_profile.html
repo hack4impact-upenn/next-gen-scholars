@@ -359,6 +359,7 @@
       </div>
       <table class="ui compact table">
         <thead class="full-width">
+          <th>Cost</th>
           <th>College</th>
           <th>Status</th>
           <th></th>
@@ -367,6 +368,11 @@
           {% if user.student_profile.acceptances|length > 0 %} {% for acceptance in 
             user.student_profile.acceptances|sort(attribute='college') %}
             <tr>
+              {% if acceptance.net_cost >= 0 %}
+              <td>${{ acceptance.net_cost }}</td>
+              {% else %}
+              <td>Pending Award Parsing</td>
+              {% endif %}
               <td>{{ acceptance.college }}</td>
               <td>{{ acceptance.status }}</td>
               <td class="collapsing">
@@ -383,7 +389,7 @@
                     "{{ acceptance.id }}">
                       <i class="x icon"></i>
                   </div>
-                  <a class="ui icon tiny basic button" href="www.google.com" title="Imput Award Letter Information">
+                  <a class="ui icon tiny basic button" href="/counselor/parse_award_letter/{{ acceptance.id }}" title="Imput Award Letter Information">
                     <i class="paste icon"></i>
                   </a>
                 </div>

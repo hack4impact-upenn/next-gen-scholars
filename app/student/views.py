@@ -11,7 +11,7 @@ from .forms import (
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm,
-    AddAcceptanceForm, EditAcceptanceForm)
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
                       Acceptance)
@@ -1115,3 +1115,40 @@ def bool_to_string(bool):
         return 'True'
     else:
         return 'False'
+
+
+@csrf.exempt
+@student.route('/acceptance/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def view_acceptance_profile(item_id):
+    acceptance = Acceptance.query.filter_by(id=item_id).first()
+    if acceptance:
+        college = College.query.filter_by(name=acceptance.college).first()
+        return render_template(
+            'student/acceptance_profile.html',
+            acceptance=acceptance, 
+            college=college)
+    abort(404)
+
+@csrf.exempt
+@student.route('/profile/add_scholarship/<int:student_profile_id>', methods=['GET','POST'])
+@login_required
+def add_student_scholarship(student_profile_id):
+    # only student or counselor admin may access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
+    form = AddStudentScholarshipForm()
+    if form.validate_on_submit():
+        new_item = Scholarship(
+            student_profile_id=student_profile_id,
+            name=form.name.data,
+            award_amount=form.award_amount.data)
+        db.session.add(new_item)
+        db.session.commit()
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
+    return render_template(
+        'student/add_academic_info.html',
+        form=form,
+        header='Add Student Scholarship',
+        student_profile_id=student_profile_id)
