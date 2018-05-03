@@ -34,3 +34,8 @@ def calendar():
 @login_required
 def scattergram():
     return render_template('main/scattergram.html')
+
+@main.route('/comparer', methods=['GET', 'POST'])
+@login_required
+def comparer():
+    return render_template('main/college_comparer.html')

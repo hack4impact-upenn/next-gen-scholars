@@ -7,6 +7,8 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
 from redis import Redis
 from rq import Connection, Queue, Worker
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime
 
 from app import create_app, db
 from app.models import (Role, User, College, Major, SMSAlert,
@@ -130,6 +132,11 @@ def run_worker():
         port=app.config['RQ_DEFAULT_PORT'],
         db=0,
         password=app.config['RQ_DEFAULT_PASSWORD'])
+
+    # initialize a background scheduler for SMS alerts
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(check_alerts, 'interval', start_date=datetime.now(), minutes=15)
+    scheduler.start()
 
     with Connection(conn):
         worker = Worker(map(Queue, listen))

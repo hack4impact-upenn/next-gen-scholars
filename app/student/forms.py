@@ -166,7 +166,8 @@ class EditStudentProfile(Form):
                                    Length(1, 100)])
     graduation_year = IntegerField(
         'Graduation Year', validators=[InputRequired()])
-    gpa = FloatField('GPA', validators=[InputRequired()])
+    unweighted_gpa = FloatField('Unweighted GPA', validators=[InputRequired()])
+    weighted_gpa = FloatField('Weighted GPA', validators=[Optional()])
     fafsa_status = SelectField(
         'FAFSA Status',
         choices=[('Incomplete', 'Incomplete'), ('Submitted', 'Submitted'),
@@ -187,36 +188,55 @@ class AddCollegeForm(Form):
         validators=[InputRequired()],
         get_label='name',
         query_factory=lambda: db.session.query(College).order_by('name'))
+    lvl = SelectField(
+        'Interest Level',
+        choices= [('High','High'), ('Medium','Medium'),
+        ('Low','Low')],
+        validators=[InputRequired()])
     submit = SubmitField('Add College')
 
 
 class AddMajorForm(Form):
     major = StringField('Major', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Add Major')
-    
 
-class AddCompletedApplicationForm(Form):
+
+class AddAcceptanceForm(Form):
+    link = StringField('Award Letter Link', validators=[InputRequired(), Length(1, 100)])
     college = QuerySelectField(
-        'College Name', validators=[InputRequired()], 
-        get_label='name',
-        query_factory=lambda: db.session.query(College).order_by('name'))
-    status = SelectField(
-        'Status',
-        choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
-        ('Denied','Denied'), ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
-        validators=[InputRequired()])
-    submit = SubmitField('Add Completed Application')
-
-
-class EditCompletedApplicationForm(Form):
-    college = QuerySelectField(
-        'College Name', 
+        'College Name',
         validators=[InputRequired()],
         get_label='name',
         query_factory=lambda: db.session.query(College).order_by('name'))
     status = SelectField(
         'Status',
-        choices=[('Pending Results','Pending Results'), ('Accepted','Accepted'),
-        ('Denied','Denied'), ('Waitlisted', 'Waitlisted'), ('Deferred', 'Deferred')],
+        choices=[('Accepted', 'Accepted'),('Accepted with award letter',
+                  'Accepted with award letter'), ('Pending Award Letter Parsing',
+                   'Pending Award Letter Parsing')],
         validators=[InputRequired()])
-    submit = SubmitField('Update Completed Application')
+    submit = SubmitField('Add Acceptance')
+
+
+class EditAcceptanceForm(Form):
+    link = StringField(
+        'Award Letter Link', validators=[InputRequired(),
+                                         Length(1, 100)])
+    college = QuerySelectField(
+        'College Name',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(College).order_by('name'))
+    status = SelectField(
+        'Status',
+        choices=[('Accepted', 'Accepted'),
+                 ('Accepted with award letter',
+                  'Accepted with award letter'), ('Pending Award Letter Parsing', 
+                  'Pending Award Letter Parsing')],
+        validators=[InputRequired()])
+    submit = SubmitField('Update Acceptance')
+
+
+class AddStudentScholarshipForm(Form):
+    name = StringField('Scholarship Name', validators=[InputRequired()])
+    award_amount = FloatField('Award Amount', validators=[InputRequired()])
+    submit = SubmitField('Add Scholarship Award')

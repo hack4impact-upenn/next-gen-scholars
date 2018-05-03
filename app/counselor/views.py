@@ -10,7 +10,7 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditTestNameForm, DeleteTestNameForm,
                     AddCollegeProfileForm, EditCollegeProfileStep1Form,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
-                    NewSMSAlertForm, EditSMSAlertForm)
+                    NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
@@ -18,7 +18,7 @@ from ..decorators import admin_required
 from ..email import send_email
 from ..models import (Role, User, College, StudentProfile, EditableHTML,
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Scholarship)
+                      ScattergramData, Acceptance, Scholarship)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -168,16 +168,16 @@ def user_info(user_id):
 @counselor_required
 def view_user_profile(user_id):
     """ See a student's profile - containing all info from DB """
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
+    student = User.query.filter_by(id=user_id).first()
+    if student is None:
         abort(404)
-    if user.is_admin():
+    if student.is_admin():
         abort(404)
-    if not user.is_student():
+    if not student.is_student():
         abort(404)
     sat = 'N/A'
     act = 'N/A'
-    student_profile = user.student_profile
+    student_profile = student.student_profile
     if student_profile is not None:
         test_scores = student_profile.test_scores
         for t in test_scores:
@@ -186,7 +186,7 @@ def view_user_profile(user_id):
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
         return render_template(
-            'student/student_profile.html', user=user, sat=sat, act=act)
+            'counselor/student_profile.html', user=student, sat=sat, act=act)
     else:
         abort(404)
 
@@ -571,7 +571,7 @@ def add_alert():
     if form.validate_on_submit():
         hour, minute = form.time.data.split(':')
         am_pm = form.am_pm.data
-        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        hour = (int(hour) % 12) + (12 if am_pm == 'PM' else 0)
         alert = SMSAlert(
             title=form.title.data,
             content=form.content.data,
@@ -602,7 +602,7 @@ def edit_alert(alert_id):
     if form.validate_on_submit():
         hour, minute = form.time.data.split(':')
         am_pm = form.am_pm.data
-        hour = (int(hour) % 12) + (12 if am_pm == 'AM' else 0)
+        hour = (int(hour) % 12) + (12 if am_pm == 'PM' else 0)
         alert.title = form.title.data
         alert.content = form.content.data
         alert.date = form.date.data
@@ -650,8 +650,52 @@ def upload_scattergram():
         return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
     return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
 
+<<<<<<< HEAD
 @counselor.route('/')
 @login_required
 @counselor_required
 def view_checklist():
     return render_template('account/checklist.html')
+=======
+
+# adds parsed award letter information to an acceptance
+@csrf.exempt
+@counselor.route('/parse_award_letter/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def parse_award_letter(item_id):
+    acceptance = Acceptance.query.filter_by(id=item_id).first()
+    if acceptance:
+        form = ParseAwardLetterForm()
+        if form.validate_on_submit():
+            acceptance.cost = form.cost.data
+            acceptance.loans = form.loans.data
+            acceptance.work_study = form.work_study.data
+            acceptance.financial_aid = form.financial_aid.data
+            acceptance.institutional_scholarships = form.institutional_scholarships.data
+            acceptance.net_cost = form.net_cost.data
+            db.session.add(acceptance)
+            db.session.commit()
+            url = url_for('counselor.student_database')
+            return redirect(url)
+        return render_template(
+            'student/edit_academic_info.html',
+            form=form,
+            header="Parse Award Letter",
+            student_profile_id=acceptance.student_profile_id)
+    abort(404)
+
+
+@csrf.exempt
+@counselor.route('/acceptance/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+def view_acceptance_profile(item_id):
+    acceptance = Acceptance.query.filter_by(it=item_id).first()
+    if acceptance:
+        college = College.query.filter_by(name=acceptance.college).first()
+        return render_template(
+            'student/acceptance_profile.html',
+            acceptance=acceptance, 
+            college=college)
+    abort(404)
+>>>>>>> test
