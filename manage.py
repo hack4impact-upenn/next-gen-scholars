@@ -15,6 +15,8 @@ from app.models import (Role, User, College, Major, SMSAlert,
                         StudentProfile, ChecklistItem, TestName,
                         Scholarship)
 
+from app.sms import check_alerts
+
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)

@@ -45,7 +45,7 @@ class Scholarship(db.Model):
             'African-American', 'Agriculture', 'Arts-related','Asian','Asian Pacific American',
             'Community Service','Construction Related Fields','Disabled','Engineering',
             'Environmental Interest','Female','Filipino','First Generation College Student',
-            'Queer','General -- Open to All','Latinx','Immigrant/AB540/DACA','Interest in Journalism',
+            'Queer','General','Latinx','Immigrant/AB540/DACA','Interest in Journalism',
             'Japanese','Jewish','Indigenous','Open to All Grade Levels','Science/Engineering',
             'Student-Athlete','Teaching','Women in Math/Engineering'
         ]
@@ -103,4 +103,4 @@ class Scholarship(db.Model):
 
         # return scholarships
     def __repr__(self):
-        return '<Scholarship: {}>'.formate(self.name)
+        return '<Scholarship: {}>'.format(self.name)

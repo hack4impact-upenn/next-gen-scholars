@@ -17,6 +17,7 @@
         <div class="ui raised secondary green segment">
             <h1 style="color:#1A85D6;" class="ui header">Net Cost to Student</h1>
             <p><strong>Net Cost:</strong> ${{ acceptance.net_cost }}</p>
+            <p><strong>Net Cost with External Scholarships:</strong> ${{ acceptance.net_cost - student_profile.scholarship_amount }}</p>
         </div>
         <div class="ui raised secondary green segment">
             <h1 style="color: #1A85D6;" class="ui header">Gross Cost to Student</h1>
@@ -29,8 +30,9 @@
 
         <div class="ui raised secondary green segment"> 
             <h1 style="color: #1A85D6;" class="ui header">Cost with Scholarships and Financial Aid</h1>
-            <p><strong>Cost of Attendance - Scholarships:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships }}</p>
+            <p><strong>Cost of Attendance - Institutional Scholarships:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships }}</p>
             <p><strong>Cost of Attendance - Scholarships and Financial Aid:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships - acceptance.financial_aid }}</p>
+            <p><strong>Cost of Attendance - All Scholarships and Financial Aid:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships - acceptance.financial_aid - student_profile.scholarship_amount }}</p>
         </div>
 
         <div class="ui raised secondary green segment">

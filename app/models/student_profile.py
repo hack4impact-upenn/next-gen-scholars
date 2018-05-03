@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, Acceptance
+from . import College, Essay, Major, RecommendationLetter, TestScore, ChecklistItem, Acceptance, StudentScholarship
 from .. import db
 from sqlalchemy.orm import validates
 
@@ -60,6 +60,8 @@ class StudentProfile(db.Model):
     essays = db.relationship('Essay')
     recommendation_letters = db.relationship('RecommendationLetter')
     acceptances = db.relationship('Acceptance')
+    scholarships = db.relationship('StudentScholarship')
+    scholarship_amount = db.Column(db.Float, index=True)
     checklist = db.relationship('ChecklistItem')
     cal_token = db.Column(db.String, index=True)
     cal_refresh_token = db.Column(db.String, index=True)
@@ -102,7 +104,11 @@ class StudentProfile(db.Model):
             essays=Essay.generate_fake(),
             recommendation_letters=RecommendationLetter.generate_fake(),
             acceptances=Acceptance.generate_fake(),
+            scholarships=StudentScholarship.generate_fake(),
+            scholarship_amount=0,
             checklist=ChecklistItem.generate_fake())
+        for i in profile.scholarships:
+            profile.scholarship_amount = profile.scholarship_amount + i.award_amount
         return profile
 
     def __repr__(self):

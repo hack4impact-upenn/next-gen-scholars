@@ -369,7 +369,7 @@
             user.student_profile.acceptances|sort(attribute='college') %}
             <tr>
               {% if acceptance.net_cost >= 0 %}
-              <td>${{ acceptance.net_cost }}</td>
+              <td><a href="/student/acceptance/{{ acceptance.id }}/{{ user.student_profile.id }}">{{ acceptance.net_cost }}</a></td>
               {% else %}
               <td>Pending Award Parsing</td>
               {% endif %}
@@ -409,6 +409,57 @@
               <a class="ui right floated small green basic labeled icon button" href="{{ url_for
                 ('student.add_acceptance', student_profile_id=user.student_profile.id) }}">
                 <i class="plus icon"></i>Add Acceptance
+              </a>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+<!-- Display Scholarships Awarded -->
+<div class="row">
+    <div class="twelve wide column">
+    <div style="color: #1A85D6;" class="ui horizontal divider">Scholarships</div>
+      <table class="ui compact table">
+        <thead class="full-width">
+          <th>Name</th>
+          <th>Award Amount</th>
+          <th></th>
+        </thead>
+        <tbody class="full-width">
+          {% if user.student_profile.scholarships|length > 0 %} {% for scholarship in 
+            user.student_profile.scholarships|sort(attribute='name') %}
+            <tr>
+              <td>{{ scholarship.name }}</td>
+              <td>{{ scholarship.award_amount }}</td>
+              <td class="collapsing">
+                <div class="ui tiny buttons">
+                    <a class="ui icon blue basic button"
+                      href="/student/profile/student_scholarship/edit/{{ scholarship.id }}">
+                      <i class="edit icon"></i>
+                    </a>
+                    <div class="ui icon red basic button delete-scholarship-button" data-id=
+                    "{{ scholarship.id }}">
+                      <i class="x icon"></i>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}{% else %}
+            <tr>
+              <td colspan="4">
+                No scholarships added.
+              </td>
+            </tr>
+            {% endif %}
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th colspan="4">
+              <a class="ui right floated small green basic labeled icon button" href="{{ url_for
+                ('student.add_student_scholarship', student_profile_id=user.student_profile.id) }}">
+                <i class="plus icon"></i>Add Scholarship
               </a>
             </th>
           </tr>
@@ -505,6 +556,20 @@
         type: 'POST',
         success: function(data) {
           if (data.success !== "True") {
+            alert("Sorry there was an error, please try again.");
+          }
+        }
+      });
+    });
+
+    $('delete-scholarship-button').click(function(){
+      var url = '/student/profile/student_scholarship/delete/' + $(this).data('id');
+      $(this).parent().parent().parent().remove();
+      $.ajax({
+        url: url,
+        type: 'POST',
+        success: function(data){
+          if(data.success !== "True"){
             alert("Sorry there was an error, please try again.");
           }
         }

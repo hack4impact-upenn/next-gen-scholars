@@ -10,7 +10,9 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditTestNameForm, DeleteTestNameForm,
                     AddCollegeProfileForm, EditCollegeProfileStep1Form,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
-                    NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm)
+                    NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm,
+                    AddScholarshipProfileForm, EditScholarshipProfileStep1Form,
+                    EditScholarshipProfileStep2Form, DeleteScholarshipProfileForm)
 from . import counselor
 from .. import db
 from ..decorators import counselor_required
@@ -650,13 +652,11 @@ def upload_scattergram():
         return render_template('counselor/upload_scattergram.html', message=message, message_type=message_type)
     return render_template('counselor/upload_scattergram.html', message=None, message_type=None)
 
-<<<<<<< HEAD
 @counselor.route('/')
 @login_required
 @counselor_required
 def view_checklist():
     return render_template('account/checklist.html')
-=======
 
 # adds parsed award letter information to an acceptance
 @csrf.exempt
@@ -698,4 +698,108 @@ def view_acceptance_profile(item_id):
             acceptance=acceptance, 
             college=college)
     abort(404)
->>>>>>> test
+
+
+@csrf.exempt
+@counselor.route(
+    '/add_scholarship',
+    methods=['GET','POST'])
+@counselor_required
+def add_scholarship():
+    form = AddScholarshipProfileForm()
+    if form.validate_on_submit():
+        name = Scholarship.query.filter_by(name=form.name.data).first()
+        if name is None:
+            schol = Scholarship(
+                name=form.name.data,
+                deadline=form.deadline.data,
+                award_amount=form.award_amount.data,
+                category=form.category.data,
+                description=form.description.data,
+                merit_based=form.merit_based.data,
+                service_based=form.service_based.data,
+                need_based=form.need_based.data,
+                minimum_gpa=form.minimum_gpa.data,
+                interview_required=form.interview_required.data,
+                link=form.link.data)
+            db.session.add(schol)
+        else:
+            flash('Scholarship could not be added - already exists in database.', 'error')
+        return redirect(url_for('counselor.index'))
+    db.session.commit()
+    return render_template(
+        'counselor/add_college.html', form=form, header="Add Scholarship Profile")
+
+
+@counselor.route('/edit_scholarship', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def edit_scholarship_step1():
+    # Allows a counselor to choose which college they want to edit.
+    form = EditScholarshipProfileStep1Form()
+    if form.validate_on_submit():
+        schol = Scholarship.query.filter_by(name=form.name.data.name).first()
+        return redirect(
+            url_for('counselor.edit_scholarship_step2', scholarship_id=schol.id))
+    return render_template(
+        'counselor/edit_college.html',
+        form=form,
+        header='Edit Scholarship Profile')
+
+@counselor.route('/edit_scholarship/<int:scholarship_id>', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def edit_scholarship_step2(scholarship_id):
+    # Allows a counselor to edit the previously chosen college.
+    # This page is one you get re-routed to, not one that's findable.
+    old_schol = Scholarship.query.filter_by(id=scholarship_id).first()
+    form = EditScholarshipProfileStep2Form(
+        name=old_schol.name,
+        deadline=old_schol.deadline,
+        award_amount=old_schol.award_amount,
+        category=old_schol.category,
+        description=old_schol.description,
+        merit_based=old_schol.merit_based,
+        service_based=old_schol.service_based,
+        need_based=old_schol.need_based,
+        minimum_gpa=old_schol.minimum_gpa,
+        interview_required=old_schol.interview_required,
+        link=old_schol.link)
+    if form.validate_on_submit():
+        schol = old_schol
+        schol.name = form.name.data
+        schol.deadline=form.deadline.data
+        schol.award_amount=form.award_amount.data
+        schol.category=form.category.data
+        schol.description=form.description.data
+        schol.merit_based=form.merit_based.data
+        schol.service_based=form.service_based.data
+        schol.need_based=form.need_based.data
+        schol.minimum_gpa=form.minimum_gpa.data
+        schol.interview_required=form.interview_required.data
+        schol.link=form.link.data
+        db.session.add(schol)
+        db.session.commit()
+        flash('Scholarship profile successfully edited.', 'form-success')
+        return redirect(url_for('counselor.scholarships'))
+    return render_template(
+        'counselor/edit_college.html',
+        form=form,
+        header='Edit Scholarship Profile')
+
+@counselor.route('/delete_scholarship', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def delete_scholarship():
+    """Allows a counselor to delete a scholarship profile."""
+    form = DeleteScholarshipProfileForm()
+    if form.validate_on_submit():
+        scholarship = form.name.data
+        db.session.delete(scholarship)
+        db.session.commit()
+        flash('Scholarship profile successfully deleted.', 'form-success')
+        return redirect(url_for('counselor.index'))
+    return render_template(
+        'counselor/delete_college.html',
+        form=form,
+        header='Delete Scholarship Profile')

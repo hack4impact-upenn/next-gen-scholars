@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance
+from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -11,7 +11,7 @@ from .forms import (
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
     EditRecommendationLetterForm, AddCommonAppEssayForm,
-    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm)
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
                       Acceptance, Scholarship)
@@ -1136,16 +1136,18 @@ def bool_to_string(bool):
 
 
 @csrf.exempt
-@student.route('/acceptance/<int:item_id>', methods=['GET', 'POST'])
+@student.route('/acceptance/<int:item_id>/<int:student_profile_id>', methods=['GET', 'POST'])
 @login_required
-def view_acceptance_profile(item_id):
+def view_acceptance_profile(item_id, student_profile_id):
     acceptance = Acceptance.query.filter_by(id=item_id).first()
     if acceptance:
         college = College.query.filter_by(name=acceptance.college).first()
+        student = StudentProfile.query.filter_by(id=student_profile_id).first()
         return render_template(
             'student/acceptance_profile.html',
             acceptance=acceptance, 
-            college=college)
+            college=college,
+            student_profile=student)
     abort(404)
 
 @csrf.exempt
@@ -1157,10 +1159,12 @@ def add_student_scholarship(student_profile_id):
         abort(404)
     form = AddStudentScholarshipForm()
     if form.validate_on_submit():
-        new_item = Scholarship(
+        new_item = StudentScholarship(
             student_profile_id=student_profile_id,
             name=form.name.data,
             award_amount=form.award_amount.data)
+        student = StudentProfile.query.filter_by(id=student_profile_id).first()
+        student.scholarship_amount = student.scholarship_amount + form.award_amount.data
         db.session.add(new_item)
         db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -1170,3 +1174,50 @@ def add_student_scholarship(student_profile_id):
         form=form,
         header='Add Student Scholarship',
         student_profile_id=student_profile_id)
+
+@student.route(
+    '/profile/student_scholarship/edit/<int:item_id>', 
+    methods=['GET','POST'])
+@login_required
+def edit_student_scholarship(item_id):
+    schol = StudentScholarship.query.filter_by(id=item_id).first()
+    student = StudentProfile.query.filter_by(id=schol.student_profile_id).first()    
+    if schol:
+        if schol.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        form = EditStudentScholarshipForm(
+            name=schol.name,
+            award_amount=schol.award_amount
+        )
+        student.scholarship_amount = student.scholarship_amount - schol.award_amount
+        if form.validate_on_submit():
+            schol.name = form.name.data
+            schol.award_amount = form.award_amount.data
+            student.scholarship_amount = student.scholarship_amount + form.award_amount.data
+            db.session.add(schol)
+            db.session.commit()
+            url = get_redirect_url(schol.student_profile_id)
+            return redirect(url)
+        student.scholarship_amount = student.scholarship_amount + schol.award_amount        
+        return render_template(
+            'student/edit_academic_info.html',
+            form=form,
+            header="Edit Student Scholarship",
+            student_profile_id=schol.student_profile_id)
+    abort(404)
+
+@student.route(
+    '/profile/student_scholarship/delete/<int:item_id>',
+    methods=['GET','POST'])
+@login_required
+@csrf.exempt
+def delete_student_scholarship(item_id):
+    schol = StudentScholarship.query.filter_by(id=item_id).first()
+    student = StudentProfile.query.filter_by(id=schol.student_profile_id).first()
+    if schol:
+        if schol.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
+            student.scholarship_amount = student.scholarship_amount - schol.award_amount
+            db.session.delete(schol)
+            db.session.commit()
+            return jsonify({"success": "True"})
+    return jsonify({"success": "False"})

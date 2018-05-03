@@ -12,6 +12,7 @@ from .major import *
 from .miscellaneous import *
 from .recommendation_letter import *
 from .acceptance import *
+from .student_scholarship import *
 from .test_name import *
 from .test_score import *
 from .student_profile import *
