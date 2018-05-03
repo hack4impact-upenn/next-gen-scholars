@@ -17,20 +17,11 @@ class Scholarship(db.Model):
     minimum_gpa = db.Column(db.Float, index=True)
     interview_required = db.Column(db.Boolean, default=False)
     link = db.Column(db.String, index=True)
-    status = db.Column(db.String, index=True)
 
 
     @staticmethod
     def get_scholarship_by_name(name):
         return Scholarship.query.filter_by(name=name).first()
-
-
-    @validates('status')
-    def validate_status(self, key, status):
-        assert status in [
-            'Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'
-        ]
-        return status
 
     @validates('category')
     def validate_category(self, key, category):
@@ -38,10 +29,11 @@ class Scholarship(db.Model):
             'African-American', 'Agriculture', 'Arts-related','Asian','Asian Pacific American',
             'Community Service','Construction Related Fields','Disabled','Engineering',
             'Environmental Interest','Female','Filipino','First Generation College Student',
-            'Queer','General -- Open to All','Latinx','Immigrant/AB540/DACA','Interest in Journalism',
+            'Queer','General','Latinx','Immigrant/AB540/DACA','Interest in Journalism',
             'Japanese','Jewish','Indigenous','Open to All Grade Levels','Science/Engineering',
             'Student-Athlete','Teaching','Women in Math/Engineering'
         ]
+        return category
 
     @staticmethod
     def insert_scholarships():
@@ -65,9 +57,6 @@ class Scholarship(db.Model):
         ]
         award_amount = [
             50000, 20000, 10000
-        ]
-        statuses = [
-            'Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done'
         ]
 
         description = [
@@ -107,8 +96,7 @@ class Scholarship(db.Model):
                     need_based = random.choice(need_based),
                     minimum_gpa = random.choice(minimum_gpa),
                     interview_required = random.choice(interview_required),
-                    link = random.choice(link),
-                    status = random.choice(statuses))
+                    link = random.choice(link))
                 db.session.add(scholarship)
             db.session.commit()
         

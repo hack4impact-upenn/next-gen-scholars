@@ -1,22 +1,60 @@
 {% extends 'layouts/base.html' %} {% block content %}
 <div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
-    <div class="twelve wide computer sixteen wide mobile centered column">
-        <h2 class="ui dividing header">
-            Counselor Scholarships Page
-            <div class="sub header">
-                View scholarships.
-            </div>
-        </h2>
-
-        <div class="ui menu">
-            <div class="ui search item">
-                <div class="ui transparent icon input">
-                    <input id="search-users" type="text" placeholder="Search scholarships...">
+    <div class="four wide column">
+            <form id="filter-form" class="ui form">
+                <div class="field">
+                    <h4 class="ui header">Filter by Category</h4>
+                    <select class="ui dropdown" id='category-field'>
+                        <option value="All">All</option>
+                        <option value="African-American">African-American</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Arts-related">Arts-related</option>
+                        <option value="Asian">Asian</option>
+                        <option value="Asian Pacific American">Asian Pacific American</option>
+                        <option value="Community Service">Community Service</option>
+                        <option value="Construction Related Fields">Construction Related Fields</option>
+                        <option value="Disabled">Disabled</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Environmental Interest">Environmental Interest</option>
+                        <option value="Female">Female</option>
+                        <option value="Filipino">Filipino</option>
+                        <option value="First Generation College Student">First Generation College Student</option>
+                        <option value="Queer">Queer</option>
+                        <option value="General">General</option>
+                        <option value="Latinx">Latinx</option>
+                        <option value="Immigrant/AB540/DACA">Immigrant/AB540/DACA</option>
+                        <option value="Interest in Journalism">Interest in Journalism</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Jewish">Jewish</option>
+                        <option value="Indigenous">Indigenous</option>
+                        <option value="Science/Engineering">Science/Engineering</option>
+                        <option value="Student-Athlete">Student-Athlete</option>
+                        <option value="Teaching">Teaching</option>
+                        <option value="Women in Math/Engineering">Women in Math/Engineering</option>
+                    </select>
+                </div>
+                <button class="ui primary button" type="submit">Filter</button>
+            </form>
+            <h4 class="ui header">Search</h4>
+            <div class="ui input focus">
+                <div class="ui icon input">
+                    <input id="search-scholarships" type="text" placeholder="Search scholarships...">
                     <i class="search icon"></i>
                 </div>
             </div>
-        </div>
+            <h4 class="ui header">Upload Scholarship CSV</h4>
+            <div class="ui item">
+                <a class="ui black basic button" href="{{ url_for('counselor.upload_scholarship_file') }}">Upload Scholarships</a>
+            </div>
 
+    </div>
+    <div class="twelve wide computer sixteen wide mobile centered column">
+        <h2 class="ui dividing header">
+            Scholarships
+            <div style="margin-top:5px; margin-bottom:5px;" class="sub header">
+                View and upload scholarships.
+            </div>
+        </h2>
         {# Use overflow-x: scroll so that mobile views don't freak out # when the table is too wide #}
         <div style="overflow-x: scroll;">
             <table class="ui searchable sortable unstackable selectable celled table">
@@ -31,13 +69,13 @@
                 </thead>
                 <tbody>
                     {% for s in scholarships | sort(attribute='name') %}
-                    <tr onclick="window.location.href = '{{ url_for('student.view_scholarship_profile', scholarship_id=s.id) }}';">
+                    <tr class = "scholarship-row" onclick="window.location.href = '{{ url_for('student.view_scholarship_profile', scholarship_id=s.id) }}';">
 
-                        <td>{{ s.name }}</td>
-                        <td>{{ s.description }}</td>
-                        <td>{{ s.award_amount }}</td>
-                        <td>{{ s.deadline }} </td>
-                        <td>{{ s.category }} </td>
+                        <td class="searchable-td">{{ s.name }}</td>
+                        <td class="searchable-td">{{ s.description }}</td>
+                        <td class="searchable-td">{{ s.award_amount }}</td>
+                        <td class="searchable-td">{{ s.deadline }} </td>
+                        <td class="td-category searchable-td" data-category={{ s.category }}>{{ s.category }} </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -46,26 +84,47 @@
     </div>
 </div>
 
+<script src="{{url_for('static', filename='scripts/semantic-tablesort.js')}}"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('#search-users').keyup(function () {
-            var searchText = $(this).val();
-            if (searchText.length > 0) {
-                $('tbody td:icontains(' + searchText + ')').addClass('positive');
-                $('td.positive').not(':icontains(' + searchText + ')').removeClass('positive');
-                $('tbody td').not(':icontains(' + searchText + ')').closest('tr').addClass('hidden').hide();
-                $('tr.hidden:icontains(' + searchText + ')').removeClass('hidden').show();
-            } else {
-                $('td.positive').removeClass('positive');
-                $('tr.hidden').removeClass('hidden').show();
-            }
-        });
+            $(document).ready(function () {
+                // Semantic UI function calls to make elements dynamic
+                $('table').tablesort();
+                $('select.dropdown').dropdown();
+                $('.ui.checkbox').checkbox();
 
-        $('#select-role').dropdown({
-            onChange: function (value, text, $selectedItem) {
-                $('td.user.role:contains(' + value + ')').closest('tr').removeClass('hidden').show();
-                $('td.user.role').not(':contains(' + value + ')').closest('tr').addClass('hidden').hide();
-            }
-        });
-    });
+                // Apply current filters to table
+                function filterScholarships() {
+                    // 'All', 'Incomplete', and 'Complete'
+                    let categoryFilter = $('#category-field').val();
+                    $('.scholarship-row').each(function () {
+                        $this = $(this);
+                        $this.show();
+
+                        // Filter by Scholarship Category
+                        let category = $this.find('.td-category').data('category');
+                        if (categoryFilter != 'All' && category != categoryFilter) {
+                            $this.hide();
+
+                        }
+                    });
+                }
+
+                $('#filter-form').submit(function (e) {
+                    filterScholarships();
+                    return false;
+                })
+
+                // Search through students (with the filter applied)
+                $('#search-scholarships').keyup(function () {
+                    filterScholarships();
+                    var searchText = $(this).val();
+                    $('.matches').removeClass('matches');
+                    $('td.positive').removeClass('positive');
+                    if (searchText.length > 0) {
+                        $('tbody .searchable-td:icontains(' + searchText + ')').addClass('positive');
+                        $('.positive').closest('tr').addClass('matches');
+                        $('tbody tr').not('.matches').hide();
+                    }
+                });
+            });
 </script> {% endblock %}

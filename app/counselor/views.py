@@ -48,7 +48,7 @@ def scholarships():
     return render_template('counselor/scholarships.html', scholarships=scholarships)
 
 @csrf.exempt
-@counselor.route('/upload_', methods=['GET', 'POST'])
+@counselor.route('/upload_scholarships', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def upload_scholarship_file():
@@ -62,25 +62,24 @@ def upload_scholarship_file():
             if header_row:
                 header_row = False
                 continue
-            if len(row) >= 12 and any(row):
-                # check that there are at least for columns  
+            if len(row) >= 11 and any(row):
+                # check that there are at least eleven columns  
                 # and the row is not completely blank
                 scholarship_data = Scholarship(
                     name=row[0],
                     description=row[1],
-                    scholarship_deadline=datetime.datetime.strptime(
+                    deadline=datetime.datetime.strptime(
                         row[2], "%m/%d/%y") if row[2] else None,
                     award_amount = row[3],
                     category = row[4],
-                    merit_based = row[5],
-                    service_based = row[6],
-                    need_based = row[7],
+                    merit_based = (row[5] == "Yes"),
+                    service_based = (row[6] == "Yes" or row[6] == "yes"),
+                    need_based = (row[7] == "Yes" or row[7] == "yes"),
                     minimum_gpa = row[8],
-                    interview_required = row[9],
-                    link = row[10],
-                    status = row[11]
+                    interview_required = (row[9] == "Yes" or row[9] == "yes"),
+                    link = row[10]
                 )
-            db.session.add(scholarship_data)
+                db.session.add(scholarship_data)
         db.session.commit()
         return redirect(url_for('counselor.scholarships'))
     return render_template('counselor/upload_scholarships.html')
@@ -464,11 +463,12 @@ def add_college():
                 act_score_average_overall = 0)
             College.retrieve_college_info(college)
             db.session.add(college)
-            db.session.commit()
+        
         else:
-            flash('College could not be added - already existed in database.',
+            flash('College could not be added - already exists in database.',
                   'error')
         return redirect(url_for('counselor.index'))
+    db.session.commit()
     return render_template(
         'counselor/add_college.html', form=form, header='Add College Profile')
 
