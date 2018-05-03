@@ -196,7 +196,12 @@
         </tbody>
         <tfoot class="full-width">
           <tr>
-            <th colspan="3">
+            <th colspan="1">
+              <a class="ui left floated small green basic labeled icon button" href="{{ url_for('student.comparer', student_profile_id=user.student_profile.id) }}">
+                <i class="exchange icon"></i>College Comparer
+              </a>
+            </th>
+            <th colspan="1">
               <a class="ui right floated small green basic labeled icon button" href="{{ url_for('student.add_college', student_profile_id=user.student_profile.id) }}">
                 <i class="plus icon"></i> Add College
               </a>
