@@ -1,38 +1,36 @@
 {% extends 'layouts/base.html' %} {% block content %}
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <h1 class="ui dividing header">{{ scholarship.name }}</h1>
-        <p>
-            {{ scholarship.description }}
-        </p>
-        <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
-        <p><strong>Award Amount: </strong> ${{ scholarship.award_amount }}</p>
-        <p><strong>Category: </strong> {{ scholarship.category }}</p>
-        <p><strong>Merit based: </strong> 
-            {% if scholarship.merit_based %} 
-                Yes 
-            {% else %} 
-                No 
-            {% endif %}
-        </p>
-        <p><strong>Service based: </strong>
-            {% if scholarship.service_based %} 
-                Yes 
-            {% else %} 
-                No 
-            {% endif %}      
-        </p>
-        <p><strong>Need based: </strong> 
-            {% if scholarship.need_based %} 
-                Yes 
-            {% else %} 
-                No 
-            {% endif %}         
-        </p>
-        <p><strong>Minimum GPA: </strong> {{ scholarship.minimum_gpa }}</p>
-        <p><strong>Interview Required: </strong> {{ scholarship.interview_required }}</p>
-        <!-- <p><strong>Link: </strong> {{scholarship.link}} </p>  -->
-        <a href={{scholarship.link}}>Link</a>
+        <b><a style="color: #1A85D6;" class = "ui header large" href={{scholarship.link}}>{{ scholarship.name }}</a></b>
+        <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
+            <div class="twelve wide computer sixteen wide mobile column">
+                <div class="ui raised secondary green segment">
+                    <h3>{{ scholarship.description }}</h3>
+                    <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
+                    <p><strong>Award Amount: </strong> ${{ scholarship.award_amount }}</p>
+                    <p><strong>Category: </strong> {{ scholarship.category }}</p>
+                    <p><strong>Merit based: </strong>
+                        {% if scholarship.merit_based %} Yes {% else %} No {% endif %}
+                    </p>
+                    <p>
+                        <strong>Service based: </strong>
+                        {% if scholarship.service_based %} Yes {% else %} No {% endif %}
+                    </p>
+                    <p>
+                        <strong>Need based: </strong>
+                        {% if scholarship.need_based %} Yes {% else %} No {% endif %}
+                    </p>
+                    <p>
+                        <strong>Minimum GPA: </strong> {{ scholarship.minimum_gpa }}</p>
+                    <p>
+                        <strong>Interview Required: </strong> 
+                         {% if scholarship.interview_required %} Yes {% else %} No {% endif %}
+                    </p>
+                    
+                </div>
+            </div>
+        </div>
+        
     </div>
 </div>
 
