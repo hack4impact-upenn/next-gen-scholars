@@ -1,14 +1,14 @@
 # Next Generation Scholars
 
 ## Team Members
-####UPenn
+#### UPenn
 * Client-facing Project Manager: Hana Pearlman
 * Team-facing Project Manager: Katie Jiang
 * Aruna Prasad
 * Kasra Koushan
 * Steven Bursztyn
 
-####URichmond
+#### URichmond
 * Codirectors: Emily Everett and Melissa Gu
 * Wallace He, Jonathan Huang, Katrina Kuhn, Tracy Nguyen
 
