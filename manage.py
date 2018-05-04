@@ -12,8 +12,11 @@ from datetime import datetime
 
 from app import create_app, db
 from app.models import (Role, User, College, Major, SMSAlert,
-                        StudentProfile, ChecklistItem, TestName)
+                        StudentProfile, ChecklistItem, TestName,
+                        Scholarship)
+
 from app.sms import check_alerts
+
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -79,6 +82,7 @@ def setup_general():
     """Runs the set-up needed for both local development and production.
        Also sets up first admin, counselor, and student users.."""
     College.insert_colleges()
+    Scholarship.insert_scholarships()
     Major.insert_majors()
     Role.insert_roles()
     TestName.insert_tests()

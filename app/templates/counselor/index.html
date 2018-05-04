@@ -41,6 +41,17 @@
                 {{ dashboard_option('Upload Scattergram Data', 'counselor.upload_scattergram',
                 description='Upload college acceptance data for scattergrams', icon='bar chart icon')}}
             </div>
+            <h4 class="ui dividing header">Scholarships</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('View Scholarships', 'counselor.scholarships', 
+                description='View and edit scholarhip descriptions', icon='money bill alternate outline icon') }}
+                {{ dashboard_option('Add Scholarship', 'counselor.add_scholarship',
+                description='Add a new scholarship profile', icon='plus icon') }}
+                {{ dashboard_option('Delete Scholarship', 'counselor.delete_scholarship',
+                description='Delete an existing scholarship profile', icon='remove icon') }}
+                {{ dashboard_option('Edit Scholarship', 'counselor.edit_scholarship_step1',
+                description='Edit existing scholarship profile', icon='edit icon')}}
+            </div>
             <h4 class="ui dividing header">SMS Alerts</h4>
             <div class="ui two column stackable grid">
                 {{ dashboard_option('Manage SMS Alerts', 'counselor.manage_alerts',

@@ -5,12 +5,12 @@ from wtforms.widgets import TextArea
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import (PasswordField, StringField, SubmitField,
                             HiddenField, BooleanField, TextAreaField,
-                            SelectField, IntegerField)
+                            SelectField, IntegerField, FloatField)
 from wtforms.fields.html5 import EmailField, DateField
 from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 
 from .. import db
-from ..models import Role, User, TestName, College
+from ..models import Role, User, TestName, College, Scholarship
 
 
 class ChangeUserEmailForm(Form):
@@ -233,3 +233,75 @@ class DeleteCollegeProfileForm(Form):
         'Are you sure you want to delete this college?',
         validators=[InputRequired()])
     submit = SubmitField('Delete College Profile')
+
+
+class ParseAwardLetterForm(Form):
+    cost = FloatField('Cost', validators=[InputRequired()])
+    loans = FloatField('Loans', validators=[InputRequired()])
+    work_study = FloatField('Work Study', validators=[InputRequired()])
+    financial_aid = FloatField('Financial Aid', validators=[InputRequired()])
+    institutional_scholarships = FloatField('Institutional Scholarships', validators=[InputRequired()])
+    net_cost = FloatField('Net Cost to Student', validators=[InputRequired()])
+    submit = SubmitField('Parse Award Letter')
+
+class AddScholarshipProfileForm(Form):
+    name = StringField(
+        'Scholarship Name',
+        validators=[InputRequired()])
+    description = StringField(u'Description', widget=TextArea())
+    # Input not required for either deadline.
+    deadline = DateField(
+        'Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    award_amount = FloatField('Award Amount', validators=[InputRequired()])
+    category = StringField('Category of Scholarship (If none, put General)', validators=[Optional()])
+    merit_based = BooleanField('Merit Based')
+    service_based = BooleanField('Service Based')
+    need_based = BooleanField('Need Based')
+    interview_required = BooleanField('Interview Required')
+    minimum_gpa = FloatField('Minimum GPA', validators=[Optional()])
+    link = StringField('Link to more information', validators=[Optional()])
+    submit = SubmitField('Add Scholarship Profile')
+
+
+class EditScholarshipProfileStep1Form(Form):
+    name = QuerySelectField(
+        'Select scholarship you wish to edit',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(Scholarship).order_by('name'))
+    submit = SubmitField('Continue')
+
+
+class EditScholarshipProfileStep2Form(Form):
+    name = StringField(
+        'College/University Name',
+        validators=[InputRequired(), Length(1, 200)])
+    description = StringField(u'Description', widget=TextArea())
+    # Input not required for either deadline.
+    deadline = DateField(
+        'Deadline (mm-dd-yyyy)',
+        format='%Y-%m-%d',
+        validators=[Optional()])
+    award_amount = FloatField('Award Amount', validators=[InputRequired()])
+    category = StringField('Category of Scholarship (If none, put General)', validators=[Optional()])
+    merit_based = BooleanField('Merit Based')
+    service_based = BooleanField('Service Based')
+    need_based = BooleanField('Need Based')
+    interview_required = BooleanField('Interview Required')
+    minimum_gpa = FloatField('Minimum GPA', validators=[Optional()])
+    link = StringField('Link to more information', validators=[Optional()])
+    submit = SubmitField('Update Scholarship Profile')
+
+
+class DeleteScholarshipProfileForm(Form):
+    name = QuerySelectField(
+        'Select scholarship you wish to delete',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(Scholarship).order_by('name'))
+    confirmation = BooleanField(
+        'Are you sure you want to delete this scholarship?',
+        validators=[InputRequired()])
+    submit = SubmitField('Delete Scholarship Profile')
