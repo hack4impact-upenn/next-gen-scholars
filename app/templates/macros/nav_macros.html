@@ -30,6 +30,8 @@
           ('student.view_user_profile', 'Profile', 'user'),
           ('student.calendar', 'Calendar', 'calendar'),
           ('student.colleges', 'Colleges', 'university'),
+          ('student.scholarships', 'Scholarships', 'money bill alternate outline icon'),
+
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% elif current_user.is_counselor() %}
@@ -38,6 +40,7 @@
           ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
+          ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% else %}
@@ -46,6 +49,7 @@
           ('counselor.student_database', 'Students', 'student'),
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
+          ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),          
           ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% endif %}

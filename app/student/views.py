@@ -2,7 +2,7 @@ import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
                    jsonify)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Essay, College, Major, StudentProfile, ScattergramData, CompletedApplication
+from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -10,10 +10,11 @@ from .forms import (
     EditCollegeForm, EditSupplementalEssayForm, EditTestScoreForm,
     EditCommonAppEssayForm, AddChecklistItemForm, EditChecklistItemForm,
     EditStudentProfile, AddMajorForm, AddCollegeForm,
-    EditRecommendationLetterForm, AddCommonAppEssayForm, AddCompletedApplicationForm,
-    EditCompletedApplicationForm)
+    EditRecommendationLetterForm, AddCommonAppEssayForm,
+    AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
-                      RecommendationLetter, TestName, Notification, CompletedApplication)
+                      RecommendationLetter, TestName, Notification,
+                      Acceptance, Scholarship)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -22,12 +23,13 @@ import requests
 import os
 import datetime
 from datetime import date
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
+os.environ[
+    'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
+import random #for fake college interest
 
-@student.route('/profile')
-@login_required
-def view_user_profile():
+#load student profile, test scores for profile and comparer
+def load_student_profile(current_user):
     sat = 'N/A'
     act = 'N/A'
     student_profile = current_user.student_profile
@@ -38,6 +40,16 @@ def view_user_profile():
                 sat = max(sat, t.score) if sat != 'N/A' else t.score
             if t.name == 'ACT':
                 act = max(act, t.score) if act != 'N/A' else t.score
+
+    return student_profile, sat, act
+
+@student.route('/profile')
+@login_required
+def view_user_profile():
+    sat = 'N/A'
+    act = 'N/A'
+    current_user.student_profile, sat, act = load_student_profile(current_user)
+    if current_user.student_profile is not None:
         return render_template(
             'student/student_profile.html',
             user=current_user,
@@ -46,6 +58,27 @@ def view_user_profile():
     else:
         abort(404)
 
+def load_comparer_data_col():
+    colleges = (current_user.student_profile.colleges)
+    return colleges
+@student.route('/comparer')
+@login_required
+def comparer():
+    student_profile, sat, act = load_student_profile(current_user)
+    colleges = load_comparer_data_col()
+    for col in colleges:
+        interest = Interest.query.filter_by(name=col.name).first()
+        try:
+            col.interest = interest.lvl
+        except:
+            col.interest = "High"
+        col.sat_score_average_overall = int(col.sat_score_average_overall)
+        col.act_score_average_overall = int(col.act_score_average_overall)
+        col.scatter_link = '/student/college_profile/' + str(col.id)
+
+    return render_template('student/college_comparer.html', user=current_user, 
+        act=act, sat=sat, 
+        colleges=colleges, authenticated=True)
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
@@ -202,7 +235,8 @@ def edit_profile(student_profile_id):
             city=student_profile.city,
             state=student_profile.state,
             fafsa_status=student_profile.fafsa_status,
-            gpa=student_profile.gpa,
+            unweighted_gpa=student_profile.unweighted_gpa,
+            weighted_gpa=student_profile.weighted_gpa,
             early_deadline=bool_to_string(student_profile.early_deadline))
         if form.validate_on_submit():
             # Update user profile information.
@@ -213,7 +247,8 @@ def edit_profile(student_profile_id):
             student_profile.city = form.city.data
             student_profile.state = form.state.data
             student_profile.fafsa_status = form.fafsa_status.data
-            student_profile.gpa = form.gpa.data
+            student_profile.unweighted_gpa = form.unweighted_gpa.data
+            student_profile.weighted_gpa = form.weighted_gpa.data
             student_profile.early_deadline = string_to_bool(
                 form.early_deadline.data)
             db.session.add(student_profile)
@@ -391,23 +426,24 @@ def delete_recommendation_letter(item_id):
     return jsonify({"success": "False"})
 
 
-# completed application methods
+# acceptance methods
 
 
 @student.route(
-    '/profile/add_competed_application/<int:student_profile_id>',
+    '/profile/add_acceptance/<int:student_profile_id>',
     methods=['GET','POST'])
 @login_required
-def add_completed_application(student_profile_id):
+def add_acceptance(student_profile_id):
     # only student or counselor/admin may access page
     if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
         abort(404)
-    form = AddCompletedApplicationForm()
+    form = AddAcceptanceForm()
     if form.validate_on_submit():
-        new_item = CompletedApplication(
-            student_profile_id = student_profile_id,
-            college = form.college.data.name,
-            status = form.status.data)
+        new_item = Acceptance(
+            student_profile_id=student_profile_id,
+            college=form.college.data.name,
+            status=form.status.data,
+            link=form.link.data)
         db.session.add(new_item)
         db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -415,52 +451,54 @@ def add_completed_application(student_profile_id):
     return render_template(
         'student/add_academic_info.html',
         form=form,
-        header="Add Completed Application",
-        student_profile_id = student_profile_id)
+        header="Add Acceptance",
+        student_profile_id=student_profile_id)
 
 
 @student.route(
-    '/profile/completed_application/edit/<int:item_id>',
+    '/profile/acceptance/edit/<int:item_id>',
     methods=['GET','POST'])
 @login_required
-def edit_completed_application(item_id):
-    application = CompletedApplication.query.filter_by(id=item_id).first()
-    if application:
+def edit_acceptance(item_id):
+    acceptance = Acceptance.query.filter_by(id=item_id).first()
+    if acceptance:
         # only allows student or counselors/admin to access page
-        if application.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        if acceptance.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
             abort(404)
-        form = EditCompletedApplicationForm(
-            college=application.college,
-            status=application.status)
+        form = EditAcceptanceForm(
+            college=acceptance.college,
+            status=acceptance.status,
+            link=acceptance.link)
         if form.validate_on_submit():
-            application.college = form.college.data.name
-            application.status = form.status.data
-            db.session.add(application)
+            acceptance.college = form.college.data.name
+            acceptance.status = form.status.data
+            acceptance.link = form.link.data
+            db.session.add(acceptance)
             db.session.commit()
-            url = get_redirect_url(application.student_profile_id)
+            url = get_redirect_url(acceptance.student_profile_id)
             return redirect(url)
         return render_template(
             'student/edit_academic_info.html',
             form=form,
-            header="Edit Completed Application",
-            student_profile_id=application.student_profile_id)
+            header="Edit Acceptance",
+            student_profile_id=acceptance.student_profile_id)
     abort(404)
 
+
 @student.route(
-    '/profile/completed_application/delete/<int:item_id>',
-    methods=['GET','POST'])
+    '/profile/acceptance/delete/<int:item_id>',
+    methods=['GET', 'POST'])
 @login_required
 @csrf.exempt
-def delete_completed_application(item_id):
-    application = CompletedApplication.query.filter_by(id=item_id).first()
-    if application:
+def delete_acceptance(item_id):
+    acceptance = Acceptance.query.filter_by(id=item_id).first()
+    if acceptance:
         # only allows student or counselors/admin to access page
-        if application.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
-            db.session.delete(application)
+        if acceptance.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
+            db.session.delete(acceptance)
             db.session.commit()
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
-
 
 
 # college methods
@@ -480,8 +518,15 @@ def add_college(student_profile_id):
     if form.validate_on_submit():
         if form.name.data not in student_profile.colleges:
             student_profile.colleges.append(form.name.data)
+            interest = Interest(lvl=form.lvl.data)
+            interest.name = form.name.data.name
+            student_profile.interests.append(interest)
             db.session.add(student_profile)
             db.session.commit()
+        elif form.name.data in student_profile.colleges:
+            interest = Interest.query.filter_by(name=form.name.data.name).first()
+            interest.lvl = form.lvl.data
+
         url = get_redirect_url(student_profile_id)
         return redirect(url)
     return render_template(
@@ -511,12 +556,27 @@ def delete_college(item_id, student_profile_id):
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
     college = College.query.filter_by(id=item_id).first()
+    interest = Interest.query.filter_by(name=college.name).first()
     if college and student_profile:
         student_profile.colleges.remove(college)
+        if interest is not None:
+            student_profile.interests.remove(interest)
+            db.session.delete(interest)
         db.session.add(student_profile)
         db.session.commit()
         return jsonify({"success": "True"})
     return jsonify({"success": "False"})
+
+
+# scholarship methods
+
+@student.route('/scholarships')
+@login_required
+def scholarships():
+    """View all scholarships"""
+    scholarships = Scholarship.query.all()
+    return render_template('student/scholarships.html', scholarships=scholarships)
+
 
 
 # common app essay methods
@@ -557,8 +617,7 @@ def edit_common_app_essay(student_profile_id):
         abort(404)
     student_profile = StudentProfile.query.filter_by(
         id=student_profile_id).first()
-    form = EditCommonAppEssayForm(
-        link=student_profile.common_app_essay)
+    form = EditCommonAppEssayForm(link=student_profile.common_app_essay)
     if form.validate_on_submit():
         student_profile.common_app_essay = form.link.data
         student_profile.common_app_essay_status = form.status.data
@@ -597,7 +656,9 @@ def delete_common_app_essay(student_profile_id):
 # supplemental essay methods
 
 
-@student.route('/profile/add_supplemental_essay/<int:student_profile_id>', methods=['GET', 'POST'])
+@student.route(
+    '/profile/add_supplemental_essay/<int:student_profile_id>',
+    methods=['GET', 'POST'])
 @login_required
 def add_supplemental_essay(student_profile_id):
     # only allows the student or counselors/admins to access page
@@ -1048,7 +1109,16 @@ def update_checklist_item(item_id):
 def view_college_profile(college_id):
     college = College.query.filter_by(id=college_id).first()
     return render_template(
-        'main/college_profile.html', pageType='college_profile', college=college)
+        'main/college_profile.html',
+        pageType='college_profile',
+        college=college)
+
+@student.route('/scholarship_profile/<int:scholarship_id>')
+@login_required
+def view_scholarship_profile(scholarship_id):
+    scholarship = Scholarship.query.filter_by(id=scholarship_id).first()
+    return render_template(
+        'main/scholarship_profile.html', pageType='scholarship_profile', scholarship=scholarship)
 
 
 def string_to_bool(str):
@@ -1063,3 +1133,91 @@ def bool_to_string(bool):
         return 'True'
     else:
         return 'False'
+
+
+@csrf.exempt
+@student.route('/acceptance/<int:item_id>/<int:student_profile_id>', methods=['GET', 'POST'])
+@login_required
+def view_acceptance_profile(item_id, student_profile_id):
+    acceptance = Acceptance.query.filter_by(id=item_id).first()
+    if acceptance:
+        college = College.query.filter_by(name=acceptance.college).first()
+        student = StudentProfile.query.filter_by(id=student_profile_id).first()
+        return render_template(
+            'student/acceptance_profile.html',
+            acceptance=acceptance, 
+            college=college,
+            student_profile=student)
+    abort(404)
+
+@csrf.exempt
+@student.route('/profile/add_scholarship/<int:student_profile_id>', methods=['GET','POST'])
+@login_required
+def add_student_scholarship(student_profile_id):
+    # only student or counselor admin may access page
+    if student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+        abort(404)
+    form = AddStudentScholarshipForm()
+    if form.validate_on_submit():
+        new_item = StudentScholarship(
+            student_profile_id=student_profile_id,
+            name=form.name.data,
+            award_amount=form.award_amount.data)
+        student = StudentProfile.query.filter_by(id=student_profile_id).first()
+        student.scholarship_amount = student.scholarship_amount + form.award_amount.data
+        db.session.add(new_item)
+        db.session.commit()
+        url = get_redirect_url(student_profile_id)
+        return redirect(url)
+    return render_template(
+        'student/add_academic_info.html',
+        form=form,
+        header='Add Student Scholarship',
+        student_profile_id=student_profile_id)
+
+@student.route(
+    '/profile/student_scholarship/edit/<int:item_id>', 
+    methods=['GET','POST'])
+@login_required
+def edit_student_scholarship(item_id):
+    schol = StudentScholarship.query.filter_by(id=item_id).first()
+    student = StudentProfile.query.filter_by(id=schol.student_profile_id).first()    
+    if schol:
+        if schol.student_profile_id != current_user.student_profile_id and current_user.role_id == 1:
+            abort(404)
+        form = EditStudentScholarshipForm(
+            name=schol.name,
+            award_amount=schol.award_amount
+        )
+        student.scholarship_amount = student.scholarship_amount - schol.award_amount
+        if form.validate_on_submit():
+            schol.name = form.name.data
+            schol.award_amount = form.award_amount.data
+            student.scholarship_amount = student.scholarship_amount + form.award_amount.data
+            db.session.add(schol)
+            db.session.commit()
+            url = get_redirect_url(schol.student_profile_id)
+            return redirect(url)
+        student.scholarship_amount = student.scholarship_amount + schol.award_amount        
+        return render_template(
+            'student/edit_academic_info.html',
+            form=form,
+            header="Edit Student Scholarship",
+            student_profile_id=schol.student_profile_id)
+    abort(404)
+
+@student.route(
+    '/profile/student_scholarship/delete/<int:item_id>',
+    methods=['GET','POST'])
+@login_required
+@csrf.exempt
+def delete_student_scholarship(item_id):
+    schol = StudentScholarship.query.filter_by(id=item_id).first()
+    student = StudentProfile.query.filter_by(id=schol.student_profile_id).first()
+    if schol:
+        if schol.student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
+            student.scholarship_amount = student.scholarship_amount - schol.award_amount
+            db.session.delete(schol)
+            db.session.commit()
+            return jsonify({"success": "True"})
+    return jsonify({"success": "False"})
