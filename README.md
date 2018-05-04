@@ -8,7 +8,7 @@
 * Kasra Koushan
 * Steven Bursztyn
 
-#### URichmond
+#### University of Richmond
 * Codirectors: Emily Everett and Melissa Gu
 * Wallace He, Jonathan Huang, Katrina Kuhn, Tracy Nguyen
 
