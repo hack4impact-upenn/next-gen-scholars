@@ -23,7 +23,7 @@ def about():
 def resources():
     editable_html_obj = EditableHTML.get_editable_html('resources')
     return render_template(
-    'main/resources.html', editable_html_obj=editable_html_obj)
+    'main/resources.html', editable_html_obj=editable_html_obj, pageType='resources')
 
 @main.route('/calendar', methods=['GET', 'POST'])
 def calendar():

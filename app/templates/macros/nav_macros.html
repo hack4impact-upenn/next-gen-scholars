@@ -71,7 +71,7 @@
 {% endmacro %}
 
 {% macro mobile_nav(pageType, current_user, dropdown=None) %}  
-    {% if pageType=='home' or pageType=='college_profile' %}
+    {% if pageType=='home' or pageType=='college_profile' or pageType=='resources' %}
         <!-- Removes padding under navbar for pages with image jumbotrons -->
         <div style="padding-bottom:0px;" class="mobile tablet only row">
     {% else %}
@@ -108,7 +108,7 @@
 {% endmacro %}
 
 {% macro desktop_nav(pageType, current_user, dropdown=None) %}
-    {% if pageType=='home' or pageType=='college_profile' %}
+    {% if pageType=='home' or pageType=='college_profile' or pageType=='resources' %}
         <!-- Removes padding under navbar for pages with image jumbotrons -->        
         <div style="padding-bottom: 0px;" class="computer only row">
     {% else %}

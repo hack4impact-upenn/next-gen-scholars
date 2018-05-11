@@ -2,14 +2,16 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-<div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
+<!-- <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile column">
         <div class="row">
             <h1 class="ui dividing header">Resources</h1>
             {{ page.render_inline_editor(editable_html_obj, current_user) }}
         </div>
     </div>
-</div>
+</div> -->
+
+<iframe style="width:100%; height:100%; padding-bottom:45px; margin-bottom:0px;" src="https://www.ngsapp.com/#resources" frameborder="0"></iframe>
 
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 {% endblock %}
