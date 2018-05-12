@@ -29,38 +29,16 @@
                         <th>Description</th>
                         <th>Regular Deadline</th>
                         <th>Early Deadline</th>
-                        <th>Admission rate</th>
                     </tr>
                 </thead>
                 <tbody>
                 
-                <!-- <script language='javascript'>
-                    $(document).ready(function () {
-                        $('.ui.accordion').accordion();
-                    });
-                </script>     -->
                 {% for c in colleges | sort(attribute='name') %}
-                    <!-- <div class="ui styled fluid accordion">
-                        <div class="title">
-                            <i class="dropdown icon"></i>
-                            {{ c.name }}
-                        </div>
-                        <div class="content">
-                            <p> {{ c.description }} <button style="float: right;" class="ui button" onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">View Profile</button></p>
-                            <p>Regular Deadline {{ c.regular_deadline }}</p>
-                            <p>Early Deadline {{ c.regular_deadline }}</p>
-                        </div>
-                    </div> -->
                     <tr onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">
                         <td>{{ c.name }}</td>
                         <td>{{ c.description }}</td>
                         <td>{{ c.regular_deadline }}</td>
                         <td>{{ c.early_deadline }} </td>
-                        {% if c.admission_rate == 0 or c.admission_rate== none %}
-                        <td> N/A </td>
-                        {% else %}
-                        <td>{{ c.admission_rate }}%</td>
-                        {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
