@@ -631,14 +631,25 @@ def upload_scattergram():
             for line in lines[1:]:
                 line = line.split(','.encode('utf-8'))
                 college_names.add(str(line[1], 'utf-8').strip())
+                csvName = str(line[0], 'utf-8').strip()
+                csvCollege=str(line[1], 'utf-8').strip()
+                csvStatus=str(line[2], 'utf-8').strip()
+                if line[3] is not None:
+                    csvGPA=str(line[3], 'utf-8').strip()
+                if line[4] is not None:
+                    csvSAT2400=str(line[4], 'utf-8').strip()
+                if line[5] is not None:
+                    csvSAT1600=str(line[5], 'utf-8').strip()
+                if line[6] is not None:
+                    csvACT=str(line[6], 'utf-8').strip()
                 point = ScattergramData(
-                    name=str(line[0], 'utf-8').strip(),
-                    college=str(line[1], 'utf-8').strip(),
-                    status=str(line[2], 'utf-8').strip(),
-                    GPA=str(line[3], 'utf-8').strip(),
-                    SAT2400=str(line[4], 'utf-8').strip(),
-                    SAT1600=str(line[5], 'utf-8').strip(),
-                    ACT=str(line[6], 'utf-8').strip()
+                    name=csvName,
+                    college=csvCollege,
+                    status=csvStatus,
+                    GPA=csvGPA,
+                    SAT2400=csvSAT2400,
+                    SAT1600=csvSAT1600,
+                    ACT=csvACT
                 )
                 db.session.add(point)
             db.session.commit()
