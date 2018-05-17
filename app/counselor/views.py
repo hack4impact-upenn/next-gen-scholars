@@ -636,12 +636,20 @@ def upload_scattergram():
                 csvStatus=str(line[2], 'utf-8').strip()
                 if line[3] is not None:
                     csvGPA=str(line[3], 'utf-8').strip()
+                else:
+                    csvGPA=""
                 if line[4] is not None:
                     csvSAT2400=str(line[4], 'utf-8').strip()
+                else:
+                    csvSAT2400=""
                 if line[5] is not None:
                     csvSAT1600=str(line[5], 'utf-8').strip()
+                else:
+                    csvSAT1600=""
                 if line[6] is not None:
                     csvACT=str(line[6], 'utf-8').strip()
+                else:
+                    csvACT=""
                 point = ScattergramData(
                     name=csvName,
                     college=csvCollege,
