@@ -634,22 +634,10 @@ def upload_scattergram():
                 csvName = str(line[0], 'utf-8').strip()
                 csvCollege=str(line[1], 'utf-8').strip()
                 csvStatus=str(line[2], 'utf-8').strip()
-                if line[3] is not None:
-                    csvGPA=str(line[3], 'utf-8').strip()
-                else:
-                    csvGPA=None
-                if line[4] is not None:
-                    csvSAT2400=str(line[4], 'utf-8').strip()
-                else:
-                    csvSAT2400=None
-                if line[5] is not None:
-                    csvSAT1600=str(line[5], 'utf-8').strip()
-                else:
-                    csvSAT1600=None
-                if line[6] is not None:
-                    csvACT=str(line[6], 'utf-8').strip()
-                else:
-                    csvACT=None
+                csvGPA=str(line[3], 'utf-8').strip()
+                csvSAT2400=str(line[4], 'utf-8').strip()
+                csvSAT1600=str(line[5], 'utf-8').strip()
+                csvACT=str(line[6], 'utf-8').strip()
                 point = ScattergramData(
                     name=csvName,
                     college=csvCollege,
