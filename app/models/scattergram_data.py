@@ -11,8 +11,8 @@ class ScattergramData(db.Model):
     status = db.Column(db.String, index=True)
     GPA = db.Column(db.Float, index=True)
     SAT2400 = db.Column(db.Integer, index=True, nullable=True)
-    SAT1600 = db.Column(db.Integer, index=True)
-    ACT = db.Column(db.Integer, index=True)
+    SAT1600 = db.Column(db.Integer, index=True, nullable=True)
+    ACT = db.Column(db.Integer, index=True, nullable=True)
 
     def __repr__(self):
         return '<ScattergramData {}, {}, {}, {}, {}, {}>'.format(self.name, self.status, self.GPA,
