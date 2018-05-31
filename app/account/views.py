@@ -36,6 +36,7 @@ def register():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             email=form.email.data,
+            phone=form.phone.data,
             password=form.password.data,
             student_profile=StudentProfile())
         db.session.add(user)

@@ -230,6 +230,7 @@ def edit_profile(student_profile_id):
         form = EditStudentProfile(
             grade=student_profile.grade,
             high_school=student_profile.high_school,
+            phone_number=student_profile.phone_number,
             graduation_year=student_profile.graduation_year,
             district=student_profile.district,
             city=student_profile.city,
@@ -242,6 +243,7 @@ def edit_profile(student_profile_id):
             # Update user profile information.
             student_profile.grade = form.grade.data
             student_profile.high_school = form.high_school.data
+            student_profile.phone_number = form.phone_number.data
             student_profile.graduation_year = form.graduation_year.data
             student_profile.district = form.district.data
             student_profile.city = form.city.data

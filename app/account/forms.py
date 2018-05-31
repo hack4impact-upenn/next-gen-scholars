@@ -30,6 +30,8 @@ class RegistrationForm(Form):
         'Email', validators=[InputRequired(),
                              Length(1, 64),
                              Email()])
+    phone = StringField(
+        'Phone number', validators=[InputRequired()])
     password = PasswordField(
         'Password',
         validators=[
