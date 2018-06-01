@@ -31,7 +31,6 @@ def new_user():
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             email=form.email.data,
-            phone=form.phone.data,
             password=form.password.data)
         if user.role.id == 1:
             user.student_profile=StudentProfile()
@@ -53,8 +52,7 @@ def invite_user():
             role=form.role.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            email=form.email.data,
-            phone=form.phone.data)
+            email=form.email.data,)
         if user.role.id == 1:
             user.student_profile=StudentProfile()
         db.session.add(user)
