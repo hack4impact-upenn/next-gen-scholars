@@ -164,6 +164,8 @@ class EditStudentProfile(Form):
     high_school = StringField(
         'High School', validators=[InputRequired(),
                                    Length(1, 100)])
+    phone_number = StringField(
+        'Phone number', validators=[InputRequired()])
     graduation_year = IntegerField(
         'Graduation Year', validators=[InputRequired()])
     unweighted_gpa = FloatField('Unweighted GPA', validators=[InputRequired()])
