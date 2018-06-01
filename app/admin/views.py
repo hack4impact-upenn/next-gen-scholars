@@ -52,7 +52,7 @@ def invite_user():
             role=form.role.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            email=form.email.data,)
+            email=form.email.data)
         if user.role.id == 1:
             user.student_profile=StudentProfile()
         db.session.add(user)
