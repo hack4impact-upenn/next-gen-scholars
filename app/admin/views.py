@@ -2,13 +2,14 @@ from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
 from flask_rq import get_queue
 
-from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
+from .forms import (AddChecklistItemForm, ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm)
+
 from . import admin
 from .. import db
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import Role, User, EditableHTML, StudentProfile
+from ..models import (Role, User, EditableHTML, StudentProfile, ChecklistItem, College)
 
 
 @admin.route('/')
@@ -194,3 +195,54 @@ def update_editor_contents():
     db.session.commit()
 
     return 'OK', 200
+
+@admin.route('/student_database', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def student_database():
+    """View student database."""
+    checklist_form = AddChecklistItemForm()
+    if checklist_form.validate_on_submit():
+        for assignee_id in checklist_form.assignee_ids.data.split(','):
+            result = add_to_cal(
+                student_profile_id=assignee_id,
+                text=checklist_form.item_text.data,
+                deadline=checklist_form.date.data)
+            checklist_item = ChecklistItem(
+                text=checklist_form.item_text.data,
+                assignee_id=assignee_id,
+                is_deletable=False,
+                creator_role_id=3,
+                deadline=checklist_form.date.data,
+                cal_event_id=result['event_id'],
+                event_created=result['event_created'])
+            db.session.add(checklist_item)
+            notif_text = '{} {} added "{}" to your checklist'.format(
+                current_user.first_name, current_user.last_name,
+                checklist_item.text)
+            notification = Notification(
+                text=notif_text, student_profile_id=assignee_id)
+            db.session.add(notification)
+        db.session.commit()
+        flash('Checklist item added.', 'form-success')
+        return redirect(url_for('admin.student_database'))
+    student_profiles = StudentProfile.query.all()
+    colleges = College.query.all()
+    essay_statuses = ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
+    return render_template(
+        'admin/student_database.html',
+        student_profiles=student_profiles,
+        checklist_form=checklist_form,
+        colleges=colleges,
+        essay_statuses=essay_statuses)
+
+@admin.context_processor
+def processor():
+    def get_essay_statuses(student_profile):
+        return list(set([e.status for e in student_profile.essays]))
+
+    def get_colleges(student_profile):
+        return ';'.join([c.name for c in student_profile.colleges])
+
+    return dict(
+        get_essay_statuses=get_essay_statuses, get_colleges=get_colleges)
