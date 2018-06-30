@@ -11,7 +11,6 @@ class Essay(db.Model):
     student_profile_id = db.Column(
         db.Integer,
         db.ForeignKey('student_profile.id'),
-        nullable=False,
         index=True)
     status = db.Column(db.String, index=True)
     link = db.Column(db.String, index=True)
