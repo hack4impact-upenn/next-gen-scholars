@@ -4,11 +4,12 @@ from flask_rq import get_queue
 
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm)
+
 from . import admin
 from .. import db
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import Role, User, EditableHTML, StudentProfile
+from ..models import (Role, User, EditableHTML, StudentProfile, ChecklistItem, College)
 
 
 @admin.route('/')
@@ -169,10 +170,11 @@ def delete_user(user_id):
         user = User.query.filter_by(id=user_id).first()
         if user.student_profile:
             db.session.delete(user.student_profile)
+            db.session.commit()
         db.session.delete(user)
         db.session.commit()
         flash('Successfully deleted user %s.' % user.full_name(), 'success')
-    return redirect(url_for('admin.registered_users'))
+    return redirect(url_for('admin.student_database'))
 
 
 @admin.route('/_update_editor_contents', methods=['POST'])
@@ -194,3 +196,28 @@ def update_editor_contents():
     db.session.commit()
 
     return 'OK', 200
+
+@admin.route('/student_database', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def student_database():
+    """View student database."""
+    student_profiles = StudentProfile.query.all()
+    colleges = College.query.all()
+    essay_statuses = ['Incomplete', 'Waiting', 'Reviewed', 'Edited', 'Done']
+    return render_template(
+        'admin/student_database.html',
+        student_profiles=student_profiles,
+        colleges=colleges,
+        essay_statuses=essay_statuses)
+
+@admin.context_processor
+def processor():
+    def get_essay_statuses(student_profile):
+        return list(set([e.status for e in student_profile.essays]))
+
+    def get_colleges(student_profile):
+        return ';'.join([c.name for c in student_profile.colleges])
+
+    return dict(
+        get_essay_statuses=get_essay_statuses, get_colleges=get_colleges)

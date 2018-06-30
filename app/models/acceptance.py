@@ -6,7 +6,8 @@ from sqlalchemy.orm import validates
 class Acceptance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_profile_id = db.Column(
-        db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
+        db.Integer, db.ForeignKey('student_profile.id')
+        )
     # college name
     college = db.Column(db.String, index=True)
     # statuses include 'Accepted', 'Accepted with award letter', 'Pending Award Letter Parsing'

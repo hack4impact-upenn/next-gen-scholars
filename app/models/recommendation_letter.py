@@ -7,7 +7,8 @@ from sqlalchemy.orm import validates
 class RecommendationLetter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_profile_id = db.Column(
-        db.Integer, db.ForeignKey('student_profile.id'), nullable=False)
+        db.Integer, db.ForeignKey('student_profile.id')
+        )
     # name of reference
     name = db.Column(db.String, index=True)
     # category of reference, e.g. '12th grade Calculus teacher', '11th grade biology teacher'
