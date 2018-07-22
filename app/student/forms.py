@@ -18,7 +18,7 @@ from ..models import TestName, College
 class EditCommonAppEssayForm(Form):
     link = StringField(
         'Link to Common App Essay',
-        validators=[InputRequired(), Length(1, 64)])
+        validators=[InputRequired(), Length(1, 100)])
     status = SelectField(
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
@@ -62,7 +62,7 @@ class EditSupplementalEssayForm(Form):
                                   Length(1, 64)])
     link = StringField(
         'Essay Link', validators=[InputRequired(),
-                                  Length(1, 64)])
+                                  Length(1, 100)])
     status = SelectField(
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
