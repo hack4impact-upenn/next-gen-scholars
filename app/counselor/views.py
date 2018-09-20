@@ -153,6 +153,63 @@ def upload_college_file():
     return render_template('counselor/upload_colleges.html')
 
 
+@counselor.route('/new-user', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def new_user():
+    """Create a new user."""
+    form = NewUserForm()
+    if form.validate_on_submit():
+        user = User(
+            role=form.role.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data,
+            password=form.password.data)
+        if user.role.id == 1:
+            user.student_profile=StudentProfile()
+        db.session.add(user)
+        db.session.commit()
+        flash('User {} successfully created'.format(user.full_name()),
+              'form-success')
+    return render_template('counselor/new_user.html', form=form)
+
+@counselor.route('/invite-user', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def invite_user():
+    """Invites a new user to create an account and set their own password."""
+    form = InviteUserForm()
+    if form.validate_on_submit():
+        user = User(
+            role=form.role.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data)
+        if user.role.id == 1:
+            user.student_profile=StudentProfile()
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        invite_link = url_for(
+            'account.join_from_invite',
+            user_id=user.id,
+            token=token,
+            _external=True)
+        get_queue().enqueue(
+            send_email,
+            recipient=user.email,
+            subject='You Are Invited To Join',
+            template='account/email/invite',
+            user=user,
+            invite_link=invite_link,
+        )
+        flash('User {} successfully invited'.format(user.full_name()),
+              'form-success')
+    return render_template('counselor/new_user.html', form=form)
+
+
+
 @counselor.route('/user/<int:user_id>')
 @counselor.route('/user/<int:user_id>/info')
 @login_required
