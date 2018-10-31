@@ -1,0 +1,13 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+<div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
+    <div class="twelve wide column">
+        <br />
+        <a class="ui black basic button" href="{{ url_for('counselor.scholarships') }}">Cancel</a>
+        <div class="ui horizontal divider"><h1>{{ header }}</h1></div>
+        {{ f.render_form(form, extra_classes='fluid') }}
+    </div>
+</div>
+{% endblock %}

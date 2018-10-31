@@ -14,3 +14,4 @@ dist
 *.sqlite
 .idea
 dump.rdb
+client_secret.json
