@@ -147,7 +147,7 @@ def calendar_data():
 
 
 SCOPES = 'https://www.googleapis.com/auth/calendar'
-CLIENT_SECRETS_FILE = 'client_secret.json'
+CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
 
 
 @student.route('/authorize_calendar')
