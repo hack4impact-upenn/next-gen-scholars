@@ -49,6 +49,7 @@ PLOTLY_API_KEY=XXXXXXXXXXXX
 MAIL_USERNAME=MySendgridUsername
 MAIL_PASSWORD=MySendgridPassword
 SECRET_KEY=SuperRandomStringToBeUsedForEncryption
+CLIENT_SECRETS_FILE=NameOfFileWithClientSecret
 ```
 
 Other Key value pairs:
