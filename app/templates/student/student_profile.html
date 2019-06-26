@@ -442,7 +442,7 @@
               user.student_profile.scholarships|sort(attribute='name') %}
               <tr>
                 <td>{{ scholarship.name }}</td>
-                <td>{{ scholarship.award_amount }}</td>
+                <td>{{ "${:,.2f}".format(scholarship.award_amount) }}</td>
                 <td class="collapsing">
                   <div class="ui tiny buttons">
                       <a class="ui icon blue basic button"

@@ -277,6 +277,7 @@ def add_test_score(student_profile_id):
         abort(404)
     form = AddTestScoreForm()
     if form.validate_on_submit():
+
         # create new test score from form data
         new_item = TestScore(
             student_profile_id=student_profile_id,
@@ -288,6 +289,7 @@ def add_test_score(student_profile_id):
         db.session.commit()
         url = get_redirect_url(student_profile_id)
         return redirect(url)
+        
     return render_template(
         'student/add_academic_info.html',
         form=form,

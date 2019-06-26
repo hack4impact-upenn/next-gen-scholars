@@ -15,3 +15,7 @@ dist
 .idea
 dump.rdb
 client_secret.json
+
+start.sh
+local_url.txt
+notes
