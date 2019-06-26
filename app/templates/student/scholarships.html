@@ -3,8 +3,16 @@
     <div class="four wide column">
         <form id="filter-form" class="ui form">
             <div class="field">
-                <h4 class="ui header">Filter by Category</h4>
-                <select class="ui dropdown" id='category-field'>
+                <!-- <h4 class="ui header">Filter by Category</h4> -->
+                <label>Categories</label>
+                <select multiple="" class="ui fluid search dropdown" id='category-field'>
+                    <option value="">Search categories...</option>
+                    {% for c in category_list %}
+                        <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- <select class="ui dropdown" id='category-field'>
                     <option value="All">All</option>
                     <option value="African-American">African-American</option>
                     <option value="Agriculture">Agriculture</option>
@@ -31,7 +39,7 @@
                     <option value="Student-Athlete">Student-Athlete</option>
                     <option value="Teaching">Teaching</option>
                     <option value="Women in Math/Engineering">Women in Math/Engineering</option>
-                </select>
+                </select> -->
             </div>
             <button class="ui primary button" type="submit">Filter</button>
         </form>
@@ -92,15 +100,34 @@
         function filterScholarships() {
             // 'All', 'Incomplete', and 'Complete'
             let categoryFilter = $('#category-field').val();
+            let category_list = ['All', "African-American","Agriculture","Arts-related","Asian","Asian Pacific American","Community Service",
+            "Construction Related Fields","Disabled","Engineering","Environmental Interest","Female","Filipino","First Generation College Student",
+            "Queer","General","Latinx","Immigrant/AB540/DACA","Interest in Journalism","Japanese","Jewish","Indigenous","Science/Engineering",
+            "Student-Athlete","Teaching","Women in Math/Engineering"];
+            var category_filter = [];
+
+            for (var i in category_list) {
+                let cat = category_list[i];
+                if ($('#c-' + cat).checkbox('is checked')) {
+                    category_filter.push(cat);
+                }
+            }
+
             $('.scholarship-row').each(function () {
                 $this = $(this);
                 $this.show();
 
                 // Filter by Scholarship Category
-                let category = $this.find('.td-category').data('category');
-                if (categoryFilter != 'All' && category != categoryFilter) {
-                    $this.hide();
+                // let category = $this.find('.td-category').data('category');
+                // if (categoryFilter != 'All' && category != categoryFilter) {
+                //     $this.hide();
+                // }
 
+                if (category_filter.length > 0) {
+                    let cat = $this.find('.td-category').data('category');
+                    if (categoryFilter != 'All' && category != categoryFilter) {
+                        $this.hide();
+                    }
                 }
             });
         }
