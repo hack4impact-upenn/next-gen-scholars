@@ -12,7 +12,7 @@ from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
 from wtforms.fields.html5 import EmailField
 
 from .. import db
-from ..models import TestName, College
+from ..models import TestName, College, TestScore
 
 
 class EditCommonAppEssayForm(Form):
@@ -107,6 +107,28 @@ class AddTestScoreForm(Form):
         u'Year', choices=year_choices, validators=[InputRequired()])
     score = IntegerField('Test Score', validators=[InputRequired()])
     submit = SubmitField('Add test score')
+
+    def validate(self):
+
+        if not Form.validate(self):
+            return False
+
+        # see if there's existing score in database with same test type, month, and year 
+        test_name = self.data.get('test_name').name
+        test_month = self.data.get('month')
+        test_year = self.data.get('year')
+
+        test = db.session.query(TestScore).filter_by(name=test_name, month=test_month, year=test_year).first()
+        if test is not None:
+            self.test_name.errors.append('Please enter a different date for this test or edit the existing score.')
+            return False
+
+        return True 
+
+
+
+
+        
 
 
 class AddRecommendationLetterForm(Form):
