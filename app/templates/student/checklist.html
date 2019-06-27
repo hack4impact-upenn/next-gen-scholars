@@ -28,7 +28,7 @@
                 </td>
             	<td class="two wide">
                     {% if item.deadline %}
-                        <b> {{  '%s' % (item.deadline)  }} </b>
+                        <b> {{  '%s' % (item.deadline.strftime('%m-%d-%Y'))  }} </b>
                     {% endif %}
                 </td>
             </tr>

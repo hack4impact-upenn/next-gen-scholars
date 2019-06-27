@@ -119,7 +119,19 @@ class AddTestScoreForm(Form):
             return False
         
         # TODO: Read me from a database or something... let admin be able to edit valid test score ranges
-        valid_ranges = {'ACT' : (0,36) , 'SAT' : (0,1600) , 'SAT Subject Test - Math Level 2' : (0,800),'AP Physics 1' : (0,5)}
+        valid_ranges = \
+            {'ACT' : (0,36) ,
+            'SAT' : (0,1600),
+            'SAT Subject Test - Math Level 2' : (0,800),
+            'AP Physics 1' : (0,5),
+            'AP Chemistry' : (0, 5),
+            'AP Computer Science A' : (0, 5),
+            'SAT Subject Test - Math Level 1' : (0, 800),
+            'AP Physics 2' : (0, 5),
+            'AP English Language & Composition': (0, 5),
+            'SAT Subject Test - Chemistry' : (0, 800),
+            'SAT Subject Test - Physics' : (0, 800)
+            }
         test_name = self.data.get('test_name').name
         valid_range = valid_ranges.get(test_name, -1)
 
@@ -132,7 +144,7 @@ class AddTestScoreForm(Form):
         # check to see if range is valid
         if not (self.data.get('score') >= valid_range[0] and self.data.get('score') <= valid_range[1]):
             self.score.errors.append("The " + test_name + '\'s score must be between ' + str(valid_range[0]) +' and ' + \
-                    str(valid_range[1]) + '.') 
+                    str(valid_range[1])) 
 
             # TODO: check to see if score is valid score in increments of x (i.e. SAT score must be in increments of 10)
             return False 
@@ -223,7 +235,9 @@ class EditStudentProfile(Form):
     city = StringField('City', validators=[InputRequired(), Length(1, 100)])
     state = StringField('State', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Update Profile')
-
+    
+    def strip_all(self):
+        raise ValidationError(self.data)
 
 class AddCollegeForm(Form):
     name = QuerySelectField(

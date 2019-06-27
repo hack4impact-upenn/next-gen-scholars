@@ -6,7 +6,7 @@
         <h2 class="ui dividing header">
             Colleges
             <div style="margin-top:5px; margin-bottom:5px;" class="sub header">
-                View colleges.
+                View colleges and pertinent information.
             </div>
         </h2>
 
@@ -37,8 +37,8 @@
                     <tr onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">
                         <td>{{ c.name }}</td>
                         <td>{{ c.description }}</td>
-                        <td>{{ c.regular_deadline }}</td>
-                        <td>{{ c.early_deadline }} </td>
+                        <td>{{ c.regular_deadline.strftime('%m-%d-%Y')}} </td>
+                        <td>{{ c.early_deadline.strftime('%m-%d-%Y')}} </td>
                     </tr>
                 {% endfor %}
                 </tbody>
