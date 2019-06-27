@@ -47,7 +47,11 @@ def index():
 def scholarships():
     """View all scholarships"""
     scholarships = Scholarship.query.all()
-    return render_template('counselor/scholarships.html', scholarships=scholarships)
+    category_list = ["African-American","Agriculture","Arts-related","Asian","Asian Pacific American","Community Service",
+            "Construction Related Fields","Disabled","Engineering","Environmental Interest","Female","Filipino","First Generation College Student",
+            "Queer","General","Latinx","Immigrant/AB540/DACA","Interest in Journalism","Japanese","Jewish","Indigenous","Science/Engineering",
+            "Student-Athlete","Teaching","Women in Math/Engineering"]
+    return render_template('counselor/scholarships.html', scholarships=scholarships, category_list=category_list)
 
 @csrf.exempt
 @counselor.route('/upload_scholarships', methods=['GET', 'POST'])

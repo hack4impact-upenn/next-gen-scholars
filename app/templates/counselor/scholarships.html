@@ -4,33 +4,11 @@
             <form id="filter-form" class="ui form">
                 <div class="field">
                     <h4 class="ui header">Filter by Category</h4>
-                    <select class="ui dropdown" id='category-field'>
-                        <option value="All">All</option>
-                        <option value="African-American">African-American</option>
-                        <option value="Agriculture">Agriculture</option>
-                        <option value="Arts-related">Arts-related</option>
-                        <option value="Asian">Asian</option>
-                        <option value="Asian Pacific American">Asian Pacific American</option>
-                        <option value="Community Service">Community Service</option>
-                        <option value="Construction Related Fields">Construction Related Fields</option>
-                        <option value="Disabled">Disabled</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Environmental Interest">Environmental Interest</option>
-                        <option value="Female">Female</option>
-                        <option value="Filipino">Filipino</option>
-                        <option value="First Generation College Student">First Generation College Student</option>
-                        <option value="Queer">Queer</option>
-                        <option value="General">General</option>
-                        <option value="Latinx">Latinx</option>
-                        <option value="Immigrant/AB540/DACA">Immigrant/AB540/DACA</option>
-                        <option value="Interest in Journalism">Interest in Journalism</option>
-                        <option value="Japanese">Japanese</option>
-                        <option value="Jewish">Jewish</option>
-                        <option value="Indigenous">Indigenous</option>
-                        <option value="Science/Engineering">Science/Engineering</option>
-                        <option value="Student-Athlete">Student-Athlete</option>
-                        <option value="Teaching">Teaching</option>
-                        <option value="Women in Math/Engineering">Women in Math/Engineering</option>
+                    <select multiple="" class="ui fluid search dropdown" id='category-field'>
+                        <option value="">Search categories...</option>
+                        {% for c in category_list %}
+                            <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <button class="ui primary button" type="submit">Filter</button>
@@ -94,17 +72,25 @@
 
                 // Apply current filters to table
                 function filterScholarships() {
-                    // 'All', 'Incomplete', and 'Complete'
-                    let categoryFilter = $('#category-field').val();
+                    // list of category names, null if no categories are selected
+                    var temp = $('#category-field').dropdown('get value');
+                    let category_filter = temp[temp.length - 1];
+
                     $('.scholarship-row').each(function () {
                         $this = $(this);
                         $this.show();
 
-                        // Filter by Scholarship Category
-                        let category = $this.find('.td-category').data('category');
-                        if (categoryFilter != 'All' && category != categoryFilter) {
-                            $this.hide();
-
+                        if (category_filter != null) {
+                            let category = $this.find('.td-category').data('category');
+                            var matchesCategoriesFilter = false;
+                            for (var i = 0; i < category_filter.length; i++) {
+                                if (category_filter[i].includes(category)) {
+                                    matchesCategoriesFilter = true;
+                                }
+                            }
+                            if (!matchesCategoriesFilter) {
+                                $this.hide();
+                            }
                         }
                     });
                 }
