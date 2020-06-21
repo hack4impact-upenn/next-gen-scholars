@@ -64,6 +64,6 @@ twilio==6.12.1
 uritemplate==3.0.0
 urllib3==1.22
 webassets==0.12.1
-Werkzeug==0.11.15
+Werkzeug==0.15.3
 WTForms==2.1
 yapf==0.19.0
