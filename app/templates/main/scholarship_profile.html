@@ -1,13 +1,13 @@
 {% extends 'layouts/base.html' %} {% block content %}
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <b><a style="color: #1A85D6;" class = "ui header large" href={{scholarship.link}}>{{ scholarship.name }}</a></b>
+        <b><a style="color: #2AB088;" class = "ui header large" href={{scholarship.link}}>{{ scholarship.name }}</a></b>
         <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
             <div class="twelve wide computer sixteen wide mobile column">
                 <div class="ui raised secondary green segment">
                     <h3>{{ scholarship.description }}</h3>
                     <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
-                    <p><strong>Award Amount: </strong> ${{ scholarship.award_amount }}</p>
+                    <p><strong>Award Amount: </strong> {{ "${:,.2f}".format(scholarship.award_amount) }}</p>
                     <p><strong>Category: </strong> {{ scholarship.category }}</p>
                     <p><strong>Merit based: </strong>
                         {% if scholarship.merit_based %} Yes {% else %} No {% endif %}

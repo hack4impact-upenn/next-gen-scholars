@@ -18,10 +18,13 @@
                     </div>
                 </div>
                 <div class="ui item">
-                    <a class="ui black basic button" href="{{ url_for('counselor.upload_college_file') }}">Upload Colleges</a>
+                    <a class="ui black basic button" href="{{ url_for('counselor.add_college') }}">Add College via This Website</a>
                 </div>
                 <div class="ui item">
-                    <a class="ui black basic button" href="{{ url_for('counselor.upload_scattergram') }}">Upload Scattergram Data</a>
+                    <a class="ui black basic button" href="{{ url_for('counselor.upload_college_file') }}">Add College via Excel</a>
+                </div>
+                <div class="ui item">
+                    <a class="ui black basic button" href="{{ url_for('counselor.upload_scattergram') }}">Add Scattergram Data</a>
                 </div>
             </div>
 
@@ -40,11 +43,27 @@
                     </thead>
                     <tbody>
                     <!--TODO: Make everything under the same onclick.-->
+
                     {% for c in colleges | sort(attribute='name') %}
                             <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.name }}</td>
                             <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.description }}</td>
-                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.regular_deadline }}</td>
-                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.early_deadline }} </td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">
+                                {% if c.regular_deadline is none %}
+                                    No Data
+                                {% else %}
+                                    {{ c.regular_deadline.strftime('%m-%d-%Y') }}     
+                                {% endif %} 
+                            </td>
+
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">
+                            
+                             {% if c.early_deadline is none %}
+                                   No Data
+                                {% else %}
+                                    {{ c.early_deadline.strftime('%m-%d-%Y') }}
+                                {% endif %} 
+                            </td>
+                            
                             <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}

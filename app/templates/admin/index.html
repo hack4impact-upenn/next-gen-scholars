@@ -5,7 +5,7 @@
         <div class="ui padded segment">
             <h3 class="ui header">
                 {% if icon is not none %}
-                    <i style="color:#1A85D6;" class="{{ icon }}"></i>
+                    <i style="color:#2AB088;" class="{{ icon }}"></i>
                 {% endif %}
                 <div class="content">
                     {{ title }}
@@ -23,7 +23,7 @@
 {% block content %}
     <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
         <div class="twelve wide column">
-            <h2 class="ui dividing header">Counselor Dashboard</h2>
+            <h2 class="ui dividing header">Admin Dashboard</h2>
             <h4 class="ui dividing header">Manage Users</h4>
             <div class="ui two column stackable grid">
                 {{ dashboard_option('Registered Users', 'admin.registered_users',
@@ -46,10 +46,17 @@
                 description='View and edit college descriptions', icon='university icon') }}
                 {{ dashboard_option('Add College', 'counselor.add_college',
                 description='Add a new college profile', icon='plus icon') }}
-                {{ dashboard_option('Delete College', 'counselor.add_college',
+                {{ dashboard_option('Delete College', 'counselor.delete_college',
                 description='Delete an existing college profile', icon='remove icon') }}
                 {{ dashboard_option('Upload Scattergram Data', 'counselor.upload_scattergram',
                 description='Upload college acceptance data for scattergrams', icon='bar chart icon')}}
+            </div>
+            <h4 class="ui dividing header">Resources</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('View Resources', 'counselor.resources',
+                description='View and edit resources', icon='linkify icon') }}
+                {{ dashboard_option('Add Resource', 'counselor.add_resource',
+                description='Add a new resource', icon='plus icon') }}
             </div>
             <h4 class="ui dividing header">SMS Alerts</h4>
             <div class="ui two column stackable grid">

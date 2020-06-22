@@ -9,7 +9,7 @@ from . import admin
 from .. import db
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, EditableHTML, StudentProfile, ChecklistItem, College)
+from ..models import (Role, User, EditableHTML, StudentProfile, ChecklistItem, College, fix_url)
 
 
 @admin.route('/')
@@ -70,7 +70,7 @@ def invite_user():
             subject='You Are Invited To Join',
             template='account/email/invite',
             user=user,
-            invite_link=invite_link,
+            invite_link=fix_url(invite_link),
         )
         flash('User {} successfully invited'.format(user.full_name()),
               'form-success')

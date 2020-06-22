@@ -1,8 +1,10 @@
 import datetime
 from flask import (abort, flash, redirect, render_template, url_for, request,
-                   jsonify)
+                   jsonify, Flask)
 from flask_login import current_user, login_required
-from ..models import TestScore, RecommendationLetter, Interest, Essay, College, Major, StudentProfile, ScattergramData, Acceptance, StudentScholarship
+from ..models import (TestScore, RecommendationLetter, Interest, 
+    EditableHTML, Essay, College, Major, Resource, StudentProfile, 
+    ScattergramData, Acceptance, StudentScholarship)
 from .. import db, csrf
 from . import student
 from .forms import (
@@ -14,7 +16,8 @@ from .forms import (
     AddAcceptanceForm, EditAcceptanceForm, AddStudentScholarshipForm, EditStudentScholarshipForm)
 from ..models import (User, College, Essay, TestScore, ChecklistItem,
                       RecommendationLetter, TestName, Notification,
-                      Acceptance, Scholarship)
+                      Acceptance, Scholarship, get_state_name_from_abbreviation,
+                      get_colors, fix_url)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -27,6 +30,15 @@ os.environ[
     'OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # TODO: remove before production?
 
 import random #for fake college interest
+import logging 
+
+app = Flask(__name__)
+
+@student.route('/')
+@login_required
+def index():
+    """Counselor dashboard page."""
+    return render_template('student/index.html')
 
 #load student profile, test scores for profile and comparer
 def load_student_profile(current_user):
@@ -42,6 +54,7 @@ def load_student_profile(current_user):
                 act = max(act, t.score) if act != 'N/A' else t.score
 
     return student_profile, sat, act
+
 
 @student.route('/profile')
 @login_required
@@ -61,6 +74,8 @@ def view_user_profile():
 def load_comparer_data_col():
     colleges = (current_user.student_profile.colleges)
     return colleges
+
+
 @student.route('/comparer')
 @login_required
 def comparer():
@@ -79,6 +94,7 @@ def comparer():
     return render_template('student/college_comparer.html', user=current_user, 
         act=act, sat=sat, 
         colleges=colleges, authenticated=True)
+
 
 @student.route('/profile_from_id/<int:student_profile_id>')
 def get_profile_from_id(student_profile_id):
@@ -154,6 +170,7 @@ CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
 @login_required
 def authorize_calendar():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+    CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE')
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, scopes=SCOPES)
     flow.redirect_uri = url_for('student.oauth2callback', _external=True)
@@ -445,7 +462,7 @@ def add_acceptance(student_profile_id):
             student_profile_id=student_profile_id,
             college=form.college.data.name,
             status=form.status.data,
-            link=form.link.data)
+            link=fix_url(form.link.data))
         db.session.add(new_item)
         db.session.commit()
         url = get_redirect_url(student_profile_id)
@@ -474,7 +491,7 @@ def edit_acceptance(item_id):
         if form.validate_on_submit():
             acceptance.college = form.college.data.name
             acceptance.status = form.status.data
-            acceptance.link = form.link.data
+            acceptance.link = fix_url(form.link.data)
             db.session.add(acceptance)
             db.session.commit()
             url = get_redirect_url(acceptance.student_profile_id)
@@ -502,6 +519,17 @@ def delete_acceptance(item_id):
             return jsonify({"success": "True"})
     return jsonify({"success": "False"})
 
+
+# resources methods
+
+@student.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template('student/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=get_colors())
+    
 
 # college methods
 
@@ -577,8 +605,11 @@ def delete_college(item_id, student_profile_id):
 def scholarships():
     """View all scholarships"""
     scholarships = Scholarship.query.all()
-    return render_template('student/scholarships.html', scholarships=scholarships)
-
+    category_list = ["African-American","Agriculture","Arts-related","Asian","Asian Pacific American","Community Service",
+            "Construction Related Fields","Disabled","Engineering","Environmental Interest","Female","Filipino","First Generation College Student",
+            "Queer","General","Latinx","Immigrant/AB540/DACA","Interest in Journalism","Japanese","Jewish","Indigenous","Science/Engineering",
+            "Student-Athlete","Teaching","Women in Math/Engineering"]
+    return render_template('student/scholarships.html', scholarships=scholarships, category_list=category_list)
 
 
 # common app essay methods
@@ -596,7 +627,7 @@ def add_common_app_essay(student_profile_id):
     if form.validate_on_submit():
         student_profile = StudentProfile.query.filter_by(
             id=student_profile_id).first()
-        student_profile.common_app_essay = form.link.data
+        student_profile.common_app_essay = fix_url(form.link.data)
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
         db.session.commit()
@@ -621,7 +652,7 @@ def edit_common_app_essay(student_profile_id):
         id=student_profile_id).first()
     form = EditCommonAppEssayForm(link=student_profile.common_app_essay)
     if form.validate_on_submit():
-        student_profile.common_app_essay = form.link.data
+        student_profile.common_app_essay = fix_url(form.link.data)
         student_profile.common_app_essay_status = form.status.data
         db.session.add(student_profile)
         db.session.commit()
@@ -672,7 +703,7 @@ def add_supplemental_essay(student_profile_id):
         new_item = Essay(
             student_profile_id=student_profile_id,
             name=form.name.data,
-            link=form.link.data,
+            link=fix_url(form.link.data),
             status=form.status.data)
         db.session.add(new_item)
         db.session.commit()
@@ -699,7 +730,7 @@ def edit_supplemental_essay(item_id):
             essay_name=essay.name, link=essay.link, status=essay.status)
         if form.validate_on_submit():
             essay.name = form.essay_name.data
-            essay.link = form.link.data
+            essay.link = fix_url(form.link.data)
             essay.status = form.status.data
             db.session.add(essay)
             db.session.commit()
@@ -788,9 +819,9 @@ def delete_major(item_id, student_profile_id):
 # checklist methods
 
 
-@student.route('/')
+@student.route('/tasks')
 @login_required
-def dashboard():
+def tasks():
     # get the logged-in user's profile id
     if current_user.student_profile_id:
         return redirect(
@@ -814,6 +845,13 @@ def compare_checklist_items(item):
 @login_required
 def checklist(student_profile_id):
     # only allows the student or counselors/admins to see a student's profile
+    users = User.query.filter_by(role_id=1)
+    for user in users:
+        checklist_items = ChecklistItem.query.filter_by(assignee_id=user.student_profile_id)
+        checklist_items = [item for item in checklist_items if not item.is_checked]
+        app.logger.error('student')
+        app.logger.error(checklist_items)
+    
     if student_profile_id == current_user.student_profile_id or current_user.role_id != 1:
         checklist_items = ChecklistItem.query.filter_by(
             assignee_id=student_profile_id)
@@ -822,6 +860,8 @@ def checklist(student_profile_id):
         checklist_items = [
             item for item in checklist_items if not item.is_checked
         ]
+        app.logger.error('after')
+        app.logger.error(checklist_items)
         checklist_items.sort(key=compare_checklist_items)
         #### form to add checklist item ###
         form = AddChecklistItemForm()
@@ -908,6 +948,8 @@ def add_to_cal(student_profile_id, text, deadline):
         'scopes': student_profile.cal_scopes
     }
 
+    app.logger.error('done w credentials')
+
     credentials = google.oauth2.credentials.Credentials(**credentials_json)
     service = googleapiclient.discovery.build(
         'calendar', 'v3', credentials=credentials)
@@ -926,6 +968,8 @@ def add_to_cal(student_profile_id, text, deadline):
         },
     }
 
+    app.logger.error('done creating event')
+
     event = service.events().insert(
         calendarId='primary', body=event_body).execute()
     student_profile.cal_token = credentials.token
@@ -936,6 +980,9 @@ def add_to_cal(student_profile_id, text, deadline):
     student_profile.cal_scopes = credentials.scopes
     db.session.add(student_profile)
     db.session.commit()
+
+    app.logger.error('done ')
+
     return {"event_id": event.get('id'), "event_created": True}
 
 
@@ -1084,13 +1131,16 @@ def update_checklist_item(item_id):
             abort(404)
         form = EditChecklistItemForm(item_text=item.text, date=item.deadline)
         if form.validate_on_submit():
-            if item.deadline is not None and form.date.data is not None:
-                update_event(item.cal_event_id, form.item_text.data,
-                             form.date.data)
-            else:
-                if item.deadline is None and form.date.data is not None:
-                    add_to_cal(item.assignee_id, form.item_text.data,
-                               form.date.data)
+            token_uri = current_user.student_profile.cal_token_uri
+            if token_uri is not None:
+                if item.deadline is not None and form.date.data is not None:
+                    update_event(item.cal_event_id, form.item_text.data,
+                                form.date.data)
+                else:
+                    if item.deadline is None and form.date.data is not None:
+                        add_to_cal(item.assignee_id, form.item_text.data,
+                                form.date.data)
+            
             item.text = form.item_text.data
             item.deadline = form.date.data
             db.session.add(item)
@@ -1110,10 +1160,16 @@ def update_checklist_item(item_id):
 @login_required
 def view_college_profile(college_id):
     college = College.query.filter_by(id=college_id).first()
+    if college.description == '':
+        return render_template('/errors/invalid_college_profile.html')
+
+    state_full_name = get_state_name_from_abbreviation(college.school_state)
+    website_url = fix_url(college.school_url)
+    net_cost_url = fix_url(college.price_calculator_url)
     return render_template(
-        'main/college_profile.html',
-        pageType='college_profile',
-        college=college)
+        'main/college_profile.html', website_url=website_url,
+        net_cost_url=net_cost_url, pageType='college_profile',
+        college=college, state_full_name=state_full_name)
 
 @student.route('/scholarship_profile/<int:scholarship_id>')
 @login_required

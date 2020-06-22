@@ -1,0 +1,14 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <h1 class="ui header centered"> 
+        Sorry, there has been an error. You have selected an invalid college profile. 
+    </h1>
+
+    <h3 class="ui header centered">
+        Please delete this college and try again, using adding the link to it's college scorecard profile in the second line. 
+    </h3>
+
+        <img src="{{url_for('static', filename='./images/how_to_add_college.png')}}" class="ui image centered" style=" width:95%; margin-bottom:50px;" />
+
+{% endblock %}

@@ -15,12 +15,12 @@
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
         <div class="ui raised secondary green segment">
-            <h1 style="color:#1A85D6;" class="ui header">Net Cost to Student</h1>
+            <h1 style="color: #2AB088;" class="ui header">Net Cost to Student</h1>
             <p><strong>Net Cost:</strong> ${{ acceptance.net_cost }}</p>
             <p><strong>Net Cost with External Scholarships:</strong> ${{ acceptance.net_cost - student_profile.scholarship_amount }}</p>
         </div>
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">Gross Cost to Student</h1>
+            <h1 style="color: #2AB088;" class="ui header">Gross Cost to Student</h1>
             {% if acceptance.cost >= 0 %}
             <p><strong>Cost of Tuition and Fees:</strong> ${{ acceptance.cost }} </p>
             {% else %}
@@ -29,14 +29,14 @@
         </div>
 
         <div class="ui raised secondary green segment"> 
-            <h1 style="color: #1A85D6;" class="ui header">Cost with Scholarships and Financial Aid</h1>
+            <h1 style="color: #2AB088;" class="ui header">Cost with Scholarships and Financial Aid</h1>
             <p><strong>Cost of Attendance - Institutional Scholarships:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships }}</p>
             <p><strong>Cost of Attendance - Scholarships and Financial Aid:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships - acceptance.financial_aid }}</p>
             <p><strong>Cost of Attendance - All Scholarships and Financial Aid:</strong> ${{ acceptance.cost - acceptance.institutional_scholarships - acceptance.financial_aid - student_profile.scholarship_amount }}</p>
         </div>
 
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">Cost with Loans and Work Study</h1>
+            <h1 style="color: #2AB088;" class="ui header">Cost with Loans and Work Study</h1>
             <p><strong>Cost of Attendance - Work Study:</strong> ${{ acceptance.cost - acceptance.work_study }}</p>
             <p><strong>Cost of Attendance - Work Study and Loans:</strong> ${{ acceptance.cost - acceptance.work_study - acceptance.loans }}</p>
         </div>

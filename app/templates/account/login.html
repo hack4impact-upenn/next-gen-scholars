@@ -2,6 +2,7 @@
 {% import 'macros/form_macros.html' as f %}
 
 {% block content %}
+
 <div class="ui stackable centered grid container" style="margin-top:12px">
     <div class="eight wide computer sixteen wide mobile column">
         <h2 class="ui dividing header">Log in</h2>
@@ -16,20 +17,37 @@
         {{ f.begin_form(form, flashes) }}
             {{ f.render_form_field(form.email) }}
             {{ f.render_form_field(form.password) }}
-            <div class="ui two column grid">
+
+            <div class="ui three column grid">
                 {{ f.render_form_field(form.remember_me, extra_classes='column') }}
+                    <div class="field center aligned column"> 
+                        <div class= "ui checkbox">
+                            <input id="passwordVisibilityToggle" type="checkbox" onclick="togglePasswordVisibility()"
+                            style="width: 17px;height: 17px;"></input> <label for="passwordVisibilityToggle"> Show Password </label>
+                        </div>
+                    </div>
                 <div class="right aligned column">
                     <a href="{{ url_for('account.reset_password_request') }}">Forgot password?</a>
                 </div>
             </div>
-
+            
             {{ f.form_message(flashes['error'], header='Something went wrong.', class='error') }}
             {{ f.form_message(flashes['warning'], header='Check your email.', class='warning') }}
             {{ f.form_message(flashes['info'], header='Information', class='info') }}
             {{ f.form_message(flashes['success'], header='Success!', class='success') }}
-
+            
             {{ f.render_form_field(form.submit) }}
         {{ f.end_form(form) }}
     </div>
+
+    <script>
+        var input = document.getElementById("password");
+        input.type = (document.getElementById("passwordVisibilityToggle").checked ? 'text' : 'password');
+
+        function togglePasswordVisibility() {
+            input.type = (input.type === 'password' ? 'text' : 'password');
+        } 
+    </script>
+
 </div>
 {% endblock %}

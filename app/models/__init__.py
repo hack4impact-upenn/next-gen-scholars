@@ -20,3 +20,4 @@ from .user import *
 from .notification import *
 from .sms_alert import *
 from .scholarship import *
+from .resource import *

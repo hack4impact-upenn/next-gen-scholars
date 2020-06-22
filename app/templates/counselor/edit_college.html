@@ -6,6 +6,7 @@
     <div class="twelve wide column">
         <br />
         <a class="ui black basic button" href="{{ url_for('counselor.colleges') }}">Cancel</a>
+        <a style="float:right" class="ui red basic button" href="{{ url_for('counselor.delete_specific_college', college_id=college_id) }}">Delete College</a>
         <div class="ui horizontal divider"><h1>{{ header }}</h1></div>
         {{ f.render_form(form, extra_classes='fluid') }}
     </div>

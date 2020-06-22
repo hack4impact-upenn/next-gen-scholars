@@ -1,11 +1,11 @@
 @media -sass-debug-info{filename{}line{font-family:\000037}}
 nav {
-  margin-bottom: 40px !important;
+  margin-bottom: 70px !important;
 }
 
 @media -sass-debug-info{filename{}line{font-family:\0000312}}
 .ui.fixed.main.menu .right.menu > .item:last-of-type {
-  border-right: 1px solid rgba(34, 36, 38, 0.09804);
+  border-right: 1px solid rgba(34, 36, 38, 0.0980392);
 }
 
 @media -sass-debug-info{filename{}line{font-family:\0000318}}
@@ -24,9 +24,209 @@ table.selectable tr:hover {
   cursor: pointer !important;
 }
 
-.goog-te-banner-frame.skiptranslate {
-    display: none !important;
-} 
-body {
-    top: 0px !important; 
+
+/* Following Material Design Button Code from https://codepen.io/finnhvman/pen/MQyJxV */
+
+.pure-material-button-contained {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  transition: bottom 1s;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 100%;
+  min-width: 64px;
+  height: 64px;
+  vertical-align: middle;
+  text-align: center;
+  text-overflow: ellipsis;
+  color: white;
+  background-color:#2AB088;;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  font-size: 30px;
+  padding-left: 11px;
+  line-height: 27px;
+  transition: box-shadow 0.2s;
+}
+
+.pure-material-button-contained::-moz-focus-inner {
+  border: none;
+}
+
+/* Overlay */
+.pure-material-button-contained::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Ripple */
+.pure-material-button-contained::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  padding: 50%;
+  width: 32px; /* Safari */
+  height: 32px; /* Safari */
+  background-color: rgb(var(--pure-material-onprimary-rgb, 255, 255, 255));
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  transition: opacity 1s, transform 0.5s;
+}
+
+/* Hover, Focus */
+.pure-material-button-contained:hover,
+.pure-material-button-contained:focus {
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.pure-material-button-contained:hover::before {
+  opacity: 0.08;
+}
+
+.pure-material-button-contained:focus::before {
+  opacity: 0.24;
+}
+
+.pure-material-button-contained:hover:focus::before {
+  opacity: 0.3;
+}
+
+/* Active */
+.pure-material-button-contained:active {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.pure-material-button-contained:active::after {
+  opacity: 0.32;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0s;
+}
+
+/* Disabled */
+.pure-material-button-contained:disabled {
+  color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.38);
+  background-color: rgba(var(--pure-material-onsurface-rgb, 0, 0, 0), 0.12);
+  box-shadow: none;
+  cursor: initial;
+}
+
+#language_footer{
+  background-color:#2AB088;;
+  position:fixed; 
+  right: 10px; 
+  bottom: 10px; 
+  width: 250px; 
+  border-radius:30px; 
+  transition: bottom 0.1s;
+  display:none;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.language_footer_hidden{
+  bottom: -40px;
+}
+
+
+.college_link{
+  text-align: center;
+  color: white;
+}
+
+.college_link_icon_padding{
+  margin-top:10px;
+}
+
+.college_link:hover{
+  cursor:pointer;
+}
+
+.uni_web{
+  background-color:#d00014 !important;
+}
+.uni_web:hover{
+  background-color:#d14754 !important;
+}
+
+.uni_cost{
+  background-color:#00abbc !important;
+}
+.uni_cost:hover{
+  background-color:#56c4ce !important;
+
+}
+
+.uni_scd{
+  background-color:#5f9d30 !important;
+}
+.uni_scd:hover{
+  background-color:#8ec466 !important;
+
+}
+
+.link_icon{
+  color:white;
+  font-size: 40px !important;
+  padding-left: 0px; 
+}
+
+.big_stat_title{
+  font-size: 55px;
+  margin-bottom:0px;
+}
+.big_stat_subtitle{
+  font-size: 15px;
+  margin-top:0px;
+}
+
+.medium_stat_title{
+  font-size:34px;
+  margin:0px;
+}
+.medium_stat_subtitle{
+  margin:0px;
+  font-size:13px;
+
+}
+
+.college_info_section_header{
+  color:#1A85D6 !important;
+  margin-bottom:5px;
+}
+
+.college_info{
+  text-align:center;
+  margin-bottom: 15px !important;
+}
+.flex_wrapper{
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+
+.stat_box{
+  vertical-align: middle;
+  text-align: center;
+}
+
+.resource_item{
+  background-color: red;
+  transition: background-color .1s ease .1s ease;
+}
+.resource_div:hover{
+  cursor:pointer;
+  background-color: rgba(34,36,38,.1);
+}
+
+.college_info_table{
+  text-align: center !important;
 }

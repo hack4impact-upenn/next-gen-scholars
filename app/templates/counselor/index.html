@@ -5,7 +5,7 @@
         <div class="ui padded segment">
             <h3 class="ui header">
                 {% if icon is not none %}
-                    <i style="color:#1A85D6;" class="{{ icon }}"></i>
+                    <i style="color: #2AB088;" class="{{ icon }}"></i>
                 {% endif %}
                 <div class="content">
                     {{ title }}
@@ -29,6 +29,10 @@
                 description='View student profiles and add tasks', icon='student icon') }}
                 {{ dashboard_option('View Default Tasks', 'counselor.default_checklist',
                 description='View and add default tasks for all students', icon='tasks icon') }}
+                {{ dashboard_option('Add New User', 'counselor.new_user',
+                                    description='Create a new user account', icon='add user icon') }}
+                {{ dashboard_option('Invite New User', 'counselor.invite_user',
+                                    description='Invites a new user to create their own account', icon='add user icon') }}
             </div>
             <h4 class="ui dividing header">Colleges</h4>
             <div class="ui two column stackable grid">
@@ -51,6 +55,13 @@
                 description='Delete an existing scholarship profile', icon='remove icon') }}
                 {{ dashboard_option('Edit Scholarship', 'counselor.edit_scholarship_step1',
                 description='Edit existing scholarship profile', icon='edit icon')}}
+            </div>
+            <h4 class="ui dividing header">Resources</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('View Resources', 'counselor.resources',
+                description='View and edit resources', icon='linkify icon') }}
+                {{ dashboard_option('Add Resource', 'counselor.add_resource',
+                description='Add a new resource', icon='plus icon') }}
             </div>
             <h4 class="ui dividing header">SMS Alerts</h4>
             <div class="ui two column stackable grid">

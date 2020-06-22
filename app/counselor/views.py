@@ -1,10 +1,10 @@
 import datetime
 from datetime import date
 import pytz
-from flask import abort, flash, redirect, render_template, url_for, request, jsonify
+from flask import abort, flash, redirect, render_template, url_for, request, jsonify, Flask
 from flask_login import current_user, login_required
 from flask_rq import get_queue
-from .. import csrf
+from .. import db, csrf
 from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     NewUserForm, AddChecklistItemForm, AddTestNameForm,
                     EditTestNameForm, DeleteTestNameForm,
@@ -12,15 +12,16 @@ from .forms import (ChangeAccountTypeForm, ChangeUserEmailForm, InviteUserForm,
                     EditCollegeProfileStep2Form, DeleteCollegeProfileForm,
                     NewSMSAlertForm, EditSMSAlertForm, ParseAwardLetterForm,
                     AddScholarshipProfileForm, EditScholarshipProfileStep1Form,
-                    EditScholarshipProfileStep2Form, DeleteScholarshipProfileForm)
+                    EditScholarshipProfileStep2Form,EditResourceForm, AddResourceForm,
+                    DeleteScholarshipProfileForm)
 from . import counselor
-from .. import db
 from ..decorators import counselor_required
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import (Role, User, College, StudentProfile, EditableHTML,
+from ..models import (Role, User, College, StudentProfile, EditableHTML, 
                       ChecklistItem, TestName, College, Notification, SMSAlert,
-                      ScattergramData, Acceptance, Scholarship)
+                      ScattergramData, Acceptance, Scholarship, fix_url, interpret_scorecard_input, 
+                      get_colors, Resource)
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -29,8 +30,10 @@ import os
 import datetime
 import csv
 import io
+import logging
 # TODO: remove before production?
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+app = Flask(__name__)
 
 
 @counselor.route('/')
@@ -47,7 +50,11 @@ def index():
 def scholarships():
     """View all scholarships"""
     scholarships = Scholarship.query.all()
-    return render_template('counselor/scholarships.html', scholarships=scholarships)
+    category_list = ["African-American","Agriculture","Arts-related","Asian","Asian Pacific American","Community Service",
+            "Construction Related Fields","Disabled","Engineering","Environmental Interest","Female","Filipino","First Generation College Student",
+            "Queer","General","Latinx","Immigrant/AB540/DACA","Interest in Journalism","Japanese","Jewish","Indigenous","Science/Engineering",
+            "Student-Athlete","Teaching","Women in Math/Engineering"]
+    return render_template('counselor/scholarships.html', scholarships=scholarships, category_list=category_list)
 
 @csrf.exempt
 @counselor.route('/upload_scholarships', methods=['GET', 'POST'])
@@ -79,7 +86,7 @@ def upload_scholarship_file():
                     need_based = (row[7] == "Yes" or row[7] == "yes"),
                     minimum_gpa = row[8],
                     interview_required = (row[9] == "Yes" or row[9] == "yes"),
-                    link = row[10]
+                    link = fix_url(row[10])
                 )
                 db.session.add(scholarship_data)
         db.session.commit()
@@ -132,6 +139,7 @@ def upload_college_file():
                         image = row[7]
                     )
                     College.retrieve_college_info(college)
+    
                 # else update the existing college
                 else:
                     college.description = row[1]
@@ -151,6 +159,63 @@ def upload_college_file():
         db.session.commit()
         return redirect(url_for('counselor.colleges'))
     return render_template('counselor/upload_colleges.html')
+
+
+@counselor.route('/new-user', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def new_user():
+    """Create a new user."""
+    form = NewUserForm()
+    if form.validate_on_submit():
+        user = User(
+            role=form.role.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data,
+            password=form.password.data)
+        if user.role.id == 1:
+            user.student_profile=StudentProfile()
+        db.session.add(user)
+        db.session.commit()
+        flash('User {} successfully created'.format(user.full_name()),
+              'form-success')
+    return render_template('counselor/new_user.html', form=form)
+
+@counselor.route('/invite-user', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def invite_user():
+    """Invites a new user to create an account and set their own password."""
+    form = InviteUserForm()
+    if form.validate_on_submit():
+        user = User(
+            role=form.role.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data)
+        if user.role.id == 1:
+            user.student_profile=StudentProfile()
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        invite_link = url_for(
+            'account.join_from_invite',
+            user_id=user.id,
+            token=token,
+            _external=True)
+        get_queue().enqueue(
+            send_email,
+            recipient=user.email,
+            subject='You Are Invited To Join',
+            template='account/email/invite',
+            user=user,
+            invite_link=fix_url(invite_link),
+        )
+        flash('User {} successfully invited'.format(user.full_name()),
+              'form-success')
+    return render_template('counselor/new_user.html', form=form)
+
 
 
 @counselor.route('/user/<int:user_id>')
@@ -251,6 +316,9 @@ def student_database():
                 text=notif_text, student_profile_id=assignee_id)
             db.session.add(notification)
         db.session.commit()
+
+        app.logger.error("first time")
+
         flash('Checklist item added.', 'form-success')
         return redirect(url_for('counselor.student_database'))
 
@@ -357,24 +425,47 @@ def default_checklist():
     form = AddChecklistItemForm()
     if form.validate_on_submit():
         # create new checklist item from form data
-        new_item = ChecklistItem(
-            text=form.item_text.data,
-            assignee_id=current_user.id,
-            creator_role_id=3,
-            is_default_item=True,
-            deadline=form.date.data)
-        db.session.add(new_item)
+        exists = ChecklistItem.query.filter_by(text=form.item_text.data).filter_by(deadline=form.date.data).first()
+
+        if not exists:
+            new_item = ChecklistItem(
+                text=form.item_text.data,
+                assignee_id=current_user.id,
+                creator_role_id=3,
+                is_default_item=True,
+                deadline=form.date.data)
+            db.session.add(new_item)
+
+            users = User.query.filter_by(role_id=1)
+            for user in users:
+                # add new checklist to each user's account
+                if (user == users.first()):
+                    ite = ChecklistItem.query.filter_by(assignee_id=user.student_profile.id).filter_by(text=form.item_text.data).filter_by(deadline=form.date.data).first()
+                    if not ite:
+                        checklist_item = ChecklistItem(
+                            assignee_id=user.student_profile_id,
+                            text=form.item_text.data,
+                            is_deletable=False,
+                            deadline=form.date.data)
+                        db.session.add(checklist_item)
+                else:
+                    checklist_item = ChecklistItem(
+                        assignee_id=user.student_profile_id,
+                        text=form.item_text.data,
+                        is_deletable=False,
+                        deadline=form.date.data)
+                    db.session.add(checklist_item)
+                    
+        db.session.commit()
 
         users = User.query.filter_by(role_id=1)
         for user in users:
             # add new checklist to each user's account
-            checklist_item = ChecklistItem(
-                assignee_id=user.student_profile_id,
-                text=form.item_text.data,
-                is_deletable=False,
-                deadline=form.date.data)
-            db.session.add(checklist_item)
-        db.session.commit()
+            checklist_items = ChecklistItem.query.filter_by(assignee_id=user.student_profile_id)
+            checklist_items = [item for item in checklist_items if not item.is_checked]
+            app.logger.error('adding student stuff')
+            app.logger.error(checklist_items)
+
         return redirect(url_for('counselor.default_checklist'))
     return render_template(
         'counselor/default_checklist.html', form=form, checklist=default_items)
@@ -394,10 +485,25 @@ def add_test_name():
             db.session.add(test)
             db.session.commit()
         else:
-            flash('Test could not be added - already existed in database.',
+            flash('Test could not be added - test already exists in the database.',
                   'error')
         return redirect(url_for('counselor.index'))
     return render_template('counselor/add_test_name.html', form=form)
+
+
+@login_required
+@counselor.route(
+    '/resources/delete/<int:item_id>', methods=['GET', 'POST'])
+@csrf.exempt
+def delete_resource(item_id):
+    resource = Resource.query.filter_by(id=item_id).first()
+    if resource:
+        # only allows the counselors/admins to perform action
+        if current_user.role_id >= 2:
+            db.session.delete(resource)
+            db.session.commit()
+            return jsonify({"success": "True"})
+    return jsonify({"success": "False"})
 
 
 @counselor.route('/edit_test', methods=['GET', 'POST'])
@@ -434,11 +540,11 @@ def delete_test_name():
         form=form,
         header='Delete Test Name')
 
-
 @counselor.route('/add_college', methods=['GET', 'POST'])
 @login_required
 @counselor_required
 def add_college():
+   
     # Allows a counselor to add a college profile.
     form = AddCollegeProfileForm()
     if form.validate_on_submit():
@@ -447,6 +553,7 @@ def add_college():
             # College didn't already exist in database, so add it.
             college = College(
                 name=form.name.data,
+                scorecard_id=interpret_scorecard_input(form.college_scorecard_url.data),
                 description=form.description.data,
                 early_deadline=form.early_deadline.data,
                 regular_deadline=form.regular_deadline.data,
@@ -463,13 +570,17 @@ def add_college():
                 room_and_board = 0,
                 sat_score_average_overall = 0,
                 act_score_average_overall = 0)
-            College.retrieve_college_info(college)
+            add_worked = College.retrieve_college_info(college)
+            if not add_worked:
+                flash('Input Error. Please check your form over.')
+                return render_template(
+                    'counselor/add_college.html', form=form, header='Add College Profile')
             db.session.add(college)
         
         else:
             flash('College could not be added - already exists in database.',
                   'error')
-        return redirect(url_for('counselor.index'))
+        return redirect(url_for('counselor.colleges'))
     db.session.commit()
     return render_template(
         'counselor/add_college.html', form=form, header='Add College Profile')
@@ -501,6 +612,7 @@ def edit_college_step2(college_id):
     form = EditCollegeProfileStep2Form(
         name=old_college.name,
         description=old_college.description,
+        college_scorecard_url=old_college.scorecard_id,
         regular_deadline=old_college.regular_deadline,
         early_deadline=old_college.early_deadline,
         scholarship_deadline=old_college.scholarship_deadline,
@@ -510,6 +622,7 @@ def edit_college_step2(college_id):
     if form.validate_on_submit():
         college = old_college
         college.name = form.name.data
+        college.scorecard_id=interpret_scorecard_input(form.college_scorecard_url.data)
         college.description = form.description.data
         college.early_deadline = form.early_deadline.data
         college.regular_deadline = form.regular_deadline.data
@@ -524,6 +637,7 @@ def edit_college_step2(college_id):
         return redirect(url_for('counselor.colleges'))
     return render_template(
         'counselor/edit_college.html',
+        college_id=college_id,
         form=form,
         header='Edit College Profile')
 
@@ -544,6 +658,16 @@ def delete_college():
         'counselor/delete_college.html',
         form=form,
         header='Delete College Profile')
+
+@counselor.route('/delete_college/<int:college_id>', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def delete_specific_college(college_id):
+    # Allows a counselor to delete a specific college profile.
+    college = College.query.filter_by(id=college_id).first()
+    db.session.delete(college)
+    db.session.commit()
+    return redirect(url_for('counselor.colleges')) 
 
 
 @counselor.route('/alerts', methods=['GET', 'POST'])
@@ -740,7 +864,7 @@ def add_scholarship():
                 need_based=form.need_based.data,
                 minimum_gpa=form.minimum_gpa.data,
                 interview_required=form.interview_required.data,
-                link=form.link.data)
+                link=fix_url(form.link.data))
             db.session.add(schol)
         else:
             flash('Scholarship could not be added - already exists in database.', 'error')
@@ -783,7 +907,7 @@ def edit_scholarship_step2(scholarship_id):
         need_based=old_schol.need_based,
         minimum_gpa=old_schol.minimum_gpa,
         interview_required=old_schol.interview_required,
-        link=old_schol.link)
+        link=fix_url(old_schol.link))
     if form.validate_on_submit():
         schol = old_schol
         schol.name = form.name.data
@@ -796,7 +920,7 @@ def edit_scholarship_step2(scholarship_id):
         schol.need_based=form.need_based.data
         schol.minimum_gpa=form.minimum_gpa.data
         schol.interview_required=form.interview_required.data
-        schol.link=form.link.data
+        schol.link=fix_url(form.link.data)
         db.session.add(schol)
         db.session.commit()
         flash('Scholarship profile successfully edited.', 'form-success')
@@ -822,3 +946,66 @@ def delete_scholarship():
         'counselor/delete_college.html',
         form=form,
         header='Delete Scholarship Profile')
+
+
+#resources methods
+
+@counselor.route('/resources')
+@login_required
+def resources():
+    """View all Resources."""
+    resources = Resource.query.all()
+    editable_html_obj = EditableHTML.get_editable_html('resources')
+    return render_template('counselor/resources.html', resources=resources, editable_html_obj=editable_html_obj, colors=get_colors())
+
+@login_required
+@counselor.route(
+    '/resources/edit/<int:item_id>', methods=['GET', 'POST'])
+@csrf.exempt
+def edit_resource(item_id):
+    resource = Resource.query.filter_by(id=item_id).first()
+    form = EditResourceForm(
+        resource_url=resource.resource_url,
+        title=resource.title,
+        description=resource.description,
+        image_url=resource.image_url
+    )    
+    if not resource:
+        abort(404)
+    if form.validate_on_submit():
+        resource_new = resource
+        resource_new.resource_url = form.resource_url.data
+        resource_new.title = form.title.data
+        resource_new.description = form.description.data
+        resource_new.image_url = form.image_url.data
+        db.session.add(resource_new)
+        db.session.commit()
+        flash('Resource successfully edited.', 'form-success')
+        return redirect(url_for('counselor.resources'))
+    return render_template('counselor/edit_resource.html', form=form, 
+        resource=resource, header='Edit Resource')
+
+@counselor.route('/add_resource', methods=['GET', 'POST'])
+@login_required
+@counselor_required
+def add_resource():
+    # Allows a counselor to add a college profile.
+    form = AddResourceForm()
+    if form.validate_on_submit():
+        resource_url = Resource.query.filter_by(resource_url=form.resource_url.data).first()
+        if resource_url is None:
+            # College didn't already exist in database, so add it.
+            resource = Resource(
+                resource_url=form.resource_url.data,
+                title=form.title.data,
+                description=form.description.data,
+                image_url=form.image_url.data
+            )
+            db.session.add(resource)
+        else:
+            flash('Resource could not be added - already exists in database.',
+                  'error')
+        return redirect(url_for('counselor.resources'))
+    db.session.commit()
+    return render_template(
+        'counselor/add_resource.html', form=form, header='Add Resource')

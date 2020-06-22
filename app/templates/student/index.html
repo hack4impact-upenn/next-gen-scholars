@@ -1,0 +1,100 @@
+{% extends 'layouts/base.html' %}
+
+{% macro dashboard_option(title, endpoint, description=None, icon=None) %}
+    <a class="column" href="{{ url_for(endpoint) }}">
+        <div class="ui padded segment">
+            <h3 class="ui header">
+                {% if icon is not none %}
+                    <i style="color:#2AB088;" class="{{ icon }}"></i>
+                {% endif %}
+                <div class="content">
+                    {{ title }}
+                    {% if description is not none %}
+                        <div class="sub header">
+                            {{ description }}
+                        </div>
+                    {% endif %}
+                </div>
+            </h3>
+        </div>
+    </a>
+{% endmacro %}
+
+{% block content %}
+    <div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:64px">
+        <div class="twelve wide column">
+            <div class="ui three steps">
+                <div class="step">
+                    <i class="user icon"></i>
+                    <div class="content">
+                        <div class="title">Complete Profile</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <i class="calendar icon"></i>
+                    <div class="content">
+                        <div class="title">Sync Calendar</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <i class="tasks icon"></i>
+                    <div class="content">
+                        <div class="title">Complete Tasks</div>
+                    </div>
+                </div>
+            </div>
+            <h2 class="ui dividing header">Student Dashboard</h2>
+            <h4 class="ui dividing header">Personal Tools</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('View Tasks', 'student.tasks',
+                                    description='View your list of upcoming and completed tasks', icon='tasks icon') }}
+                
+                {{ dashboard_option('View Calendar', 'student.calendar',
+                                    description='View your personal and NGS calendar for upcoming events', icon='calendar icon') }}
+            
+                {{ dashboard_option('Account Settings', 'account.manage',
+                                    description='Manage your account settings and change your login information', icon='settings icon') }}
+            
+                {{ dashboard_option('View Profile', 'student.view_user_profile',
+                                    description='View and manage your student profile', icon='user icon') }}            
+            </div>
+            <!-- <h4 class="ui dividing header">Manage Profile</h4>
+            <div class="ui two column stackable grid">
+
+                
+                {{ dashboard_option('Add Test Score', 'student.tasks',
+                                    description='Add a test score to your student profile', icon='user icon') }}
+
+                {{ dashboard_option('Add Major of Interest', 'student.tasks',
+                                    description='Add a potential college major or interest', icon='user icon') }}
+
+                {{ dashboard_option('Add Supplemental Essay', 'student.tasks',
+                                    description='Add a supplemental essay and mark its progress', icon='user icon') }}
+
+                {{ dashboard_option('Add College', 'student.tasks',
+                                    description='Add a college of interest to your student profile', icon='user icon') }}
+
+                {{ dashboard_option('Add Recommendation Letter', 'student.tasks',
+                                    description='Add a recommendation letter and mark its progress', icon='user icon') }}
+
+                {{ dashboard_option('Add Acceptance', 'student.tasks',
+                                    description='Add a college you were acceped into, along with pertinent information', icon='user icon') }}
+
+                {{ dashboard_option('Add Scholarship', 'student.tasks',
+                                    description='Add a scholarship you have won and its award amount', icon='user icon') }}
+
+            </div> -->
+            <h4 class="ui dividing header">Explore</h4>
+            <div class="ui two column stackable grid">
+                {{ dashboard_option('Explore Colleges', 'student.colleges',
+                                    description='View different colleges to add to your wishlist', icon='university icon') }}
+
+                {{ dashboard_option('Explore Scholarships', 'student.scholarships',
+                                    description='View different scholarships you can apply to', icon='money bill alternate outline icon') }}
+
+                {{ dashboard_option('View Resources', 'student.resources',
+                                    description='Explore different resources for the college application process', icon='file alternate icon') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

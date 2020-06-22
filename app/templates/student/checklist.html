@@ -28,7 +28,7 @@
                 </td>
             	<td class="two wide">
                     {% if item.deadline %}
-                        <b> {{  '%s' % (item.deadline)  }} </b>
+                        <b> {{  '%s' % (item.deadline.strftime('%m-%d-%Y'))  }} </b>
                     {% endif %}
                 </td>
             </tr>
@@ -102,7 +102,7 @@
         {% endif %}
         <div class="stretched divided very relaxed row">
         	{{ render_checklist(checklist) }}
-            <button class="ui green button" id="add-checklist-item"><i class="plus icon" ></i>Add Item</button>
+            <button class="ui button" id="add-checklist-item" style="background-color:#FF4249; color:white"><i class="plus icon" ></i>Add Item</button>
             {{ completed_list(completed) }}
         </div>
     </div>
@@ -114,10 +114,10 @@
 </div>
 
 <script type="text/javascript">
-$(document).ready(function(){
-    $('#add-checklist-item').click(function() {
-        $('#add-checklist-item-modal').modal('show');
+    $(document).ready(function(){
+        $('#add-checklist-item').click(function() {
+            $('#add-checklist-item-modal').modal('show');
+        });
     });
-});
 </script>
 {% endblock %}

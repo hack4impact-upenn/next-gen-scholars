@@ -1,0 +1,68 @@
+{% import 'macros/page_macros.html' as page %}
+{% extends 'layouts/base.html' %}
+
+
+{% macro resource_m(id, title, url=none, imageSource="none", description=none, index=0) %}
+	<div class="ui segment resource_div {{ colors[index%10] }}" style="text-align:center;" onclick="window.location.href='{{url}}';"> 
+		<div class="image">
+			<img style="max-width: 100px;" src="{{ imageSource }}">
+		</div>
+		
+		<div class="middle aligned content">
+			<h4 style="color: blue"> {{ title }} </h4>
+			<div class="description" style="margin-bottom: 20px;">
+				<p style="color:black"> {{ description }}</p>
+			</div>
+		</div>
+
+	</div>
+{% endmacro %}
+
+
+
+{% block content %}
+<div class="ui stackable grid centered container" style="margin-top:12px; margin-bottom:14px">
+    <div class="twelve wide computer sixteen wide mobile column">
+        <div class="row" style="margin-bottom: 50px;">
+			<h1 class="ui dividing header">Resources</h1>
+			{{ page.render_inline_editor(editable_html_obj, current_user) }}
+        </div>
+
+	
+		<div class="ui three column stackable centered container" style="padding-bottom: 100px;">
+			<div class="ui items">
+				{% for r in resources | sort(attribute='title') %}
+					{{ resource_m(r.id, r.title, r.resource_url, r.image_url, r.description, loop.index0) }}
+				{% endfor %}  
+			</div>
+		</div>
+
+
+    </div>
+</div> 
+
+
+<script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		// Delete resource 
+		$('.delete-resource-button').click(function() {
+			var url = '/counselor/resources/delete/' + $(this).data('id');
+			$(this).parent().remove();
+			$.ajax({
+			url: url,
+			type: 'GET',
+			success: function(data) {
+				if (data.success !== "True") {
+				alert("Sorry there was an error removing this resource, please try again later.");
+				}
+			}
+			});
+	  });
+	});
+
+  </script>
+
+{% endblock %}

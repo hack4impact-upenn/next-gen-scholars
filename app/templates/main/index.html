@@ -1,15 +1,174 @@
 {% import 'macros/page_macros.html' as page %}
 {% extends 'layouts/base.html' %}
 
-{% block content %}
-<!-- <div class="container" style="padding-bottom:75px; background-size: cover; text-align: center; background-image:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('https://c.pxhere.com/photos/63/d6/cellphone_desk_iphone_laptop_macbook_notebook_notepad_pencil-972233.jpg!d');">
-    <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">Welcome to Next Generation Scholars</h1>
-     {% if not current_user.is_authenticated %}
-    <button onclick= "window.location.href='/account/register';" class="ui red button">Register</button>
-    <button onclick= "window.location.href='/account/login';"class="ui green button">Login</button>
-    {% endif %}
-</div> -->
+{% macro message_option(title, url, imageSource, description) %}
+    <div class="ui card">
+        <div class="image">
+            <img src="{{ imageSource }}">
+        </div>
+        <div class="content">
+            <div class="header"><a href="{{ url }}"> {{ title }}</a></div>
+            <div class="description"> {{ description }}</div>
+        </div>
+    </div> <br />
+{% endmacro %}
 
-<iframe style="width:100%; height:100%; padding-bottom:45px; margin-bottom:0px;" src="https://www.ngsapp.com/" frameborder="0"></iframe>    
+{% macro resource(title, url=none, imageSource="https://uploads.strikinglycdn.com/static/backgrounds/striking-pack-3/7.jpg", description=none) %}
+    <div class="item">
+        <div class="image">
+            <img src="{{ imageSource }}">
+        </div>
+        <div class="middle aligned content">
+            <a class="header" href="{{url}}"> {{ title }}</a>
+            {% if description is not none %}
+                <div class="description">
+                    <p> {{ description }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% block content %}
+<!-- <img src="https://cdn.shopify.com/s/files/1/1482/0322/files/Merchandise_Shop_for_Homepage_of_website_35543d35-61a6-4c64-a8d6-533ab4ad3904_2048x.jpg?v=1488502359" width="100%"> -->
+<div class="ui inverted vertical masthead center aligned segment" style="background-image: url('../static/images/ngs_test.JPG'); background-size:100%; background-color:#564359; padding-top:12%; padding-bottom:12%; margin-top:-30px;">
+    <div class="ui container">
+
+    </div>
+    <div class="ui text container" >
+        <h1 class="ui inverted header">
+            Next Generation Scholars Portal
+        </h1>
+        <h2>The best way for students and counselors to communicate for the college application process</h2> <br />
+        {% if not current_user.is_authenticated %}
+            <a class="ui huge primary button" style="background-color:#FF4249" href="{{url_for('account.login')}}">
+                Get Started
+                <i class="right arrow icon"></i>
+            </a>
+
+        {% endif %}
+    </div>
+</div>
+
+<div class="ui stackable centered grid container" style="margin-top:12px; margin-bottom:64px">
+    <div class="ui vertical segment">
+        <div class="ui three column stackable center aligned grid container">
+            <div class="column">
+                <img
+                    class="ui centered small circular image"
+                    src="{{url_for('static',filename='images/ngs_jovani.jpg')}}"
+                />
+                <h1 class="ui header">Administrators</h1>
+                <p>
+                    Administrators can invite and manage users, as well as add colleges and scholarships. Administrators can 
+                    assign default tasks to students, view and manage student profiles, evaluate progress 
+                    on important college application steps, such as recommendation letters and supplemental essays, as well 
+                    as access and update the calendar. Counselors also have the option to add new colleges and scholarships 
+                    for students to explore.
+
+                    {{ page.render_inline_editor(editable_html_obj, current_user) }} 
+                </p>
+            </div>
+            <div class="column">
+                <img
+                  class="ui centered small circular image"
+                  src="{{url_for('static',filename='images/ngs_sally.jpg')}}"
+                  
+                />
+                <h1 class="ui header">Counselors</h1>
+                <p>
+                  Counselors can assign default tasks to students, view and manage student profiles, evaluate progress 
+                  on important college application steps, such as recommendation letters and supplemental essays, as well 
+                  as access and update the calendar. Counselors also have the option to add new colleges and scholarships 
+                  for students to explore, in addition to recommending colleges and scholarships to certain students.
+
+                  {{ page.render_inline_editor(editable_html_obj, current_user) }} 
+                </p>
+            </div>
+            <div class="column">
+                <img
+                  class="ui centered small circular image"
+                  src="{{url_for('static',filename='images/user-avatar.jpg')}}"
+                />
+                <h1 class="ui header">Students</h1>
+                <p>
+                  Students can create a profile with contact information, grades and test scores, extracurriculars,
+                  colleges and majors of interest, recommendation letter and supplemental essay progress, as well 
+                  as college acceptances and scholarship awards. Students can also keep track of their tasks through
+                  the checklist and calendar, as well as explore potential colleges and scholarships.
+
+                  {{ page.render_inline_editor(editable_html_obj, current_user) }} 
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="twelve wide computer sixteen wide mobile column">
+        <div class="ui centered vertical segment">
+            <div class="ui stackable grid">
+                <div class="ten wide column" style="margin-top:5%;">
+                    <h1 class="ui header">
+                        Made by Hack4Impact + NGS
+                        <div class="ui sub header">UPenn, URichmond, Cornell, UIUC.</div>
+                    </h1>
+                    <p>
+                        Hack4Impact is a 501 (c)(3) nonprofit organization founded at the University of 
+                        Pennsylvania in Philadelphia, with chapters at various colleges across the United States. 
+                        They collaborate with nonprofits and other socially responsible organizations to develop 
+                        software that meets important social and humanitarian needs.
+                    </p>
+                    <a class="ui huge primary button" style="background-color:#FF4249" href="http://hack4impact.org">
+                        Get More Information
+                        <i class="right arrow icon"></i>
+                    </a>
+                </div>
+                <div class="six wide right aligned column">
+                    <img
+                        class="ui image"
+                        src="{{url_for('static',filename='images/h4i.png')}}"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- <div class="twelve wide computer sixteen wide mobile column">
+        <h1 class="ui dividing header">Messages</h1> <br /> 
+        <div class="ui two column centered grid">
+            {{ message_option('FAFSA', 'https://studentaid.ed.gov/sa/fafsa',
+                'https://user-images.strikinglycdn.com/res/hrscywv4p/image/upload/c_limit,fl_lossy,h_1440,w_720,f_auto,q_auto/1320747/AR-310039872_oxkllq.png', 
+                'Due on 3/2 -- Update your progress in your profile and tasks!') }}
+
+            {{ message_option('10,000 DEGREES', 'http://www.10000degrees.org/undergraduate-scholarships/',
+                'https://user-images.strikinglycdn.com/res/hrscywv4p/image/upload/c_limit,fl_lossy,h_1440,w_720,f_auto,q_auto/1320747/10k-logo_jqjaoq.png', 
+                'Due on 3/2 -- Update your progress in your profile and tasks!') }}
+
+            {{ message_option('CA Dream Act', 'https://dream.csac.ca.gov/',
+                'https://user-images.strikinglycdn.com/res/hrscywv4p/image/upload/c_limit,fl_lossy,h_1440,w_720,f_auto,q_auto/1320747/CA_Dream_Act_logo_lgh0xl.jpg', 
+                'Due on 3/2 -- Update your progress in your profile and tasks!') }}
+        </div>
+    </div> -->
+
+    
+
+    <div class="twelve wide computer sixteen wide mobile column">
+        <div class="row">
+            <h1 class="ui dividing header">Upcoming Events</h1>
+            <div style="position: relative; padding-bottom: 75%; height: 0; overflow: hidden;";>
+                <iframe src="https://calendar.google.com/calendar/embed?src=ngs4impact%40gmail.com&ctz=America%2FLos_Angeles" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="twelve wide computer sixteen wide mobile column">
+        <div class="row">
+            <h1 class="ui dividing header">Survey</h1>
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdUGSDIw98c_E45nkGF_dYQ4gtp7vKwv1LpQxA7YcESA0j-eg/viewform?embedded=true" style="border: 0" width="100%" height="650" frameborder="0"></iframe>
+        </div>
+    </div> -->
+</div>
+
+<script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
 
 {% endblock %}

@@ -153,8 +153,12 @@ class AddCollegeProfileForm(Form):
     name = StringField(
         'College/University Name',
         validators=[InputRequired(), Length(1, 200)])
-    description = StringField(u'Description', widget=TextArea())
-    # Input not required for either deadline.
+    college_scorecard_url = StringField(
+        'URL to the College Scorecard Profile or College Scorecard ID',
+        validators=[Optional()])
+    description = StringField(u'Description',
+        validators=[Optional()], 
+        widget=TextArea())
     early_deadline = DateField(
         'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
@@ -168,7 +172,7 @@ class AddCollegeProfileForm(Form):
         format='%Y-%m-%d',
         validators=[Optional()])
     fafsa_deadline = DateField(
-        'Fafsa Deadline (mm-dd-yyyy)',
+        'FAFSA Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
         validators=[Optional()])
     acceptance_deadline = DateField(
@@ -177,7 +181,7 @@ class AddCollegeProfileForm(Form):
         validators=[Optional()])
     image = StringField(
         'URL for image of college',
-        validators=[InputRequired()]
+        validators=[Optional()]
     )
     submit = SubmitField('Add College Profile')
 
@@ -191,12 +195,61 @@ class EditCollegeProfileStep1Form(Form):
     submit = SubmitField('Continue')
 
 
+class AddResourceForm(Form):
+    resource_url = StringField(
+        u'Link to Resource',
+        validators=[InputRequired()]
+    )
+    title = StringField(
+        u'Resource Title',
+        validators=[InputRequired()]
+    )
+    description = StringField(
+        u'Resource Description', 
+        validators=[InputRequired()],
+        widget=TextArea()
+    )
+    image_url = StringField(
+        u'URL of Resource Image',
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Add Resource')
+
+
+class EditResourceForm(Form):
+    resource_url = StringField(
+        u'Link to Resource',
+        validators=[InputRequired()]
+    )
+    title = StringField(
+        u'Resource Title',
+        validators=[InputRequired()]
+    )
+    description = StringField(
+        u'Resource Description', 
+        validators=[InputRequired()],
+        widget=TextArea()
+    )
+    image_url = StringField(
+        u'URL of Resource Image',
+        validators=[InputRequired()]
+    )
+    submit = SubmitField('Edit Resource')
+
+
 class EditCollegeProfileStep2Form(Form):
     name = StringField(
         'College/University Name',
         validators=[InputRequired(), Length(1, 200)])
-    description = StringField(u'Description', widget=TextArea())
+   
+    college_scorecard_url = StringField(
+        'URL to the College Scorecard Profile or College Scorecard ID',
+        validators=[Optional()])
     # Input not required for either deadline.
+    description = StringField(
+        u'Description', 
+        widget=TextArea(),
+        validators=[Optional()])
     early_deadline = DateField(
         'Early Deadline (mm-dd-yyyy)',
         format='%Y-%m-%d',
@@ -219,7 +272,7 @@ class EditCollegeProfileStep2Form(Form):
         validators=[Optional()])
     image = StringField(
         'URL to image of college',
-        validators=[InputRequired()])
+        validators=[Optional()])
     submit = SubmitField('Save College Profile')
 
 

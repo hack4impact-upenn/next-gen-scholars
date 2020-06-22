@@ -3,80 +3,223 @@
 {% block content %}
 <div class="container" style="padding-bottom:50px; text-align: center; background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('{{ college.image }}'); background-size: cover;">
     <h1 style="font-size:4.5em; color:white; text-align:center; padding-top:100px; padding-bottom:30px; font-family: 'IBM Plex Serif', serif;">{{ college.name }}</h1>
-    {% if college.school_url != "" %}
-    <button onclick="window.open('http://{{ college.school_url }}', '_blank')" class="ui green button">Website</button>
-    {% endif %}
 </div>
+
+{% macro create_medium_stat_box(stat, description, extra_classes=none )%}
+    <div class="ui segment stat_box {{extra_classes}}" >
+        <h2 class="medium_stat_title">{{ stat }}</h2>
+        <h3 class="medium_stat_subtitle"> {{ description }} </h3>
+    </div>
+{% endmacro %}
+
+
+{% macro create_link_box(url, description, extra_classes=none, icon_class=none)%}
+    <div class="column">
+        <div class="ui segment college_link {{extra_classes}}" onclick="window.open('{{ url }}', '_blank')"> 
+            <div class="college_link_icon_padding link_icon">
+                <i class="{{icon_class}} icon link_icon"></i>
+            </div>
+            {{ description }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro create_table_row(left, right, type=none) %}
+    {% if right is not none %}
+    <tr>
+        <td> {{left}} </td>
+        {% if type == 'money'%}
+        <td> {{ "${0:,.0f}".format(right) }}</td>
+        {% elif type == 'percent' %}
+        <td> {{ right }}%</td>
+        {% else %}
+        <td> {{ right }}</td>
+        {% endif%}
+    </tr>
+    {% endif %}
+{% endmacro %}
 
 <div class="ui stackable grid container" style="margin-top:12px; margin-bottom:64px">
     <div class="twelve wide computer sixteen wide mobile centered column">
-        <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">General Information</h1>
-            <p><strong>Description:</strong> {{ college.description }} </p>
-            
-            {% if college.admission_rate != 0.0 %}
-            <p><strong>Admission Rate</strong>: 
-                {{ college.admission_rate }}% 
-            </p>
-            <p><em>&emsp; Note: Don't be deterred by a low acceptance rate if the rest of your profile fits the school!</em></p>
-            {% endif %}
-            
-            {% if college.school_city != "" %}
-            <p><strong>City</strong>: 
-                {{ college.school_city }}
-            </p>
-            {% endif %}
 
-            {% if college.sat_score_average_overall != 0.0 %}
-            <p><strong>Average SAT Score</strong>: 
-                {{ college.sat_score_average_overall }}
-            </p>
-            {% endif %}
-
-            {% if college.act_score_average_overall != 0.0 %}
-            <p><strong>Average ACT Score</strong>: 
-                {{ college.act_score_average_overall }}
-            </p>
-            {% endif %}
-
-            {% if college.school_size != 0 %}
-            <p><strong>Undergraduate size</strong>: 
-                {{ college.school_size }}
-            </p>
-            {% endif %}
+        <div class="ui raised secondary green segment college_info">
+            <h1 style="margin-bottom:15px;" class="ui header college_info_section_header">Useful Links</h1>
+            <div class="ui three column doubling stackable grid container stretched flex_wrapper">
+                {{ create_link_box(website_url, 'School Website', 'uni_web', 'university') }}
+                {{ create_link_box(net_cost_url, 'Net Cost Calculator', 'uni_cost', 'dollar sign') }}
+                {{ create_link_box('https://collegescorecard.ed.gov/school/?'+college.scorecard_id|string, 'College Scorecard Profile', 'uni_scd', 'chart bar') }}
+            </div>
+        
         </div>
 
-        <div class="ui raised secondary green segment"> 
-            <h1 style="color: #1A85D6;" class="ui header">Costs</h1>
-            {% if college.cost_of_attendance_in_state != 0.0 and college.cost_of_attendance_out_of_state != 0.0 %}
-            <p><strong>Overall Cost of Attendance</strong>:
-                {% if college.cost_of_attendance_in_state == college.cost_of_attendance_out_of_state %}
-                ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }}
-                {% else %}
-                In-state ${{ "{0:,.0f}".format(college.cost_of_attendance_in_state) }} -- Out-of-state ${{ "{0:,.0f}".format(college.cost_of_attendance_out_of_state)}}
+        <div class="ui raised secondary green segment college_info">
+            <h1 class="ui header college_info_section_header">{{college.name}} at a Glance</h1>
+            <p style="font-size:18px;margin-bottom:15px;">{{ college.description }} </p>
+
+            <div class="ui three column doubling stackable grid container stretched flex_wrapper">
+                <div class="column">
+                    <div class="ui segment" style="text-align: center;"> 
+                        <h2 class="big_stat_title"> {{ college.admission_rate }}% </h1>
+                        <h3 class="big_stat_subtitle"> Acceptance Rate </h2>
+                        {% if college.admission_rate is not none and college.admission_rate < 30.0 %}
+                        <em>&emsp; Note: Don't be deterred by an acceptance rate if the rest of your profile fits the school!</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if college.sat_score_average_overall != 0.0 or college.act_score_average_overall != 0.0 %}
+                <div class="column">
+                    {% if college.sat_score_average_overall != 0.0 %}
+                        {{create_medium_stat_box("{0:,.0f}".format(college.sat_score_average_overall|round|int), 'Average SAT Score')}}
+                    {% endif %}
+                    {% if college.act_score_average_overall != 0.0 %}
+                        {{create_medium_stat_box(college.act_score_average_overall|round|int , 'Average ACT Score')}}
+                    {% endif %}
+                </div>
                 {% endif %}
-            </p>
+
+                <div class="column">
+                    {% if college.school_city != "" %}
+                    <div class="ui segment stat_box">
+                        <h2 style="font-size: 20px;margin:0px;">{{ college.school_city }}, {{ state_full_name }}</h2>
+                        <h3 class="medium_stat_subtitle"> Location </h3>
+                    </div>
+                    {% endif %}  
+                    {% if college.school_city != "" %}
+                        {{create_medium_stat_box("{0:,.0f}".format(college.school_size), 'Undergraduate Size')}}
+                    {% endif %}  
+                </div>
+            </div>
+            
+
+            {% if college.is_hispanic_serving == 1%}
+            <p><strong>This school is a hispanic-serving institution.</strong>: 
             {% endif %}
+        </div>
 
-            {% if college.tuition_in_state != 0.0 and college.tuition_out_of_state != 0.0 %} 
-            <p><strong>Tuition</strong>:
-                {% if college.tuition_in_state == college.tuition_out_of_state %} 
-                ${{ "{0:,.0f}".format(college.tuition_in_state) }}
-                {% else %}
-                In-state ${{ "{0:,.0f}".format(college.tuition_in_state) }} --  Out-of-state  ${{ "{0:,.0f}".format(college.tuition_out_of_state)}}
-                {% endif %} 
-            </p>
-            {% endif %} 
 
-            {% if college.room_and_board != 0.0 %}
-            <p><strong>Room and Board</strong>:
-                ${{"{0:,.0f}".format(college.room_and_board)}}
-            </p>
-            {% endif %} 
+        <div class="ui raised secondary green segment college_info"> 
+            <h1 class="ui header college_info_section_header">Costs</h1>
+            
+            <div class="ui two column doubling stackable grid container flex_wrapper">
+                <div class="column">
+
+                    {% if college.tuition_in_state == college.tuition_out_of_state %} 
+                    {{create_medium_stat_box('$'+"{0:,.0f}".format(college.cost_of_attendance_in_state), 'Average Total Cost of Attendance')}}
+                    {% else %}
+                    {{create_medium_stat_box('$'+"{0:,.0f}".format(college.cost_of_attendance_in_state), 'Average Total In-State Cost of Attendance')}}
+                    {{create_medium_stat_box('$'+"{0:,.0f}".format(college.cost_of_attendance_out_of_state), 'Average Total Out-of-State Cost of Attendance')}}
+                    {% endif %} 
+
+                
+                     <div class="ui two column doubling stackable grid container stretched flex_wrapper">
+                        <div class="column">
+                            {% if college.room_and_board != 0.0 %}
+                            {{create_medium_stat_box('$'+"{0:,.0f}".format(college.room_and_board), 'Room and Board')}}   
+                            {% endif %} 
+                        </div>
+                        <div class="column">
+                            {% if college.room_and_board != 0.0 %}
+                            {{create_medium_stat_box('$'+"{0:,.0f}".format(college.tuition_in_state), 'Tuition')}}   
+                            {% endif %} 
+                        </div>
+
+                    </div>
+                </div>
+
+                {% if college.net_price_0_30000 is not none or 
+                    college.net_price_30001_48000 is not none or
+                    college.net_price_48001_75000 is not none or
+                    college.net_price_75001_110000 is not none or
+                    college.net_price_110001_plus is not none
+                %}
+                <div class="column">
+                    <table class="ui celled padded table college_info_table">
+                        <tr>
+                            <th>Family Income</th>
+                            <th style="margin-left:30px;">Net Price</th>
+                        </tr>
+                        {{ create_table_row('$0 - $30,000', college.net_price_0_30000, 'money') }}
+                        {{ create_table_row('$30,001 - $48,000', college.net_price_30001_48000, 'money') }}
+                        {{ create_table_row('$48,001 - $75,000', college.net_price_48001_75000, 'money') }}
+                        {{ create_table_row('$75,001 - $110,000', college.net_price_75001_110000, 'money') }}
+                        {{ create_table_row('$110,001 +', college.net_price_110001_plus, 'money') }}
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if college.median_debt_first_gen is not none or college.median_debt_first_gen is not none or 
+            college.median_debt_income_0_30000 is not none or college.median_debt_income_30001_75000 is not none
+            or college.median_debt_income_75001_plus is not none %}
+        <div class="ui raised secondary green segment college_info">
+            <h1 class="ui header college_info_section_header">Debt</h1>
+                <div class="ui two column doubling stackable grid container flex_wrapper">
+                    {% if college.median_debt_first_gen is not none or college.median_debt_first_gen is not none%}
+                    <div class="column">
+                        {% if college.median_debt_first_gen is not none%}
+                        {{create_medium_stat_box("${0:,.0f}".format(college.median_debt_first_gen),
+                            'Median Debt of First Generation Students')}}
+                        {% endif %}
+                        {% if college.median_debt_first_gen is not none%}
+                        {{create_medium_stat_box("${0:,.0f}".format(college.median_debt_non_first_gen),
+                            'Median Debt of Non-First Generation Students')}}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="column">
+                        <table class="ui celled padded table college_info_table">
+                            <tr>
+                                <th>Family Income</th>
+                                <th style="margin-left:30px;">Median Debt</th>
+                            </tr>
+                            {{ create_table_row('$0 - $30,000', college.median_debt_income_0_30000, 'money') }}
+                            {{ create_table_row('$30,001 - $75,000', college.median_debt_income_30001_75000, 'money') }}
+                            {{ create_table_row('$75,001 + ', college.median_debt_income_75001_plus, 'money') }}
+                        </table>
+                    </div>
+
+                </div>
+        </div>
+        {% endif %}
+
+        <div class="ui raised secondary green segment college_info">
+            <h1 class="ui header college_info_section_header">Student Demographics</h1>
+                <div class="ui two column doubling stackable grid container flex_wrapper">
+                    {% if college.median_debt_first_gen is not none or college.median_debt_first_gen is not none%}
+                    <div class="column">
+                        {% if college.first_generation_percentage is not none%}
+                        <div class="column">
+                            {{ create_medium_stat_box(college.first_generation_percentage|string+'%', 'Percentage of First-Generation Students')}}
+                        </div>
+                        {% endif %}
+
+                       
+                    </div>
+                    {% endif %}
+
+                    <div class="column">
+                        <table class="ui celled padded table college_info_table">
+                            <tr>
+                                <th>Race</th>
+                                <th style="margin-left:30px;"> Percent of Student Body</th>
+                            </tr>
+                            {{ create_table_row('White', college.race_white, 'percent') }}
+                            {{ create_table_row('Black', college.race_black, 'percent') }}
+                            {{ create_table_row('Hispanic', college.race_hispanic, 'percent') }}
+                            {{ create_table_row('Asian', college.race_asian, 'percent') }}
+                            {{ create_table_row('Native American', college.race_american_indian, 'percent') }}
+                            {{ create_table_row('Native Hawaiian', college.race_native_hawaiian, 'percent') }}
+                        </table>
+                    </div>
+
+                </div>
         </div>
 
         <div class="ui raised secondary green segment">
-            <h1 style="color: #1A85D6;" class="ui header">Deadlines</h1>
+            <h1 class="ui header college_info_section_header">Deadlines</h1>
             <p><strong>Early</strong>: {{ college.early_deadline }}</p>
             <p><strong>Regular</strong>: {{ college.regular_deadline }}</p>
             <p><strong>Scholarship</strong>: {{ college.scholarship_deadline }}</p>
@@ -84,41 +227,7 @@
             <p><strong>Acceptance Deadline</strong>: {{ college.acceptance_deadline }}</p>
         </div>
 
-        <div class="ui raised secondary green segment"> 
-            <h1 style="color: #1A85D6;" class="ui header"> Student demographics </h1>
-            {% if college.first_generation_percentage != 0 %}
-            <p><strong>{{ college.first_generation_percentage }}%</strong> First Generation Students</p>
-            {% endif %}
 
-            {% if college.race_white != 0 %}
-            <p><strong>{{ college.race_white }}%</strong> White</p>
-            {% endif %}
-
-            {% if college.race_black != 0 %}
-            <p><strong>{{ college.race_black }}%</strong> Black</p>
-            {% endif %}
-
-            {% if college.race_hispanic != 0 %}
-            <p><strong>{{ college.race_hispanic }}%</strong> Hispanic</p>
-            {% endif %}
-
-            {% if college.race_asian != 0 %}
-            <p><strong>{{ college.race_asian }}%</strong> Asian</p>
-            {% endif %}
-
-            {% if college.race_american_indian != 0 %}
-            <p><strong>{{ college.race_american_indian }}%</strong> American Indian/Alaska Native</p>
-            {% endif %}
-
-            {% if college.race_native_hawaiian != 0 %}
-            <p><strong>{{ college.race_native_hawaiian }}%</strong> Native Hawaiian/ Pacific Islander</p>
-            {% endif %}
-
-            {% if college.race_international != 0 %}
-            <p><strong>{{ college.race_international }}%</strong> International</p>
-            {% endif %}
-
-        </div>
         {% if college.plot_SAT1600 %}
         <h4 class="ui header">GPA vs. SAT [1600] Scattergram</h4>
         <iframe width="900" height="480" frameborder="0" seamless="seamless" scrolling="no" src="{{college.plot_SAT1600}}.embed?showlink=false"></iframe>

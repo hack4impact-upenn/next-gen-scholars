@@ -4,11 +4,17 @@
 
 {% macro render_menu_items(endpoints) %}
     {% for endpoint, name, icon in endpoints %}
-        <a class="item {% if request.endpoint == endpoint %}active{% endif %}" href="{{ url_for(endpoint) }}">
-            {% if icon %}
-                <i class="{{ icon }} icon"></i>
-            {% endif %}
-            {{ name | safe }}
+        {% set href_url = url_for(endpoint) %}
+        {% if endpoint == 'student.dashboard'%}
+          {% set endpoint = 'student.checklist' %}
+        {% endif %}
+
+        <a class="item {% if request.endpoint == endpoint %}active{% endif %}" href= "{{ href_url }}">
+      
+          {% if icon %}
+              <i class="{{ icon }} icon"></i>
+          {% endif %}
+          {{ name | safe }}
         </a>
     {% endfor %}
 {% endmacro %}
@@ -26,13 +32,14 @@
     {% else %}
       {% if current_user.is_student() %}
         {% set endpoints = [
-          ('student.dashboard', 'Tasks', 'tasks'),
+          ('student.index', 'Dashboard', 'dashboard'),
+          ('student.tasks', 'Tasks', 'tasks'),
           ('student.view_user_profile', 'Profile', 'user'),
           ('student.calendar', 'Calendar', 'calendar'),
           ('student.colleges', 'Colleges', 'university'),
           ('student.scholarships', 'Scholarships', 'money bill alternate outline icon'),
+          ('student.resources', 'Resources', 'file text outline')
 
-          ('main.resources', 'Resources', 'file text outline')
         ] %}
       {% elif current_user.is_counselor() %}
         {% set endpoints = [
@@ -41,7 +48,7 @@
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
           ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),
-          ('main.resources', 'Resources', 'file text outline')
+          ('counselor.resources', 'Resources', 'file text outline')
         ] %}
       {% else %}
         {% set endpoints = [
@@ -50,7 +57,7 @@
           ('main.calendar', 'Calendar', 'calendar'),
           ('counselor.colleges', 'Colleges', 'university'),
           ('counselor.scholarships', 'Scholarships', 'money bill alternate outline icon'),          
-          ('main.resources', 'Resources', 'file text outline')
+          ('counselor.resources', 'Resources', 'file text outline')
         ] %}
       {% endif %}
     {% endif %}
@@ -63,8 +70,7 @@
 {% macro account_items(current_user) %}
     {% if not current_user.is_authenticated %}
       {% set endpoints = [
-        ('account.register', 'Register', 'list layout'),
-        ('account.login', 'Log In', 'sign in')
+     ('account.login', 'Log In', 'sign in')
       ] %}
       {{ render_menu_items(endpoints) }}
     {% endif %}
@@ -77,8 +83,10 @@
     {% else %}
         <div class="mobile tablet only row">
     {% endif %}
-            <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
-             <a class="item" href="/">Next Generation Scholars</a>
+    
+            <!-- <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu"> -->
+            <div style="background-color:#2AB088;" class="ui fixed inverted main menu">
+              <a class="item" href="/">Next Generation Scholars</a>
               <div class="right menu">
                   <a class="icon item" id="open-nav"><i class="sidebar icon"></i></a>
               </div>
@@ -113,8 +121,9 @@
         <div style="padding-bottom: 0px;" class="computer only row">
     {% else %}
       <div class="computer only row">
-    {% endif %}   
-        <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu">
+    {% endif %}      
+      <div style="background-color:#2AB088;" class="ui fixed inverted main menu">
+      <!-- <div style="background-color:#2D9DDF;" class="ui fixed inverted main menu"> -->
           <div class="ui container">
             <a class="item" href="/">Next Generation Scholars</a>
             <div class="right menu">

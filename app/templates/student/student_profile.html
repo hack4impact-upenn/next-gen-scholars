@@ -14,13 +14,13 @@
         <div class="item">
           <i class="mail icon"></i>
           <div class="content">
-            &nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+            &nbsp;&nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
           </div>
         </div>
         <div class="item">
           <i class="calendar outline icon"></i>
           <div class="content">
-            &nbsp;{{ user.student_profile.grade }}th Grade
+            &nbsp;&nbsp;{{ user.student_profile.grade }}th Grade
           </div>
         </div>
         <div class="item">
@@ -32,7 +32,7 @@
         <div class="item">
           <i class="phone icon"></i>
           <div class="content">
-            {{ user.student_profile.phone_number }}
+             &nbsp;&nbsp;{{ user.student_profile.phone_number }}
           </div>
         </div>
         <div class="item">
@@ -52,30 +52,30 @@
   <!-- DISPLAY ACADEMIC INFORMATION -->
   <div class="row">
     <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
+      <div style="color: #2AB088;" class="ui horizontal divider">
         <h3>Academic Information</h3>
       </div>
     </div>
     <div class="nine wide column">
-      <div class="ui mini four statistics">
+      <div class="ui mini four statistics" style="justify-content: center;">
         <div class="statistic">
           <div class="label">Unweighted GPA</div>
-          <span style="padding:0.25em"></span>
+          <span style="padding:0.3em;"></span>
           <div class="value">{{ user.student_profile.unweighted_gpa }}</div>
         </div>
         <div class="statistic">
           <div class="label">Weighted GPA</div>
-          <span style="padding:0.25em"></span>
+          <span style="padding:0.3em"></span>
           <div class="value">{{ user.student_profile.weighted_gpa }}</div>
         </div>
         <div class="statistic">
           <div class="label">SAT</div>
-          <span style="padding:0.25em"></span>
+          <span style="padding:0.3em"></span>
           <div class="value">{{ sat }}</div>
         </div>
         <div class="statistic">
           <div class="label">ACT</div>
-          <span style="padding:0.25em"></span>
+          <span style="padding:0.3em"></span>
           <div class="value">{{ act }}</div>
         </div>
       </div>
@@ -85,7 +85,7 @@
   <!-- DISPLAY TEST SCORES -->
   <div class="row">
     <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
+      <div style="color: #2AB088;" class="ui horizontal divider">
         Test Scores
       </div>
       <table class="ui compact table">
@@ -134,7 +134,7 @@
   <div class="row">
     <!-- DISPLAY MAJORS -->
     <div class="six wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
+      <div style="color: #2AB088;" class="ui horizontal divider">
         Majors of Interest
       </div>
       <table class="ui compact table">
@@ -172,7 +172,7 @@
     </div>
     <!-- DISPLAY COLLEGES -->
     <div class="six wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
+      <div style="color: #2AB088;" class="ui horizontal divider">
         Colleges of Interest
       </div>
       <table class="ui compact table">
@@ -221,10 +221,10 @@
   <!-- DISPLAY ESSAYS -->
   <div class="row">
     <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
+      <div style="color: #2AB088;" class="ui horizontal divider">
         <h3>College Application Information</h3>
       </div>
-      <div style="color: #1A85D6;" class="ui horizontal divider">Essays</div>
+      <div style="color: #2AB088;" class="ui horizontal divider">Essays</div>
       <table class="ui compact table">
         <thead class="full-width">
           <th>Essay</th>
@@ -310,7 +310,7 @@
   <!-- DISPLAY RECOMMENDATION LETTERS -->
   <div class="row">
     <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">Recommendation Letters</div>
+      <div style="color: #2AB088;" class="ui horizontal divider">Recommendation Letters</div>
       <table class="ui compact table">
         <thead class="full-width">
           <th>Name</th>
@@ -365,10 +365,10 @@
   <!-- DISPLAY Acceptances -->
   <div class="row">
     <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">
+      <div style="color: #2AB088;" class="ui horizontal divider">
         <h3>Acceptances</h3>
       </div>
-      <div style="color: #1A85D6;" class="ui horizontal divider">Colleges</div>      
+      <div style="color: #2AB088;" class="ui horizontal divider">Colleges</div>      
       <table class="ui compact table">
         <thead class="full-width">
           <th>Cost of Attendance</th>
@@ -429,8 +429,8 @@
 
 <!-- Display Scholarships Awarded -->
   <div class="row">
-      <div class="twelve wide column">
-      <div style="color: #1A85D6;" class="ui horizontal divider">Scholarships</div>
+      <div class="twelve wide column" style="padding-bottom: 50px;">
+      <div style="color: #2AB088;" class="ui horizontal divider">Scholarships</div>
         <table class="ui compact table">
           <thead class="full-width">
             <th>Name</th>
@@ -442,7 +442,7 @@
               user.student_profile.scholarships|sort(attribute='name') %}
               <tr>
                 <td>{{ scholarship.name }}</td>
-                <td>{{ scholarship.award_amount }}</td>
+                <td>{{ "${:,.2f}".format(scholarship.award_amount) }}</td>
                 <td class="collapsing">
                   <div class="ui tiny buttons">
                       <a class="ui icon blue basic button"
