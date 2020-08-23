@@ -14,13 +14,13 @@
         <div class="item">
           <i class="mail icon"></i>
           <div class="content">
-            &nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+            &nbsp;&nbsp;<a href="mailto:{{ user.email }}">{{ user.email }}</a>
           </div>
         </div>
         <div class="item">
           <i class="calendar outline icon"></i>
           <div class="content">
-            &nbsp;{{ user.student_profile.grade }}th Grade
+            &nbsp;&nbsp;{{ user.student_profile.grade }}th Grade
           </div>
         </div>
         <div class="item">
@@ -32,7 +32,7 @@
         <div class="item">
           <i class="phone icon"></i>
           <div class="content">
-            {{ user.student_profile.phone_number }}
+             &nbsp;&nbsp;{{ user.student_profile.phone_number }}
           </div>
         </div>
         <div class="item">
@@ -442,7 +442,7 @@
               user.student_profile.scholarships|sort(attribute='name') %}
               <tr>
                 <td>{{ scholarship.name }}</td>
-                <td>{{ scholarship.award_amount }}</td>
+                <td>{{ "${:,.2f}".format(scholarship.award_amount) }}</td>
                 <td class="collapsing">
                   <div class="ui tiny buttons">
                       <a class="ui icon blue basic button"

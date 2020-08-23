@@ -73,7 +73,7 @@
 
                         <td class="searchable-td">{{ s.name }}</td>
                         <td class="searchable-td">{{ s.description }}</td>
-                        <td class="searchable-td">{{ s.award_amount }}</td>
+                        <td class="searchable-td">{{ "${:,.2f}".format(s.award_amount) }}</td>
                         <td class="searchable-td">{{ s.deadline }} </td>
                         <td class="td-category searchable-td" data-category={{ s.category }}>{{ s.category }} </td>
                     </tr>

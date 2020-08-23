@@ -43,8 +43,8 @@
                     {% for c in colleges | sort(attribute='name') %}
                             <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.name }}</td>
                             <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.description }}</td>
-                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.regular_deadline }}</td>
-                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.early_deadline }} </td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.regular_deadline.strftime('%m-%d-%Y') }}</td>
+                            <td onclick="window.location.href = '{{ url_for('counselor.edit_college_step2', college_id=c.id) }}';">{{ c.early_deadline.strftime('%m-%d-%Y') }} </td>
                             <td><div class="ui basic button" onclick="window.location.href = '{{ url_for('student.view_college_profile', college_id=c.id) }}';">View Profile</div></td>
                         </tr>
                     {% endfor %}

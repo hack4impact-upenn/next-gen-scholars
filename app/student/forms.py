@@ -8,8 +8,9 @@ from wtforms.fields import (PasswordField, StringField, SubmitField,
                             IntegerField, FloatField, SelectField,
                             BooleanField)
 from wtforms.fields.html5 import EmailField, DateField
-from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional
+from wtforms.validators import Email, EqualTo, InputRequired, Length, Optional, NumberRange
 from wtforms.fields.html5 import EmailField
+import re
 
 from .. import db
 from ..models import TestName, College
@@ -23,7 +24,8 @@ class EditCommonAppEssayForm(Form):
         'Status',
         choices=[('Incomplete', 'Incomplete'), ('Waiting', 'Waiting'),
                  ('Reviewed', 'Reviewed'), ('Edited', 'Edited'), ('Done',
-                                                                  'Done')],
+                                                                  'Done')], 
+        #default=('Waiting', 'Waiting'),                                                     
         validators=[InputRequired()])
     submit = SubmitField('Update essay link')
 
@@ -94,7 +96,7 @@ class AddTestScoreForm(Form):
         month_choices.append((calendar.month_name[i], calendar.month_name[i]))
     year_choices = []
     today = datetime.today()
-    for i in range(8):
+    for i in range(11):
         year_choices.append((str(today.year - i), str(today.year - i)))
     test_name = QuerySelectField(
         'Test Name',
@@ -106,7 +108,58 @@ class AddTestScoreForm(Form):
     year = SelectField(
         u'Year', choices=year_choices, validators=[InputRequired()])
     score = IntegerField('Test Score', validators=[InputRequired()])
+
     submit = SubmitField('Add test score')
+
+    # must override validate method in order to cross-check scores across different fields
+    def validate(self):
+        
+        # first run the normal non-overriden validate method
+        if not Form.validate(self):
+            return False
+        
+        # TODO: Read me from a database or something... let admin be able to edit valid test score ranges
+        valid_ranges = \
+            {'ACT' : (0,36) ,
+            'SAT' : (0,1600),
+            'SAT Subject Test - Math Level 2' : (0,800),
+            'AP Physics 1' : (0,5),
+            'AP Chemistry' : (0, 5),
+            'AP Computer Science A' : (0, 5),
+            'SAT Subject Test - Math Level 1' : (0, 800),
+            'AP Physics 2' : (0, 5),
+            'AP English Language & Composition': (0, 5),
+            'SAT Subject Test - Chemistry' : (0, 800),
+            'SAT Subject Test - Physics' : (0, 800)
+            }
+        test_name = self.data.get('test_name').name
+        valid_range = valid_ranges.get(test_name, -1)
+
+        # checking to see if the test name shows up in database; 
+        # this error should not happen under normal circumstances
+        if valid_range == -1:
+            self.test_name.errors.append('Not a valid test.') 
+            return False
+
+        # check to see if range is valid
+        if not (self.data.get('score') >= valid_range[0] and self.data.get('score') <= valid_range[1]):
+            self.score.errors.append("The " + test_name + '\'s score must be between ' + str(valid_range[0]) +' and ' + \
+                    str(valid_range[1])) 
+
+            # TODO: check to see if score is valid score in increments of x (i.e. SAT score must be in increments of 10)
+            return False 
+
+        return True
+
+class EditValidTestScoreRanges(Form):
+    #TODO: implement me
+    test_name = QuerySelectField(
+        'Test Name',
+        validators=[InputRequired()],
+        get_label='name',
+        query_factory=lambda: db.session.query(TestName).order_by('name'))
+    min_num = IntegerField('Minimum Valid Test Score', validators=[InputRequired()])
+    max_num = IntegerField('Maximum Valid Test Score', validators=[InputRequired()])
 
 
 class AddRecommendationLetterForm(Form):
@@ -182,7 +235,9 @@ class EditStudentProfile(Form):
     city = StringField('City', validators=[InputRequired(), Length(1, 100)])
     state = StringField('State', validators=[InputRequired(), Length(1, 100)])
     submit = SubmitField('Update Profile')
-
+    
+    def strip_all(self):
+        raise ValidationError(self.data)
 
 class AddCollegeForm(Form):
     name = QuerySelectField(
@@ -243,7 +298,22 @@ class AddStudentScholarshipForm(Form):
     award_amount = FloatField('Award Amount', validators=[InputRequired()])
     submit = SubmitField('Add Scholarship Award')
 
+    
+    def validate_award_amount(form, field):
+        award_amount = str(field.data)
+
+        # regex makes sure that vals either have no decimal, a decimal and a tenths places, a decimal 
+        # and a hundreths place
+        if re.match('^\d+(\.\d(\d)?)?$', award_amount) is None:
+            raise ValidationError('Monetary amount must be in the format: xx, xx.xx or xx.xx')
+
+
 class EditStudentScholarshipForm(Form):
     name = StringField('Scholarship Name', validators=[InputRequired()])
     award_amount = FloatField('Award Amount', validators=[InputRequired()])
     submit = SubmitField('Update Scholarship Award')
+
+    def validate_award_amount(form, field):
+        award_amount = str(field.data)
+        if re.match('^\d+(\.\d(\d)?)?$', award_amount) is None:
+            raise ValidationError('Monetary amount must be in the format: xx, xx.xx or xx.xx')

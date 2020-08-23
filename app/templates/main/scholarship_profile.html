@@ -7,7 +7,7 @@
                 <div class="ui raised secondary green segment">
                     <h3>{{ scholarship.description }}</h3>
                     <p><strong>Deadline: </strong> {{ scholarship.deadline }}</p>
-                    <p><strong>Award Amount: </strong> ${{ scholarship.award_amount }}</p>
+                    <p><strong>Award Amount: </strong> {{ "${:,.2f}".format(scholarship.award_amount) }}</p>
                     <p><strong>Category: </strong> {{ scholarship.category }}</p>
                     <p><strong>Merit based: </strong>
                         {% if scholarship.merit_based %} Yes {% else %} No {% endif %}
